@@ -8,12 +8,14 @@ interface DepartureBoardProps {
   destination?: string
   remarks?: string
   time?: string
+  headerSlot?: React.ReactNode
 }
 
 export default function DepartureBoard({ 
   flight = "WN2025",
   destination = "DAL", 
-  remarks = "ON TIME"
+  remarks = "ON TIME",
+  headerSlot
 }: DepartureBoardProps) {
   const [currentTime, setCurrentTime] = useState<string | null>(null)
 
@@ -47,7 +49,16 @@ export default function DepartureBoard({
               Departures
             </span>
           </div>
-          <span className="text-airport-white font-mono text-sm">
+          {headerSlot && (
+            <div className="flex items-center">
+              {headerSlot}
+            </div>
+          )}
+        </div>
+        
+        {/* Current Time - Centered */}
+        <div className="text-center mb-4">
+          <span className="text-airport-white font-mono text-lg">
             {currentTime || '--:--'}
           </span>
         </div>

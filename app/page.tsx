@@ -9,12 +9,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header - Departure Board */}
-      <DepartureBoard />
-
-      {/* Theme Toggle - Responsive Position */}
-      <div className="fixed top-16 right-4 sm:top-6 sm:right-6 z-40">
-        <ThemeToggle />
-      </div>
+      <DepartureBoard headerSlot={<ThemeToggle />} />
       
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
