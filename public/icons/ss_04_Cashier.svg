@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="1201.3333"
+   height="1200"
+   viewBox="0 0 1201.3333 1200"
+   sodipodi:docname="ss_04_Cashier.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="1201.3333"
+       height="1200"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 4505.25,2547.25 c -1078.59,0.22 -1952.78,874.41 -1953,1953 0.22,1078.13 874.41,1952.31 1953,1952 1078.13,0.31 1952.31,-873.87 1952,-1952 0.31,-1078.59 -873.87,-1952.78 -1952,-1953 z"
+       style="fill:none;stroke:#000000;stroke-width:507.159;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1200)" />
+    <path
+       id="path2"
+       d="m 3485.25,4157.25 h 475 c 29.75,-137.25 69.25,-303.46 285,-365 v 540 c -296.14,42.44 -722.99,172.75 -723,651 0.01,536.75 591.79,704.25 723,704 v 325 h 446 v -325 c 301.25,-17.25 737.83,-269.75 738,-750 h -470 c -11.75,142.75 -121.75,282.75 -263,293 v -495 c 358.75,-37.18 779.79,-174.62 780,-658 -0.21,-422.96 -422.9,-731.07 -780,-750 v -326 h -451 v 331 c -258.02,37.66 -730.25,287.75 -760,825"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1200)" />
+    <path
+       id="path3"
+       d="m 4248.25,5225.25 v -410 c -318.25,4.75 -324.43,352.92 0,410"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1200)" />
+    <path
+       id="path4"
+       d="m 4701.25,4255.25 c 393.75,-10.25 437.5,-402.75 0,-466"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1200)" />
+    <path
+       id="path5"
+       d="m 4701.25,3789.25 v 466"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1200)" />
+  </g>
+</svg>

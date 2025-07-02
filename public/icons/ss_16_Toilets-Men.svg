@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="260"
+   height="670.66669"
+   viewBox="0 0 260 670.66669"
+   sodipodi:docname="ss_16_Toilets-Men.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="260"
+       height="670.66669"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 976.988,4202.62 c 225.502,0 408.342,182.84 408.342,408.36 0,225.51 -182.84,408.35 -408.342,408.35 -225.527,0 -408.34,-182.84 -408.34,-408.35 0,-225.52 182.813,-408.36 408.34,-408.36"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path2"
+       d="m 540,4112.5 c -289.172,0 -521.7305,-235.84 -521.7305,-530 V 2328.75 C 18.2695,2085 375,2085 375,2328.75 v 1146.42 h 84.449 V 336.102 c 0,-325.9028 475.031,-316.3129 475.031,0 V 2158.29 h 81.82 V 336.102 c 0,-316.3129 477.64,-325.9028 477.64,0 V 3475.17 h 82.47 V 2328.75 c 0,-245.63 354.87,-245.62 354.23,0 V 3575 c 0,271.25 -210.64,536.94 -528.14,536.94 L 540,4112.5"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+  </g>
+</svg>

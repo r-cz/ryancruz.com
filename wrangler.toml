@@ -1,0 +1,12 @@
+name = "ryancruz-com"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[site]
+bucket = "./.opennext"
+
+[[kv_namespaces]]
+binding = "MY_KV"
+
+[vars]
+# Environment variables for your worker

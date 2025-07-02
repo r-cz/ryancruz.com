@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="321.33334"
+   height="668"
+   viewBox="0 0 321.33334 668"
+   sodipodi:docname="ss_17_Toilets-Women.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="321.33334"
+       height="668"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 1206.25,4191.25 c 221.27,0.4 400.44,179.56 400,401 0.44,220.57 -178.73,399.75 -400,400 -220.719,-0.25 -399.91,-179.43 -400,-400 0.09,-221.44 179.281,-400.6 400,-401"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,668)" />
+    <path
+       id="path2"
+       d="m 1147.25,1653.25 v -1386 C 1147.5,15 770.16,15 770.25,267.25 v 1376 h -507 l 542,1880 h -84 l -315,-1061 c -75.449,-231 -392.9492,-136 -320,112 l 350,1152 c 37.051,130.88 203.18,363.75 491,364 h 265 v 0 h 285 c 285.25,-0.25 452.12,-235.08 495,-364 l 350,-1151 c 70.25,-247.75 -244.75,-350.25 -320,-109 l -315,1057 h -91 l 546,-1880 h -507 v -1378 c -0.25,-250.25 -376.02,-249 -376,0 v 1388 h -112"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,668)" />
+  </g>
+</svg>

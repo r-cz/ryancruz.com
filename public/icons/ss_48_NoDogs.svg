@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="1177.3333"
+   height="1177.3333"
+   viewBox="0 0 1177.3333 1177.3333"
+   sodipodi:docname="ss_48_NoDogs.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="1177.3333"
+       height="1177.3333"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 4719.25,3936.25 h -922 v -546 c -0.39,-300.25 -455.68,-300.25 -456,0 v 1193 h -205 c -292.39,0.41 -295.05,405.07 -6,405 h 366 v 0 h 1155 l 701,701 v -357 c 0,0 483.37,-483.6 485,-485 112.75,-117.25 47.75,-260.39 -56,-260 h -609 l -2,-1197 c -0.25,-300.25 -451.26,-300.25 -451,0 v 546"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:9.58;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1177.3333)" />
+    <path
+       id="path2"
+       d="m 5852.25,3000.25 -2832,2833"
+       style="fill:none;stroke:#ffffff;stroke-width:564.45;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1177.3333)" />
+    <path
+       id="path3"
+       d="m 4415.25,2462.25 c -1078.7,0.01 -1953,874.29 -1953,1953 0,1078.2 874.3,1952.49 1953,1952 1078.21,0.49 1952.5,-873.8 1953,-1952 -0.5,-1078.71 -874.79,-1952.99 -1953,-1953 z"
+       style="fill:none;stroke:#000000;stroke-width:490;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1177.3333)" />
+    <path
+       id="path4"
+       d="m 5855.25,2998.25 -2839,2838"
+       style="fill:none;stroke:#000000;stroke-width:517.57;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,1177.3333)" />
+  </g>
+</svg>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="638.66669"
+   height="670.66669"
+   viewBox="0 0 638.66669 670.66669"
+   sodipodi:docname="ss_38_BeautySalon.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="638.66669"
+       height="670.66669"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 2478.25,4437.25 h -720 c -130.12,-0.27 -125.34,-192.92 0,-193 h 720 v -96 h -719 c -130.54,-0.22 -125.75,-192.87 0,-193 h 719 v -96 -5 h -719 c -130.54,-0.01 -125.75,-192.65 0,-193 h 719 v -96 h -719 c -127.82,0.02 -125.75,-192.62 0,-193 h 719 v -96 h -719 c -127.82,0.05 -128.25,-192.59 0,-193 h 719 v -96 h -719 c -127.82,0.08 -128.25,-192.56 0,-193 h 719 v -96 h -719 c -127.82,0.11 -128.25,-192.51 0,-193 h 719 v -96 h -720 c -126.82,0.18 -124.75,-192.48 1,-192 h 719 v -1869 c 0.38,-285.2812 435.67,-280.2812 436,0 v 4375 c -0.33,129.75 -107.82,294.39 -285,294 l -871,1 c -130.24,-0.16 -125.45,-192.82 0,-193 h 720 v -97 h -720 c -130.05,0.41 -125.26,-192.23 0,-192 h 720 v -99"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path2"
+       d="m 1644.25,663.25 c -24.28,-158.391 29.37,-442.031 142,-545 117.68,-107.7383 256.89,29.262 199,141 -57.76,109.922 -131.12,170.172 -69,434 l -272,-30"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path3"
+       d="m 1100.25,5019.25 c -32.48,0.24 -66.98,-12.7 -73,-69 l -235,-2097 v -1272 c -443.32,231.76 -776.168,-128.24 -776,-455 -0.168,-292.211 214.719,-531.828 521,-532 307.16,0.172 516.96,268.551 517,532 v 1278 h 98 v -1278 c 0.48,-304.07 245.85,-528.238 509,-528 330.18,-0.238 540.53,232.422 541,525 -0.47,332.26 -343.32,689.76 -788,458 v 1272 l -241,2097 c -6.28,56.3 -40.79,69.24 -73,69"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path4"
+       d="m 4058.25,4523.25 c 132.96,0.03 240.47,107.53 240,240 0.47,132.74 -107.04,240.25 -240,240 -132.23,0.25 -239.74,-107.26 -240,-240 0.26,-132.47 107.77,-239.97 240,-240"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path5"
+       d="m 4023.25,3000.25 v -832 c -0.05,-150.98 -226.45,-150.98 -226,0 l -1,826 h -304 l 325,1128 h -50 l -189,-636 c -45.07,-139.21 -235.57,-82.21 -192,66 l 210,692 c 22.43,78.32 122.11,218.04 295,218 h 159 v 0 h 171 c 170.95,0.04 271.08,-140.86 297,-218 l 210,-691 c 41.96,-148.46 -147.05,-209.96 -192,-65 l -189,634 h -55 l 328,-1128 h -305 v -827 c 0.45,-149.98 -225.01,-149.23 -225,0 v 833 h -67"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path6"
+       d="m 533.25,862.25 c -143.641,-0.16 -260.469,116.648 -260,261 -0.469,143.88 116.359,260.71 260,261 144.57,-0.29 261.398,-117.12 261,-261 0.398,-144.352 -116.43,-261.16 -261,-261"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+    <path
+       id="path7"
+       d="m 1684.25,862.25 c 143.77,-0.16 260.61,116.648 261,261 -0.39,143.88 -117.23,260.71 -261,261 -144.44,-0.29 -261.27,-117.12 -261,-261 -0.27,-144.352 116.56,-261.16 261,-261"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,670.66667)" />
+  </g>
+</svg>

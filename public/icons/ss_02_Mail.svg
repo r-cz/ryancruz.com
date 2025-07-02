@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="957.33331"
+   height="813.33331"
+   viewBox="0 0 957.33331 813.33331"
+   sodipodi:docname="ss_02_Mail.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="957.33331"
+       height="813.33331"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 5633.25,1546.25 v 3008 h -4087 v -3008 z"
+       style="fill:none;stroke:#000000;stroke-width:306.55;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,813.33333)" />
+    <path
+       id="path2"
+       d="m 1584.25,4516.25 1763,-1787 c 131.09,-131.87 368.9,-130.31 497,-1 l 1762,1773"
+       style="fill:none;stroke:#000000;stroke-width:306.55;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,813.33333)" />
+    <path
+       id="path3"
+       d="m 1645.25,1645.25 1351,1381"
+       style="fill:none;stroke:#000000;stroke-width:306.55;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,813.33333)" />
+    <path
+       id="path4"
+       d="m 5519.25,1661.25 -1314,1346"
+       style="fill:none;stroke:#000000;stroke-width:306.55;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,813.33333)" />
+  </g>
+</svg>

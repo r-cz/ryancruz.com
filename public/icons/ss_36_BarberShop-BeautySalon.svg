@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="389.33334"
+   height="672"
+   viewBox="0 0 389.33334 672"
+   sodipodi:docname="ss_36_BarberShop-BeautySalon.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="389.33334"
+       height="672"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 2474.25,4439.25 h -720 c -130.05,-0.27 -125.27,-192.92 0,-193 h 720 v -96 h -719 c -130.47,-0.23 -125.68,-192.88 0,-193 h 719 v -96 -5 h -719 c -130.47,-0.02 -125.68,-192.66 0,-193 h 719 v -96 h -719 c -127.75,0.01 -125.68,-192.63 0,-193 h 719 v -96 h -719 c -127.75,0.04 -128.18,-192.6 0,-193 h 719 v -96 h -719 c -127.75,0.07 -128.18,-192.57 0,-193 h 719 v -96 h -719 c -127.75,0.1 -128.18,-192.52 0,-193 h 719 v -96 h -719 c -127.75,0.17 -125.68,-192.49 0,-192 h 719 v -1869 c 0.45,-285.2891 435.74,-280.2891 436,0 v 4375 c -0.26,129.75 -107.75,294.39 -285,294 l -871,1 c -130.17,-0.16 -125.38,-192.82 0,-193 h 720 v -97 h -720 c -129.98,0.41 -125.19,-192.23 0,-192 h 720 v -99"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,672)" />
+    <path
+       id="path2"
+       d="m 1640.25,665.25 c -24.21,-158.398 29.44,-442.039 142,-545 117.75,-107.75 256.96,29.25 199,141 -57.69,109.91 -131.05,170.16 -69,434 l -272,-30"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,672)" />
+    <path
+       id="path3"
+       d="m 1096.25,5021.25 c -32.41,0.24 -66.91,-12.7 -73,-69 l -235,-2097 v -1272 C 345,1815 12.1484,1455 12.25,1128.25 c -0.1016,-292.219 214.789,-531.84 522,-532 306.23,0.16 516.03,268.539 516,532 v 1278 h 99 v -1278 c -0.45,-304.078 244.92,-528.25 508,-528 330.25,-0.25 540.6,232.41 541,525 -0.4,332.25 -343.25,689.75 -788,458 v 1272 l -241,2097 c -6.21,56.3 -40.72,69.24 -73,69"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,672)" />
+    <path
+       id="path4"
+       d="m 530.25,864.25 c -144.57,-0.172 -261.398,116.641 -261,261 -0.398,143.87 116.43,260.7 261,261 143.641,-0.3 260.469,-117.13 260,-261 0.469,-144.359 -116.359,-261.172 -260,-261"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,672)" />
+    <path
+       id="path5"
+       d="m 1680.25,864.25 c 143.84,-0.172 260.68,116.641 261,261 -0.32,143.87 -117.16,260.7 -261,261 -144.37,-0.3 -261.2,-117.13 -261,-261 -0.2,-144.359 116.63,-261.172 261,-261"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,672)" />
+  </g>
+</svg>

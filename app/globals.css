@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  /* Airport signage colors */
+  --airport-yellow: #FFB612;
+  --airport-black: #000000;
+  --airport-white: #FFFFFF;
+  --airport-gray: #4A4A4A;
+  --airport-light-gray: #E5E5E5;
+  --airport-blue: #003F87;
+  --airport-green: #009639;
+  --airport-red: #D50032;
+  
+  /* Default theme */
+  --background: var(--airport-white);
+  --foreground: var(--airport-black);
+  --accent: var(--airport-yellow);
+}
+
+@theme inline {
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-airport-yellow: var(--airport-yellow);
+  --color-airport-black: var(--airport-black);
+  --color-airport-white: var(--airport-white);
+  --color-airport-gray: var(--airport-gray);
+  --color-airport-light-gray: var(--airport-light-gray);
+  --color-airport-blue: var(--airport-blue);
+  --color-airport-green: var(--airport-green);
+  --color-airport-red: var(--airport-red);
+  
+  /* Typography - Frutiger-style fonts */
+  --font-sans: var(--font-inter), var(--font-dm-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'SF Mono', monospace;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Border radius */
+  --rounded-sm: 0.125rem;
+  --rounded-md: 0.25rem;
+  --rounded-lg: 0.5rem;
+  --rounded-xl: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--airport-black);
+    --foreground: var(--airport-white);
+    --accent: var(--airport-yellow);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Airport-style utilities */
+.airport-sign {
+  background: var(--airport-black);
+  color: var(--airport-yellow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.departure-board {
+  background: var(--airport-black);
+  color: var(--airport-white);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}

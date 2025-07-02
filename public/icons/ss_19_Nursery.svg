@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="438.66666"
+   height="588"
+   viewBox="0 0 438.66666 588"
+   sodipodi:docname="ss_19_Nursery.eps"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       inkscape:label="1"
+       id="page1"
+       width="438.66666"
+       height="588"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="g1"
+     inkscape:groupmode="layer"
+     inkscape:label="1">
+    <path
+       id="path1"
+       d="m 1648.25,3198.25 c 329.75,0.08 597.38,267.72 597,598 0.38,330 -267.25,597.64 -597,598 -330.52,-0.36 -598.13,-268 -598,-598 -0.13,-330.28 267.48,-597.92 598,-598"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,588)" />
+    <path
+       id="path2"
+       d="m 1647.25,1948.25 h -632 v 457 l -483,-487 c -218.82,-218.03 -514.7383,61.91 -296,281 l 800,801 c 65,64.75 136.03,105.75 249,106 h 362 v 0 h 355 c 112.97,-0.25 189,-40 256,-106 l 808,-809 c 208.27,-208.43 -95.64,-491.03 -295,-281 l -496,497 v -459 h -628 v 0"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,588)" />
+    <path
+       id="path3"
+       d="m 2272.25,1712.25 -475,-475 349,-348 -357,-357 c -211.2,-211.211 79.68,-512.7891 298,-295 l 565,588 c 121,123.488 154.53,352.05 25,482 -0.91,0.49 -405,405 -405,405"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,588)" />
+    <path
+       id="path4"
+       d="m 1015.25,1712.25 475,-475 -349,-348 357,-357 c 211.2,-211.211 -79.68,-512.7891 -298,-295 l -565,588 c -121,123.488 -154.531,352.05 -25,482 0.91,0.49 405,405 405,405"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,588)" />
+  </g>
+</svg>
