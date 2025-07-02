@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Airport signage colors */
+  /* Airport signage colors - fixed */
   --airport-yellow: #FFB612;
   --airport-black: #000000;
   --airport-white: #FFFFFF;
@@ -11,22 +11,69 @@
   --airport-green: #009639;
   --airport-red: #D50032;
   
-  /* Default theme */
+  /* Dark theme variations */
+  --airport-dark-gray: #1A1A1A;
+  --airport-darker-gray: #0F0F0F;
+  --airport-medium-gray: #6B6B6B;
+}
+
+/* Light theme (default) */
+:root,
+[data-theme="light"] {
   --background: var(--airport-white);
   --foreground: var(--airport-black);
   --accent: var(--airport-yellow);
+  --muted: var(--airport-light-gray);
+  --muted-foreground: var(--airport-gray);
+  --border: var(--airport-light-gray);
+  --card: var(--airport-white);
+  --card-foreground: var(--airport-black);
+  --primary: var(--airport-black);
+  --primary-foreground: var(--airport-white);
+  --secondary: var(--airport-light-gray);
+  --secondary-foreground: var(--airport-black);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --background: var(--airport-darker-gray);
+  --foreground: var(--airport-white);
+  --accent: var(--airport-yellow);
+  --muted: var(--airport-dark-gray);
+  --muted-foreground: var(--airport-medium-gray);
+  --border: var(--airport-dark-gray);
+  --card: var(--airport-dark-gray);
+  --card-foreground: var(--airport-white);
+  --primary: var(--airport-white);
+  --primary-foreground: var(--airport-black);
+  --secondary: var(--airport-dark-gray);
+  --secondary-foreground: var(--airport-white);
 }
 
 @theme inline {
-  /* Colors */
+  /* Semantic colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  /* Airport signage colors */
   --color-airport-yellow: var(--airport-yellow);
   --color-airport-black: var(--airport-black);
   --color-airport-white: var(--airport-white);
   --color-airport-gray: var(--airport-gray);
   --color-airport-light-gray: var(--airport-light-gray);
+  --color-airport-dark-gray: var(--airport-dark-gray);
+  --color-airport-darker-gray: var(--airport-darker-gray);
+  --color-airport-medium-gray: var(--airport-medium-gray);
   --color-airport-blue: var(--airport-blue);
   --color-airport-green: var(--airport-green);
   --color-airport-red: var(--airport-red);
@@ -51,14 +98,6 @@
   --rounded-xl: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--airport-black);
-    --foreground: var(--airport-white);
-    --accent: var(--airport-yellow);
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -67,6 +106,7 @@ body {
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Airport-style utilities */
@@ -83,4 +123,30 @@ body {
   color: var(--airport-white);
   font-family: var(--font-mono);
   font-weight: 500;
+}
+
+/* Theme-aware utilities */
+.bg-card {
+  background-color: var(--card);
+}
+
+.text-card-foreground {
+  color: var(--card-foreground);
+}
+
+.bg-muted {
+  background-color: var(--muted);
+}
+
+.text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+.border-border {
+  border-color: var(--border);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }

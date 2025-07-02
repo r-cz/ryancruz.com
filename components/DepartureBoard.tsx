@@ -4,21 +4,27 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface DepartureBoardProps {
+  flight?: string
   destination?: string
-  status?: string
-  gate?: string
+  remarks?: string
   time?: string
 }
 
 export default function DepartureBoard({ 
-  destination = "RYAN CRUZ", 
-  status = "IDENTITY ENGINEER", 
-  gate = "DFW",
-  time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+  flight = "WN2025",
+  destination = "DAL", 
+  remarks = "ON TIME"
 }: DepartureBoardProps) {
-  const [currentTime, setCurrentTime] = useState(time)
+  const [currentTime, setCurrentTime] = useState<string | null>(null)
 
   useEffect(() => {
+    // Set initial time on client
+    setCurrentTime(new Date().toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: false 
+    }))
+
     const interval = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString('en-US', { 
         hour: '2-digit', 
@@ -42,17 +48,35 @@ export default function DepartureBoard({
             </span>
           </div>
           <span className="text-airport-white font-mono text-sm">
-            {currentTime}
+            {currentTime || '--:--'}
           </span>
         </div>
 
         {/* Main Display */}
         <div className="bg-airport-black border-2 border-airport-yellow p-6 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {/* Flight/Name */}
+            {/* Flight */}
             <div>
               <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">
                 Flight
+              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={flight}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  className="text-airport-white text-2xl md:text-3xl font-bold tracking-tight"
+                >
+                  {flight}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Destination */}
+            <div>
+              <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">
+                Destination
               </div>
               <AnimatePresence mode="wait">
                 <motion.div
@@ -60,45 +84,27 @@ export default function DepartureBoard({
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
-                  className="text-airport-white text-2xl md:text-3xl font-bold tracking-tight"
+                  className="text-airport-white text-xl md:text-2xl font-semibold"
                 >
                   {destination}
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Status/Title */}
+            {/* Remarks */}
             <div>
               <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">
-                Status
+                Remarks
               </div>
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={status}
+                  key={remarks}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
                   className="text-airport-green text-xl md:text-2xl font-semibold"
                 >
-                  {status}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Gate/Location */}
-            <div>
-              <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">
-                Gate
-              </div>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={gate}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  className="text-airport-white text-xl md:text-2xl font-semibold"
-                >
-                  {gate}
+                  {remarks}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -110,14 +116,11 @@ export default function DepartureBoard({
               <span className="text-airport-gray text-xs font-mono uppercase">
                 Southwest Airlines
               </span>
-              <span className="text-airport-gray text-xs font-mono">
-                6 Years Experience
-              </span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-airport-green rounded-full" />
               <span className="text-airport-green text-xs font-mono uppercase">
-                On Time
+                {remarks}
               </span>
             </div>
           </div>

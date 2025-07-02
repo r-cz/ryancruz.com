@@ -2,32 +2,35 @@ import DepartureBoard from '@/components/DepartureBoard'
 import BoardingPass from '@/components/BoardingPass'
 import LuggageTag from '@/components/LuggageTag'
 import AirportIcon from '@/components/AirportIcon'
+import Passport from '@/components/Passport'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header - Departure Board */}
       <DepartureBoard />
+
+      {/* Theme Toggle - Responsive Position */}
+      <div className="fixed top-16 right-4 sm:top-6 sm:right-6 z-40">
+        <ThemeToggle />
+      </div>
       
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <section className="mb-16 text-center">
-          <div className="inline-block mb-6">
-            <div className="airport-sign px-6 py-3 text-sm">
-              <span className="flex items-center space-x-2">
-                <AirportIcon type="plane" className="w-4 h-4 brightness-0 invert" />
-                <span>Now Boarding</span>
-              </span>
+        {/* Hero Section - Passport */}
+        <section className="mb-16">
+          <div className="text-center mb-8">
+            <div className="inline-block mb-6">
+              <div className="airport-sign px-6 py-3 text-sm">
+                <span className="flex items-center space-x-2">
+                  <AirportIcon type="plane" className="w-4 h-4 brightness-0 invert" />
+                  <span>Identity Verification</span>
+                </span>
+              </div>
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Welcome Aboard
-          </h1>
-          <p className="text-xl text-airport-gray max-w-4xl mx-auto leading-relaxed">
-            Cybersecurity Engineer with 6 years of experience. Currently building a CIAM solution 
-            for Southwest Airlines. Working hybrid from Dallas, Texas.
-          </p>
+          <Passport />
         </section>
 
         {/* Work Experience Section */}

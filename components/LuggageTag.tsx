@@ -18,8 +18,9 @@ export default function LuggageTag({
   details = [],
   logo
 }: LuggageTagProps) {
-  // Generate a random tag number
-  const tagNumber = `EDU${Math.floor(Math.random() * 9000) + 1000}`
+  // Generate a deterministic tag number based on institution
+  const hash = institution.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  const tagNumber = `EDU${(hash % 9000) + 1000}`
 
   return (
     <motion.div
@@ -52,7 +53,7 @@ export default function LuggageTag({
                       key={i}
                       className="bg-airport-yellow"
                       style={{
-                        width: Math.random() > 0.5 ? '1px' : '2px',
+                        width: (institution.charCodeAt(i % institution.length) % 2) ? '1px' : '2px',
                         height: '24px'
                       }}
                     />

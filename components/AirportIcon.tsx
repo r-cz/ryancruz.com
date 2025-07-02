@@ -3,9 +3,10 @@ import Image from 'next/image'
 interface AirportIconProps {
   type: 'plane' | 'departure' | 'luggage' | 'information' | 'telephone' | 'mail' | 'right-arrow' | 'left-arrow' | 'up-arrow' | 'down-arrow'
   className?: string
+  variant?: 'auto' | 'light' | 'dark' | 'yellow'
 }
 
-export default function AirportIcon({ type, className = 'w-6 h-6' }: AirportIconProps) {
+export default function AirportIcon({ type, className = 'w-6 h-6', variant = 'auto' }: AirportIconProps) {
   const iconMap = {
     plane: '/icons/ss_24_Air-Transportation.svg',
     departure: '/icons/ss_42_DepartingFlights.svg',
@@ -23,13 +24,31 @@ export default function AirportIcon({ type, className = 'w-6 h-6' }: AirportIcon
   
   if (!iconSrc) return null
 
+  // Create theme-aware className
+  const getThemeClasses = () => {
+    switch (variant) {
+      case 'light':
+        return 'brightness-0'
+      case 'dark':
+        return 'brightness-0 invert'
+      case 'yellow':
+        return 'brightness-0 invert saturate-200'
+      case 'auto':
+      default:
+        return 'brightness-0 dark:invert'
+    }
+  }
+
+  const themeClasses = getThemeClasses()
+  const combinedClassName = `${className} ${themeClasses}`.trim()
+
   return (
     <Image
       src={iconSrc}
       alt={`${type} icon`}
       width={24}
       height={24}
-      className={className}
+      className={combinedClassName}
     />
   )
 }

@@ -29,10 +29,10 @@ export default function BoardingPass({
       className="relative"
     >
       {/* Main boarding pass */}
-      <div className="bg-white border-2 border-airport-black rounded-lg overflow-hidden shadow-lg">
+      <div className="bg-card border-2 border-primary rounded-lg overflow-hidden shadow-lg">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {/* Left section - Company info */}
-          <div className="md:col-span-2 p-6 md:p-8 border-b-2 md:border-b-0 md:border-r-2 border-dashed border-airport-gray">
+          <div className="md:col-span-2 p-6 md:p-8 border-b-2 md:border-b-0 md:border-r-2 border-dashed border-muted-foreground">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-4">
                 {logo && (
@@ -45,10 +45,10 @@ export default function BoardingPass({
                   />
                 )}
                 <div>
-                  <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-1">
+                  <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                     Carrier
                   </div>
-                  <h3 className="text-2xl font-bold">{company}</h3>
+                  <h3 className="text-2xl font-bold text-card-foreground">{company}</h3>
                 </div>
               </div>
               {current && (
@@ -59,28 +59,28 @@ export default function BoardingPass({
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-1">
+              <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                 Position
               </div>
-              <p className="text-lg font-semibold">{position}</p>
+              <p className="text-lg font-semibold text-card-foreground">{position}</p>
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-1">
+              <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                 Flight Duration
               </div>
-              <p className="font-mono">{duration}</p>
+              <p className="font-mono text-card-foreground">{duration}</p>
             </div>
 
             <div>
-              <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-2">
+              <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2">
                 In-Flight Services
               </div>
               <ul className="space-y-1">
                 {description.map((item, index) => (
                   <li key={index} className="flex items-start">
                     <span className="text-airport-blue mr-2">•</span>
-                    <span className="text-sm">{item}</span>
+                    <span className="text-sm text-card-foreground">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -88,36 +88,36 @@ export default function BoardingPass({
           </div>
 
           {/* Right section - Boarding info */}
-          <div className="p-6 md:p-8 bg-airport-light-gray">
+          <div className="p-6 md:p-8 bg-muted">
             <div className="space-y-4">
               <div>
-                <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-1">
+                <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                   Gate
                 </div>
-                <p className="text-3xl font-bold font-mono">
-                  {company.substring(0, 2).toUpperCase()}{Math.floor(Math.random() * 99) + 1}
+                <p className="text-3xl font-bold font-mono text-foreground">
+                  {company.substring(0, 2).toUpperCase()}{company === 'Southwest Airlines' ? '54' : company === 'Apple' ? '63' : '42'}
                 </p>
               </div>
 
               <div>
-                <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-1">
+                <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                   Seat
                 </div>
-                <p className="text-2xl font-bold font-mono">
-                  {Math.floor(Math.random() * 30) + 1}A
+                <p className="text-2xl font-bold font-mono text-foreground">
+                  {company === 'Southwest Airlines' ? '3A' : company === 'Apple' ? '15A' : '12A'}
                 </p>
               </div>
 
               <div>
-                <div className="text-xs font-mono text-airport-gray uppercase tracking-wider mb-1">
+                <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                   Group
                 </div>
-                <p className="text-lg font-bold">A</p>
+                <p className="text-lg font-bold text-foreground">A</p>
               </div>
             </div>
 
             {/* Barcode */}
-            <div className="mt-6 pt-4 border-t border-airport-gray">
+            <div className="mt-6 pt-4 border-t border-muted-foreground">
               <div className="bg-airport-black h-12 flex items-center justify-center">
                 <div className="flex space-x-1">
                   {[...Array(20)].map((_, i) => (
@@ -125,14 +125,14 @@ export default function BoardingPass({
                       key={i}
                       className="bg-white"
                       style={{
-                        width: Math.random() > 0.5 ? '2px' : '4px',
+                        width: (company.charCodeAt(i % company.length) % 2) ? '2px' : '4px',
                         height: '32px'
                       }}
                     />
                   ))}
                 </div>
               </div>
-              <p className="text-xs font-mono text-center mt-2 text-airport-gray">
+              <p className="text-xs font-mono text-center mt-2 text-muted-foreground">
                 {company.toUpperCase().replace(/\s/g, '')}{position.substring(0, 3).toUpperCase()}
               </p>
             </div>
@@ -141,7 +141,7 @@ export default function BoardingPass({
       </div>
 
       {/* Perforation effect */}
-      <div className="absolute inset-y-0 right-1/3 w-px border-l-2 border-dashed border-airport-gray opacity-50 hidden md:block" />
+      <div className="absolute inset-y-0 right-1/3 w-px border-l-2 border-dashed border-muted-foreground opacity-50 hidden md:block" />
     </motion.div>
   )
 }
