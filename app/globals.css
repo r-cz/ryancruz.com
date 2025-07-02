@@ -125,6 +125,7 @@ body {
   font-weight: 500;
 }
 
+
 /* Theme-aware utilities */
 .bg-card {
   background-color: var(--card);
