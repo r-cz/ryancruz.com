@@ -9,9 +9,8 @@ compatibility_flags = [
 [assets]
 directory = ".open-next/assets"
 
-[[routes]]
-pattern = "ryancruz.com/*"
-custom_domain = true
+# Custom domain will be configured via Cloudflare Dashboard
+# No routes section needed for custom domains
 
 [vars]
 # Environment variables for your worker
