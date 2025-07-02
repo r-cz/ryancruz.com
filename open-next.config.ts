@@ -1,7 +1,5 @@
-import { OpenNextConfig } from '@opennextjs/cloudflare';
+import { defineCloudflareConfig } from '@opennextjs/cloudflare'
 
-const config: OpenNextConfig = {
-  default: {}
-};
-
-export default config;
+export default defineCloudflareConfig({
+  // Use default caching strategy
+})

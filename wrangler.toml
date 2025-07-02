@@ -1,12 +1,17 @@
 name = "ryancruz-com"
-compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
+main = ".open-next/worker.js"
+compatibility_date = "2024-12-30"
+compatibility_flags = [
+  "nodejs_compat",
+  "global_fetch_strictly_public"
+]
 
-[site]
-bucket = "./.opennext"
+[assets]
+directory = ".open-next/assets"
 
-[[kv_namespaces]]
-binding = "MY_KV"
+[[routes]]
+pattern = "ryancruz.com/*"
+custom_domain = true
 
 [vars]
 # Environment variables for your worker

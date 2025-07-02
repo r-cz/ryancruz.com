@@ -5,9 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:worker": "bunx @opennextjs/cloudflare",
-    "preview": "bun run build && bun run build:worker && wrangler pages dev",
-    "deploy": "bun run build && bun run build:worker && wrangler pages deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "start": "next start",
     "lint": "next lint"
   },

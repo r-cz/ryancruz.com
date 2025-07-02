@@ -2,7 +2,6 @@ import DepartureBoard from '@/components/DepartureBoard'
 import BoardingPass from '@/components/BoardingPass'
 import LuggageTag from '@/components/LuggageTag'
 import AirportIcon from '@/components/AirportIcon'
-import AppleLogo from '@/components/AppleLogo'
 
 export default function Home() {
   return (
