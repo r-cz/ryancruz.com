@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ryancruz.com
 
-## Getting Started
+Ryan Cruz's personal website - An aviation-themed portfolio site showcasing professional experience and technical expertise.
 
-First, run the development server:
+## 🛫 Overview
+
+A modern, aviation-inspired personal website built with Next.js 15, featuring airport-style design elements including boarding passes for work experience, luggage tags for education, and authentic DOT transportation symbols throughout.
+
+## ✈️ Features
+
+- **Aviation-themed design system** with airport signage aesthetics
+- **Boarding pass work experience cards** with company logos
+- **Luggage tag education credentials** 
+- **Departure board animations** with flip-card effects
+- **Authentic DOT transportation symbols** for wayfinding
+- **Responsive design** optimized for all devices
+- **Dark/light mode support** for Apple logo
+
+## 🛠 Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Animations**: Framer Motion
+- **Package Manager**: Bun
+- **Deployment**: Cloudflare Workers via OpenNext adapter
+
+## 🚀 Getting Started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Install dependencies
+bun install
+
+# Start development server
+bun run dev
+
+# Build for production
+bun run build
+
+# Build for Cloudflare Workers
+bun run build:worker
+
+# Deploy to Cloudflare
+bun run deploy
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site locally.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Design System
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The site uses an aviation/airport theme with:
+- Frutiger-style typography (with Inter/DM Sans fallbacks)
+- Airport signage color palette (black, yellow #FFB612, white)
+- Departure board flip animations
+- Boarding pass and luggage tag components
+- Airport wayfinding iconography from DOT transportation symbols
 
-## Learn More
+## 📁 Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+├── app/                 # Next.js App Router pages
+├── components/          # React components (aviation-themed)
+├── public/
+│   ├── icons/          # DOT transportation symbols
+│   └── images/         # Company logos and assets
+├── wrangler.toml       # Cloudflare Workers configuration
+└── open-next.config.ts # OpenNext adapter configuration
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🌐 Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The site is configured for deployment to Cloudflare Workers using the OpenNext adapter. This provides:
+- Global edge distribution
+- Fast cold starts
+- Cost-effective hosting
+- Custom domain support
 
-## Deploy on Vercel
+## 📄 License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+© 2025 Ryan Cruz. All rights reserved.
