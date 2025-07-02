@@ -96,52 +96,44 @@ export default function Home() {
 
         {/* Contact Section */}
         <section className="mb-16">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold flex items-center space-x-3">
-              <AirportIcon type="telephone" className="w-8 h-8" />
-              <span>Ground Control</span>
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-bold flex items-center justify-center space-x-3">
+              <span className="w-8 h-8 rounded-full border-2 border-current flex items-center justify-center text-lg font-bold">?</span>
+              <span>Information</span>
             </h2>
-            <p className="text-airport-gray mt-2">Get in touch</p>
           </div>
 
-          <div className="bg-airport-black text-airport-white p-8 rounded-lg">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex items-start space-x-3">
-                <AirportIcon type="right-arrow" className="w-6 h-6 mt-1 brightness-0 invert" />
+          {/* Contact Cards - Departure Board Style */}
+          <div className="flex flex-wrap gap-6 justify-center">
+            <a 
+              href="mailto:mail@ryancruz.com" 
+              className="bg-airport-black text-airport-white p-6 md:p-8 border-2 border-airport-yellow hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center space-x-4">
+                <AirportIcon type="mail" className="w-8 h-8 brightness-0 invert" />
                 <div>
-                  <p className="text-airport-yellow text-xs font-mono uppercase mb-2">Location</p>
-                  <p className="text-lg">Dallas, Texas</p>
+                  <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">Contact</div>
+                  <div className="text-xl font-bold">Email</div>
+                  <div className="font-mono text-sm mt-1">mail@ryancruz.com</div>
                 </div>
               </div>
-              <div className="flex items-start space-x-3">
-                <AirportIcon type="plane" className="w-6 h-6 mt-1 brightness-0 invert" />
-                <div>
-                  <p className="text-airport-yellow text-xs font-mono uppercase mb-2">Current Gate</p>
-                  <p className="text-lg">Southwest Airlines</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <AirportIcon type="up-arrow" className="w-6 h-6 mt-1 brightness-0 invert" />
-                <div>
-                  <p className="text-airport-yellow text-xs font-mono uppercase mb-2">Status</p>
-                  <p className="text-lg text-airport-green">Available for boarding</p>
-                </div>
-              </div>
-            </div>
+            </a>
             
-            {/* Contact methods */}
-            <div className="mt-8 pt-6 border-t border-airport-gray">
-              <div className="flex flex-wrap gap-6 justify-center">
-                <a href="mailto:ryan@ryancruz.com" className="flex items-center space-x-2 hover:text-airport-yellow transition-colors">
-                  <AirportIcon type="mail" className="w-5 h-5 brightness-0 invert" />
-                  <span className="font-mono text-sm">Email</span>
-                </a>
-                <a href="tel:+1234567890" className="flex items-center space-x-2 hover:text-airport-yellow transition-colors">
-                  <AirportIcon type="telephone" className="w-5 h-5 brightness-0 invert" />
-                  <span className="font-mono text-sm">Phone</span>
-                </a>
+            <a 
+              href="https://linkedin.com/in/cruzryan" 
+              className="bg-airport-black text-airport-white p-6 md:p-8 border-2 border-airport-yellow hover:shadow-lg transition-shadow"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="flex items-center space-x-4">
+                <AirportIcon type="up-right-arrow" className="w-8 h-8 brightness-0 invert" />
+                <div>
+                  <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">Connect</div>
+                  <div className="text-xl font-bold">LinkedIn</div>
+                  <div className="font-mono text-sm mt-1">linkedin.com/in/cruzryan</div>
+                </div>
               </div>
-            </div>
+            </a>
           </div>
         </section>
       </main>
