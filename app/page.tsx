@@ -127,15 +127,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-airport-black text-airport-white py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-mono text-sm">
-            © 2025 Ryan Cruz. All flights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }
