@@ -1,7 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
-
 interface PassportProps {
   name?: string
   nationality?: string
@@ -20,10 +18,7 @@ export default function Passport({
   issuingAuthority = "SOUTHWEST AIRLINES"
 }: PassportProps) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+    <div 
       className="w-full max-w-4xl mx-auto rounded-lg shadow-2xl overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, #2b4c8c 0%, #1e3a6f 100%)',
@@ -161,6 +156,6 @@ export default function Passport({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

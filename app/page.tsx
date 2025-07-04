@@ -2,7 +2,7 @@ import DepartureBoard from '@/components/DepartureBoard'
 import BoardingPass from '@/components/BoardingPass'
 import LuggageTag from '@/components/LuggageTag'
 import AirportIcon from '@/components/AirportIcon'
-import Passport from '@/components/Passport'
+import PassportFlip from '@/components/PassportFlip'
 import ThemeToggle from '@/components/ThemeToggle'
 
 export default function Home() {
@@ -11,22 +11,12 @@ export default function Home() {
       {/* Header - Departure Board */}
       <DepartureBoard headerSlot={<ThemeToggle />} />
       
+      
+      {/* Passport Flip Animation */}
+      <PassportFlip />
+      
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section - Passport */}
-        <section className="mb-16">
-          <div className="text-center mb-8">
-            <div className="inline-block mb-6">
-              <div className="airport-sign px-6 py-3 text-sm">
-                <span className="flex items-center space-x-2">
-                  <AirportIcon type="plane" className="w-4 h-4 brightness-0 invert" />
-                  <span>Identity Verification</span>
-                </span>
-              </div>
-            </div>
-          </div>
-          <Passport />
-        </section>
 
         {/* Work Experience Section */}
         <section className="mb-16">

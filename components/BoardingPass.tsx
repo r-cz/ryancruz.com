@@ -77,14 +77,14 @@ export default function BoardingPass({
 
             <div className="mb-4">
               <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
-                Flight Duration
+                Duration
               </div>
               <p className="font-mono text-card-foreground">{duration}</p>
             </div>
 
             <div>
               <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2">
-                In-Flight Services
+                Remarks
               </div>
               <ul className="space-y-1">
                 {description.map((item, index) => (
