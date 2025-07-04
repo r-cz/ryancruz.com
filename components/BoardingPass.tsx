@@ -21,6 +21,16 @@ export default function BoardingPass({
   current = false,
   logo
 }: BoardingPassProps) {
+  // Determine which font to use based on company
+  const isApple = company === 'Apple'
+  const isSouthwest = company === 'Southwest Airlines'
+  
+  const companyFontClass = isApple 
+    ? 'font-[SF_Pro_Display]' 
+    : isSouthwest 
+    ? 'font-[Southwest_Sans]' 
+    : ''
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -48,7 +58,7 @@ export default function BoardingPass({
                   <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">
                     Carrier
                   </div>
-                  <h3 className="text-2xl font-bold text-card-foreground">{company}</h3>
+                  <h3 className={`text-2xl font-bold text-card-foreground ${companyFontClass}`}>{company}</h3>
                 </div>
               </div>
               {current && (
