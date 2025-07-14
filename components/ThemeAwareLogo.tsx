@@ -26,7 +26,7 @@ export default function ThemeAwareLogo({
 
   if (!mounted) {
     // Return a placeholder during SSR to prevent hydration mismatch
-    return <div className={`w-${width/4} h-${height/4}`} />
+    return <div style={{ width: width/4, height: height/4 }} />
   }
 
   const getLogoSrc = () => {

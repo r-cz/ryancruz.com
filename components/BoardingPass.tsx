@@ -10,7 +10,6 @@ interface BoardingPassProps {
   duration: string
   description: string[]
   current?: boolean
-  logo?: string
 }
 
 export default function BoardingPass({
@@ -18,8 +17,7 @@ export default function BoardingPass({
   position,
   duration,
   description,
-  current = false,
-  logo
+  current = false
 }: BoardingPassProps) {
   const isApple = company === 'Apple'
   const isSouthwest = company === 'Southwest Airlines'

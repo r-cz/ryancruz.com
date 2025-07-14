@@ -8,15 +8,13 @@ interface LuggageTagProps {
   degree: string
   duration: string
   details?: string[]
-  logo?: string
 }
 
 export default function LuggageTag({
   institution,
   degree,
   duration,
-  details = [],
-  logo
+  details = []
 }: LuggageTagProps) {
   const hash = institution.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
   const tagNumber = `${(hash % 9000) + 1000}`

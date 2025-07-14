@@ -46,6 +46,8 @@ export default function Header() {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
           >
             <div className="w-6 h-6 flex flex-col justify-center space-y-1">
               <div className="w-full h-0.5 bg-current"></div>
