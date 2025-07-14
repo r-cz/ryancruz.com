@@ -40,7 +40,6 @@ export default function ThemeToggle() {
           ? 'bg-airport-yellow' 
           : 'bg-airport-black'
         }
-        hover:scale-105 active:scale-95 transform transition-transform
         focus:outline-none focus:ring-2 focus:ring-airport-yellow focus:ring-opacity-50
       `}
       aria-label={`Switch to ${isCurrentlyDark ? 'light' : 'dark'} mode`}
@@ -98,7 +97,7 @@ export default function ThemeToggle() {
       </motion.div>
       
       {/* Status indicator */}
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2">
         <span className="text-xs font-mono text-airport-gray dark:text-airport-light-gray">
           {theme === 'system' ? 'AUTO' : theme.toUpperCase()}
         </span>

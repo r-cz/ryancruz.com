@@ -1,19 +1,18 @@
-import DepartureBoard from '@/components/DepartureBoard'
+import Header from '@/components/Header'
 import BoardingPass from '@/components/BoardingPass'
 import LuggageTag from '@/components/LuggageTag'
 import AirportIcon from '@/components/AirportIcon'
-import PassportFlip from '@/components/PassportFlip'
-import ThemeToggle from '@/components/ThemeToggle'
+import HeroSection from '@/components/HeroSection'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - Departure Board */}
-      <DepartureBoard headerSlot={<ThemeToggle />} />
+      {/* Header */}
+      <Header />
       
       
-      {/* Passport Flip Animation */}
-      <PassportFlip />
+      {/* Hero Section */}
+      <HeroSection />
       
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -22,8 +21,7 @@ export default function Home() {
         <section className="mb-16">
           <div className="mb-8">
             <h2 className="text-3xl font-bold flex items-center space-x-3">
-              <AirportIcon type="departure" className="w-8 h-8" />
-              <span>Flight History</span>
+              <span>History</span>
               <AirportIcon type="right-arrow" className="w-6 h-6" />
             </h2>
             <p className="text-airport-gray mt-2">Professional journey & experience</p>
@@ -36,7 +34,6 @@ export default function Home() {
               position="Senior Cybersecurity Engineer"
               duration="Aug 2018 - Present"
               current={true}
-              logo="/images/LUV.svg"
               description={[
                 "Building a modern Identity solution for 100M+ Southwest.com customers",
                 "Previously migrated a legacy login solution for the Enterprise to a new Identity Provider",
@@ -48,7 +45,6 @@ export default function Home() {
               company="Apple"
               position="Mac+ Technical Advisor"
               duration="Jul 2016 - May 2018"
-              logo="/images/apple-light.svg"
               description={[
                 "Provided technical support for all mobile and desktop Apple devices",
                 "Specialized in Apple Account and iCloud services troubleshooting",
@@ -62,19 +58,17 @@ export default function Home() {
         <section className="mb-16">
           <div className="mb-8">
             <h2 className="text-3xl font-bold flex items-center space-x-3">
-              <AirportIcon type="luggage" className="w-8 h-8" />
-              <span>Baggage Claim</span>
+              <span>Education</span>
             </h2>
             <p className="text-airport-gray mt-2">Education & certifications collected</p>
           </div>
 
           {/* Education Cards */}
-          <div className="flex flex-wrap gap-8 justify-center md:justify-start">
+          <div className="flex flex-wrap gap-8 justify-center">
             <LuggageTag
               institution="University of Georgia"
               degree="Bachelor of Computer Systems Engineering"
               duration="2014 - 2018"
-              logo="/images/uni.svg"
               details={[
                 "Zell Miller Scholarship",
                 "Presidential Scholar",
@@ -84,48 +78,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Contact Section */}
-        <section className="mb-16">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold flex items-center justify-center space-x-3">
-              <span className="w-8 h-8 rounded-full border-2 border-current flex items-center justify-center text-lg font-bold">?</span>
-              <span>Information</span>
-            </h2>
-          </div>
-
-          {/* Contact Cards - Departure Board Style */}
-          <div className="flex flex-wrap gap-6 justify-center">
-            <a 
-              href="mailto:mail@ryancruz.com" 
-              className="bg-airport-black text-airport-white p-6 md:p-8 border-2 border-airport-yellow hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center space-x-4">
-                <AirportIcon type="mail" className="w-8 h-8 brightness-0 invert" />
-                <div>
-                  <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">Contact</div>
-                  <div className="text-xl font-bold">Email</div>
-                  <div className="font-mono text-sm mt-1">mail@ryancruz.com</div>
-                </div>
-              </div>
-            </a>
-            
-            <a 
-              href="https://linkedin.com/in/cruzryan" 
-              className="bg-airport-black text-airport-white p-6 md:p-8 border-2 border-airport-yellow hover:shadow-lg transition-shadow"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div className="flex items-center space-x-4">
-                <AirportIcon type="up-right-arrow" className="w-8 h-8 brightness-0 invert" />
-                <div>
-                  <div className="text-airport-yellow text-xs font-mono uppercase tracking-wider mb-2">Connect</div>
-                  <div className="text-xl font-bold">LinkedIn</div>
-                  <div className="font-mono text-sm mt-1">linkedin.com/in/cruzryan</div>
-                </div>
-              </div>
-            </a>
-          </div>
-        </section>
       </main>
     </div>
   )

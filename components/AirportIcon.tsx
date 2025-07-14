@@ -1,4 +1,8 @@
+'use client'
+
 import Image from 'next/image'
+import { useTheme } from './ThemeProvider'
+import { useEffect, useState } from 'react'
 
 interface AirportIconProps {
   type: 'plane' | 'departure' | 'luggage' | 'information' | 'telephone' | 'mail' | 'right-arrow' | 'left-arrow' | 'up-arrow' | 'down-arrow' | 'up-right-arrow'
@@ -7,6 +11,13 @@ interface AirportIconProps {
 }
 
 export default function AirportIcon({ type, className = 'w-6 h-6', variant = 'auto' }: AirportIconProps) {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const iconMap = {
     plane: '/icons/ss_24_Air-Transportation.svg',
     departure: '/icons/ss_42_DepartingFlights.svg',
@@ -25,23 +36,21 @@ export default function AirportIcon({ type, className = 'w-6 h-6', variant = 'au
   
   if (!iconSrc) return null
 
-  // Create theme-aware className
-  const getThemeClasses = () => {
+  const getIconFilter = () => {
+    if (!mounted) return 'brightness(0)' // Default for SSR
+    
     switch (variant) {
       case 'light':
-        return 'brightness-0'
+        return 'brightness(0)'
       case 'dark':
-        return 'brightness-0 invert'
+        return 'brightness(0) invert(1)'
       case 'yellow':
-        return 'brightness-0 invert saturate-200'
+        return 'brightness(0) invert(1) saturate(2)'
       case 'auto':
       default:
-        return 'brightness-0 dark:invert'
+        return resolvedTheme === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)'
     }
   }
-
-  const themeClasses = getThemeClasses()
-  const combinedClassName = `${className} ${themeClasses}`.trim()
 
   return (
     <Image
@@ -49,7 +58,8 @@ export default function AirportIcon({ type, className = 'w-6 h-6', variant = 'au
       alt={`${type} icon`}
       width={24}
       height={24}
-      className={combinedClassName}
+      className={className}
+      style={{ filter: getIconFilter() }}
     />
   )
 }

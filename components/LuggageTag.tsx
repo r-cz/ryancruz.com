@@ -1,125 +1,81 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
+import ThemeAwareLogo from './ThemeAwareLogo'
 
 interface LuggageTagProps {
   institution: string
   degree: string
   duration: string
   details?: string[]
-  logo?: string
 }
 
 export default function LuggageTag({
   institution,
   degree,
   duration,
-  details = [],
-  logo
+  details = []
 }: LuggageTagProps) {
-  // Generate a deterministic tag number based on institution
   const hash = institution.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  const tagNumber = `EDU${(hash % 9000) + 1000}`
+  const tagNumber = `${(hash % 9000) + 1000}`
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
       className="relative inline-block"
     >
-      {/* Strap */}
-      <div className="absolute -top-4 left-8 w-16 h-8">
-        <div className="w-full h-4 bg-airport-black rounded-t-full" />
-        <div className="w-8 h-4 bg-airport-black mx-auto" />
-      </div>
-
-      {/* Main tag */}
-      <div className="bg-airport-yellow border-2 border-airport-black rounded-lg p-6 shadow-lg min-w-[320px] max-w-md">
-        {/* Header with barcode */}
-        <div className="border-b-2 border-airport-black pb-4 mb-4">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <p className="text-xs font-mono uppercase">Priority</p>
-              <p className="text-2xl font-bold">EDUCATION</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs font-mono">{tagNumber}</p>
-              <div className="bg-airport-black h-8 w-24 flex items-center justify-center mt-1">
-                <div className="flex space-x-0.5">
-                  {[...Array(15)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-airport-yellow"
-                      style={{
-                        width: (institution.charCodeAt(i % institution.length) % 2) ? '1px' : '2px',
-                        height: '24px'
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Destination info */}
-        <div className="space-y-3">
+      {/* Simplified card design */}
+      <div className="bg-card border border-border rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow w-80">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            {logo && (
-              <Image
-                src={logo}
-                alt={`${institution} logo`}
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            )}
+            <div className="w-10 h-10 flex items-center justify-center">
+              <ThemeAwareLogo company={institution} width={32} height={32} />
+            </div>
             <div>
-              <p className="text-xs font-mono uppercase">From</p>
-              <p className="text-xl font-bold">{institution}</p>
+              <h3 className="text-lg font-semibold text-card-foreground">
+                {institution}
+              </h3>
+              <p className="text-sm text-muted-foreground font-mono">
+                {duration}
+              </p>
             </div>
           </div>
-
-          <div>
-            <p className="text-xs font-mono uppercase">Program</p>
-            <p className="text-lg font-semibold">{degree}</p>
+          <div className="text-xs font-mono text-muted-foreground">
+            #{tagNumber}
           </div>
-
-          <div>
-            <p className="text-xs font-mono uppercase">Duration</p>
-            <p className="font-mono">{duration}</p>
-          </div>
-
-          {details.length > 0 && (
-            <div>
-              <p className="text-xs font-mono uppercase mb-1">Special Handling</p>
-              <ul className="space-y-0.5">
-                {details.map((detail, index) => (
-                  <li key={index} className="text-sm flex items-start">
-                    <span className="mr-1">•</span>
-                    <span>{detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
 
-        {/* Bottom stamps */}
-        <div className="mt-4 pt-4 border-t-2 border-dashed border-airport-black">
-          <div className="flex justify-between items-center">
-            <div className="transform -rotate-12">
-              <div className="border-2 border-airport-red rounded p-1">
-                <p className="text-xs font-bold text-airport-red">VERIFIED</p>
+        {/* Degree */}
+        <div className="mb-4">
+          <h4 className="text-base font-medium text-card-foreground">
+            {degree}
+          </h4>
+          <div className="h-px bg-border w-12 mt-2"></div>
+        </div>
+
+        {/* Details */}
+        {details.length > 0 && (
+          <div className="space-y-1.5 mb-4">
+            {details.map((detail, index) => (
+              <div key={index} className="flex items-start space-x-2 text-sm text-muted-foreground">
+                <span className="text-airport-green">✓</span>
+                <span>{detail}</span>
               </div>
-            </div>
-            <div className="transform rotate-6">
-              <div className="border-2 border-airport-green rounded p-1">
-                <p className="text-xs font-bold text-airport-green">COMPLETE</p>
-              </div>
-            </div>
+            ))}
+          </div>
+        )}
+
+        {/* Status indicator */}
+        <div className="flex items-center justify-between pt-3 border-t border-border/50">
+          <span className="text-xs font-mono text-muted-foreground uppercase">
+            EDU • COMPLETE
+          </span>
+          <div className="flex items-center space-x-1 text-airport-green">
+            <div className="w-1.5 h-1.5 bg-airport-green rounded-full"></div>
+            <span className="text-xs font-mono">Verified</span>
           </div>
         </div>
       </div>
