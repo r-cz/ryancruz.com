@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from './ThemeProvider'
 import ThemeToggle from './ThemeToggle'
-import AirportIcon from './AirportIcon'
 
 export default function Header() {
   const { resolvedTheme } = useTheme()
