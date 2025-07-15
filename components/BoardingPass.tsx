@@ -80,7 +80,7 @@ export default function BoardingPass({
           </div>
 
           {/* Subtle flight reference */}
-          <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between text-xs font-mono text-muted-foreground">
+          <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between text-xs font-mono aviation-theming">
             <span>FLT {company.substring(0, 2).toUpperCase()}{company === 'Southwest Airlines' ? '737' : '747'}</span>
             <span>EXP • ENGINEERING</span>
           </div>

@@ -70,7 +70,7 @@ export default function LuggageTag({
 
         {/* Status indicator */}
         <div className="flex items-center justify-between pt-3 border-t border-border/50">
-          <span className="text-xs font-mono text-muted-foreground uppercase">
+          <span className="text-xs font-mono aviation-theming uppercase">
             EDU • COMPLETE
           </span>
           <div className="flex items-center space-x-1 text-airport-green">

@@ -81,7 +81,7 @@
   --foreground: var(--airport-black);
   --accent: var(--airport-yellow);
   --muted: var(--airport-light-gray);
-  --muted-foreground: var(--airport-light-gray);
+  --muted-foreground: var(--airport-gray);
   --border: var(--airport-light-gray);
   --card: var(--airport-white);
   --card-foreground: var(--airport-black);
@@ -97,7 +97,7 @@
   --foreground: var(--airport-white);
   --accent: var(--airport-yellow);
   --muted: var(--airport-dark-gray);
-  --muted-foreground: var(--airport-dark-gray);
+  --muted-foreground: var(--airport-medium-gray);
   --border: var(--airport-dark-gray);
   --card: var(--airport-dark-gray);
   --card-foreground: var(--airport-white);
@@ -185,6 +185,16 @@ body {
   font-weight: 500;
 }
 
+/* Corny aviation theming elements - very subtle */
+.aviation-theming {
+  color: var(--airport-light-gray);
+}
+
+[data-theme="dark"] .aviation-theming {
+  color: var(--airport-medium-gray);
+  opacity: 0.4;
+}
+
 
 /* Theme-aware utilities */
 .bg-card {
@@ -205,6 +215,31 @@ body {
 
 .border-border {
   border-color: var(--border);
+}
+
+/* FAA-style technical animations */
+@keyframes data-flow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes radar-ping {
+  0% { 
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% { 
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+.data-flow {
+  animation: data-flow 3s ease-in-out infinite;
+}
+
+.radar-ping {
+  animation: radar-ping 2s ease-out infinite;
 }
 
 /* Smooth transitions for theme changes */
