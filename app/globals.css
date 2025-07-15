@@ -81,7 +81,7 @@
   --foreground: var(--airport-black);
   --accent: var(--airport-yellow);
   --muted: var(--airport-light-gray);
-  --muted-foreground: var(--airport-gray);
+  --muted-foreground: var(--airport-light-gray);
   --border: var(--airport-light-gray);
   --card: var(--airport-white);
   --card-foreground: var(--airport-black);
@@ -97,7 +97,7 @@
   --foreground: var(--airport-white);
   --accent: var(--airport-yellow);
   --muted: var(--airport-dark-gray);
-  --muted-foreground: var(--airport-medium-gray);
+  --muted-foreground: var(--airport-dark-gray);
   --border: var(--airport-dark-gray);
   --card: var(--airport-dark-gray);
   --card-foreground: var(--airport-white);

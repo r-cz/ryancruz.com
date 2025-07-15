@@ -26,7 +26,7 @@ export default function HeroSection() {
           </h1>
           
           {/* Subtitle with aviation reference */}
-          <div className="flex items-center justify-center space-x-3 text-xl md:text-2xl text-muted-foreground mb-8">
+          <div className="flex items-center justify-center space-x-3 text-xl md:text-2xl text-muted-foreground opacity-60 mb-8">
             <AirportIcon type="departure" className="w-6 h-6" />
             <span>Senior Cybersecurity Engineer</span>
           </div>
@@ -37,10 +37,10 @@ export default function HeroSection() {
               <div className="w-2 h-2 bg-airport-green rounded-full animate-pulse"></div>
               <span className="font-mono">ACTIVE</span>
             </div>
-            <div className="flex items-center space-x-2 text-muted-foreground opacity-40">
+            <div className="flex items-center space-x-2 text-muted-foreground opacity-20">
               <span className="font-mono">DAL</span>
             </div>
-            <div className="flex items-center space-x-2 text-muted-foreground opacity-40">
+            <div className="flex items-center space-x-2 text-muted-foreground opacity-20">
               <span className="text-sm">●</span>
               <span className="font-mono">EST. 2018</span>
             </div>
