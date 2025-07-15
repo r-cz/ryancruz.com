@@ -7,9 +7,14 @@ import { useEffect, useState } from 'react'
 export default function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    // Check if running on iOS
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    setIsIOS(iOS)
   }, [])
 
   if (!mounted) {
@@ -17,6 +22,11 @@ export default function ThemeToggle() {
     return (
       <div className="w-14 h-8 bg-airport-gray rounded-full opacity-50" />
     )
+  }
+
+  // Hide theme toggle entirely on iOS
+  if (isIOS) {
+    return null
   }
 
   const toggleTheme = () => {

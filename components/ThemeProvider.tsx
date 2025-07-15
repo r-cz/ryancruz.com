@@ -35,10 +35,20 @@ export function ThemeProvider({
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
-    // Get theme from localStorage on mount
-    const stored = localStorage.getItem('theme') as Theme
-    if (stored && ['light', 'dark', 'system'].includes(stored)) {
-      setThemeState(stored)
+    // Check if running on iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    
+    if (isIOS) {
+      // Force system mode on iOS to keep themes in sync
+      setThemeState('system')
+      localStorage.setItem('theme', 'system')
+    } else {
+      // Get theme from localStorage on mount for non-iOS devices
+      const stored = localStorage.getItem('theme') as Theme
+      if (stored && ['light', 'dark', 'system'].includes(stored)) {
+        setThemeState(stored)
+      }
     }
   }, [])
 
