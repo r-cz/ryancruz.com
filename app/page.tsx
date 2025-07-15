@@ -6,16 +6,44 @@ import HeroSection from '@/components/HeroSection'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* KDAL Airport Diagram Background - Full page */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Light mode - standard black SVG with higher opacity */}
+        <div 
+          className="absolute inset-0 dark:hidden opacity-[0.08]"
+          style={{
+            backgroundImage: 'url(/kdal.svg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+            filter: 'contrast(1.1) brightness(0.3)'
+          }}
+        />
+        {/* Dark mode - inverted SVG with lower opacity */}
+        <div 
+          className="absolute inset-0 hidden dark:block opacity-[0.04]"
+          style={{
+            backgroundImage: 'url(/kdal.svg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+            filter: 'invert(1) contrast(0.8) brightness(1.2)'
+          }}
+        />
+        {/* Gradient overlay for depth - more subtle */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/15" />
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-background/15" />
+      </div>
+
       {/* Header */}
       <Header />
-      
       
       {/* Hero Section */}
       <HeroSection />
       
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {/* Work Experience Section */}
         <section className="mb-16">
