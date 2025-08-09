@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from './ThemeProvider'
 import ThemeToggle from './ThemeToggle'
+import { Icon } from '@iconify/react'
 
 export default function Header() {
   const { resolvedTheme } = useTheme()
@@ -30,10 +31,10 @@ export default function Header() {
   }, [])
 
   const menuItems = [
-    { label: 'Contact', href: 'mailto:mail@ryancruz.com' },
-    { label: 'LinkedIn', href: 'https://linkedin.com/in/cruzryan' },
-    { label: 'Resume', href: '/Resume.pdf' },
-    { label: 'iam.tools', href: 'https://iam-tools.pages.dev' },
+    { label: 'Contact', href: 'mailto:mail@ryancruz.com', icon: 'system-uicons:mail' },
+    { label: 'LinkedIn', href: 'https://linkedin.com/in/cruzryan', icon: 'system-uicons:link' },
+    { label: 'Resume', href: '/Resume.pdf', icon: 'system-uicons:document' },
+    { label: 'iam.tools', href: 'https://iam-tools.pages.dev', icon: 'system-uicons:wrench' },
   ]
 
   return (
@@ -93,8 +94,13 @@ export default function Header() {
                 }}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="w-8 text-card-foreground font-mono text-sm">
-                  {index === 0 ? 'EM' : index === 1 ? 'LI' : index === 2 ? 'CV' : 'IA'}
+                <div className="w-8 flex justify-center">
+                  <Icon 
+                    icon={item.icon}
+                    width={18}
+                    height={18}
+                    className="text-card-foreground"
+                  />
                 </div>
                 <div className="flex-1 text-card-foreground font-mono text-sm">
                   {item.label}

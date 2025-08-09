@@ -11,23 +11,25 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "framer-motion": "^12.23.3",
-    "next": "15.3.5",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "@iconify-icons/system-uicons": "^1.2.7",
+    "@iconify/react": "^6.0.0",
+    "framer-motion": "^12.23.12",
+    "next": "15.4.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@opennextjs/cloudflare": "^1.5.1",
+    "@opennextjs/cloudflare": "^1.6.5",
     "@tailwindcss/postcss": "^4.1.11",
-    "@types/node": "^24.0.13",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "eslint": "^9.31.0",
-    "eslint-config-next": "15.3.5",
+    "@types/node": "^24.2.1",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.33.0",
+    "eslint-config-next": "15.4.6",
     "tailwindcss": "^4.1.11",
-    "typescript": "^5.8.3",
-    "wrangler": "^4.24.3"
+    "typescript": "^5.9.2",
+    "wrangler": "^4.28.1"
   }
 }
