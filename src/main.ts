@@ -2,7 +2,12 @@ import './style.css'
 
 // Main app initialization
 document.addEventListener('DOMContentLoaded', () => {
-  const app = document.querySelector<HTMLDivElement>('#app')!
+  const app = document.querySelector<HTMLDivElement>('#app')
+  
+  if (!app) {
+    console.error('App element not found')
+    return
+  }
   
   app.innerHTML = `
     <div class="relative min-h-screen">

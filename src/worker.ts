@@ -14,6 +14,11 @@ export default {
             ...response.headers,
             'Content-Type': 'text/html; charset=utf-8',
             'Cache-Control': 'public, max-age=0, must-revalidate',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'DENY',
+            'X-XSS-Protection': '1; mode=block',
+            'Referrer-Policy': 'strict-origin-when-cross-origin',
+            'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
           },
         })
       }
@@ -46,6 +51,11 @@ export default {
         headers: {
           ...indexResponse.headers,
           'Content-Type': 'text/html; charset=utf-8',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'X-XSS-Protection': '1; mode=block',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
         },
       })
     }
