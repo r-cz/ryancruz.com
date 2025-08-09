@@ -4,26 +4,25 @@ Ryan Cruz's personal website - An aviation-themed portfolio site showcasing prof
 
 ## 🛫 Overview
 
-A modern, aviation-inspired personal website built with Next.js 15, featuring airport-style design elements including boarding passes for work experience, luggage tags for education, and authentic DOT transportation symbols throughout.
+A modern, aviation-inspired personal website built with Vite and TypeScript, featuring authentic airport design elements including a real KDAL airport diagram background and DOT transportation symbols throughout.
 
 ## ✈️ Features
 
 - **Aviation-themed design system** with airport signage aesthetics
-- **Boarding pass work experience cards** with company logos
-- **Luggage tag education credentials** 
-- **Departure board animations** with flip-card effects
+- **Real KDAL airport diagram background** with gradient overlay
 - **Authentic DOT transportation symbols** for wayfinding
 - **Responsive design** optimized for all devices
-- **Dark/light mode support** for Apple logo
+- **Modern CSS custom properties** for theming
+- **Clean, minimal interface** with professional focus
 
 ## 🛠 Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
+- **Build Tool**: Vite 6
+- **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 4
-- **Animations**: Framer Motion
 - **Package Manager**: Bun
-- **Deployment**: Cloudflare Workers via OpenNext adapter
+- **Testing**: Bun Test with jsdom
+- **Deployment**: Cloudflare Workers
 
 ## 🚀 Getting Started
 
@@ -37,39 +36,57 @@ bun run dev
 # Build for production
 bun run build
 
-# Build for Cloudflare Workers
-bun run build:worker
+# Run tests
+bun test
 
-# Deploy to Cloudflare
-bun run deploy
+# Run tests with coverage
+bun test --coverage
+
+# Type checking
+bun run typecheck
+
+# Linting
+bun run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the site locally.
+Open [http://localhost:5173](http://localhost:5173) to view the site locally.
 
 ## 🎨 Design System
 
-The site uses an aviation/airport theme with:
-- Frutiger-style typography (with Inter/DM Sans fallbacks)
+The site features an aviation/airport theme with:
+- Clean typography optimized for readability
 - Airport signage color palette (black, yellow #FFB612, white)
-- Departure board flip animations
-- Boarding pass and luggage tag components
+- Real KDAL airport diagram as background
+- CSS custom properties for theming
 - Airport wayfinding iconography from DOT transportation symbols
 
 ## 📁 Project Structure
 
 ```
-├── app/                 # Next.js App Router pages
-├── components/          # React components (aviation-themed)
+├── src/                 # Source code
+│   ├── main.ts         # Main application entry point
+│   ├── style.css       # Global styles and CSS variables
+│   ├── worker.ts       # Cloudflare Worker for deployment
+│   └── main.test.ts    # Test files
 ├── public/
-│   ├── icons/          # DOT transportation symbols
-│   └── images/         # Company logos and assets
+│   ├── icons/          # DOT transportation symbols (50+ icons)
+│   ├── images/         # Profile and company assets
+│   └── kdal.svg        # KDAL airport diagram background
+├── bunfig.toml         # Bun configuration
 ├── wrangler.toml       # Cloudflare Workers configuration
-└── open-next.config.ts # OpenNext adapter configuration
+└── vite.config.ts      # Vite build configuration
 ```
+
+## 🧪 Testing
+
+The project uses Bun's native test runner with jsdom for DOM testing:
+- Test setup in `test-setup.ts` configures jsdom environment
+- Tests located in `src/main.test.ts`
+- Coverage reports generated in `coverage/` directory
 
 ## 🌐 Deployment
 
-The site is configured for deployment to Cloudflare Workers using the OpenNext adapter. This provides:
+The site deploys to Cloudflare Workers providing:
 - Global edge distribution
 - Fast cold starts
 - Cost-effective hosting

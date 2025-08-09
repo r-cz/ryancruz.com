@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, spyOn } from 'bun:test'
 import './main'
 
 describe('main.ts', () => {
@@ -23,7 +23,7 @@ describe('main.ts', () => {
     document.body.innerHTML = '' // Remove app element
     
     // Mock console.error to capture the error
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleSpy = spyOn(console, 'error').mockImplementation(() => {})
     
     // Trigger DOMContentLoaded event
     const event = new Event('DOMContentLoaded')

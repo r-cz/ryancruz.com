@@ -1,0 +1,3 @@
+[test]
+# Use jsdom for DOM environment in tests
+preload = ["./test-setup.ts"]
