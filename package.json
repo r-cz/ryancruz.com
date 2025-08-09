@@ -1,35 +1,27 @@
 {
   "name": "ryancruz-com",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "vite build && bun run build:worker",
+    "build:worker": "bun build src/worker.ts --outdir dist --target browser",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext ts,tsx",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy",
+    "clean": "rm -rf node_modules dist .vite bun.lock && echo '🧹 Cleaned: node_modules, dist, .vite, bun.lock' && echo '📦 Run: bun install'"
   },
-  "dependencies": {
-    "@iconify-icons/system-uicons": "^1.2.7",
-    "@iconify/react": "^6.0.0",
-    "framer-motion": "^12.23.12",
-    "next": "15.4.6",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "sharp": "^0.34.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@opennextjs/cloudflare": "^1.6.5",
-    "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/node": "^24.2.1",
-    "@types/react": "^19.1.9",
-    "@types/react-dom": "^19.1.7",
     "eslint": "^9.33.0",
-    "eslint-config-next": "15.4.6",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
+    "vite": "^6.0.5",
     "wrangler": "^4.28.1"
   }
 }
