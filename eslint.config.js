@@ -13,6 +13,27 @@ export default [
       parserOptions: {
         ecmaVersion: 2022,
         sourceType: 'module'
+      },
+      globals: {
+        // DOM globals
+        document: 'readonly',
+        window: 'readonly',
+        console: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        Event: 'readonly',
+        // Worker globals
+        Request: 'readonly',
+        Response: 'readonly',
+        URL: 'readonly',
+        Headers: 'readonly',
+        ExecutionContext: 'readonly',
+        // Bun test globals  
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        spyOn: 'readonly'
       }
     },
     plugins: {

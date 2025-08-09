@@ -1,6 +1,6 @@
 // Cloudflare Worker for serving static Vite build
 export default {
-  async fetch(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: { ASSETS: { fetch: (request: Request) => Promise<Response> } }): Promise<Response> {
     const url = new URL(request.url)
     
     // Handle root requests

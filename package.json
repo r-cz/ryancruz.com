@@ -4,10 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "bun run typecheck && bun run lint && vite build && bun run build:worker",
+    "dev": "bun run build:dev --watch",
+    "build:dev": "bun run build.ts",
+    "build": "bun run typecheck && bun run lint && bun run build:site && bun run build:worker",
+    "build:site": "bun run build.ts --minify",
     "build:worker": "bun build src/worker.ts --outdir dist --target browser",
-    "preview": "vite preview",
+    "preview": "cd dist && python3 -m http.server 8080",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
@@ -16,8 +18,10 @@
     "clean": "rm -rf node_modules dist .vite bun.lock && echo '🧹 Cleaned: node_modules, dist, .vite, bun.lock' && echo '📦 Run: bun install'"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250809.0",
     "@eslint/js": "^9.33.0",
-    "@tailwindcss/vite": "^4.1.11",
+    "@tailwindcss/cli": "^4.1.11",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^24.2.1",
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
@@ -25,7 +29,6 @@
     "jsdom": "^25.0.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
-    "vite": "^6.0.5",
     "wrangler": "^4.28.1"
   }
 }
