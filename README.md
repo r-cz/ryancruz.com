@@ -4,7 +4,7 @@ Ryan Cruz's personal website - An aviation-themed portfolio site showcasing prof
 
 ## 🛫 Overview
 
-A modern, aviation-inspired personal website built with Vite and TypeScript, featuring authentic airport design elements including a real KDAL airport diagram background and DOT transportation symbols throughout.
+A modern, aviation-inspired personal website built with Bun and TypeScript, featuring authentic airport design elements including a real KDAL airport diagram background and DOT transportation symbols throughout.
 
 ## ✈️ Features
 
@@ -17,7 +17,7 @@ A modern, aviation-inspired personal website built with Vite and TypeScript, fea
 
 ## 🛠 Tech Stack
 
-- **Build Tool**: Vite 6
+- **Build Tool**: Bun + Custom Build Script
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 4
 - **Package Manager**: Bun
@@ -33,27 +33,37 @@ bun install
 # Start development server
 bun run dev
 
+# Start local development (no network)
+bun run dev:local
+
 # Build for production
 bun run build
 
+# Watch and rebuild on changes
+bun run build:watch
+
+# Preview built site
+bun run preview
+
 # Run tests
 bun test
-
-# Run tests with coverage
-bun test --coverage
 
 # Type checking
 bun run typecheck
 
 # Linting
 bun run lint
+
+# Deploy to Cloudflare
+bun run deploy
 ```
 
-Open [http://localhost:5173](http://localhost:5173) to view the site locally.
+The development server will start on a port shown in your terminal (typically 8787 for Wrangler).
 
 ## 🎨 Design System
 
 The site features an aviation/airport theme with:
+
 - Clean typography optimized for readability
 - Airport signage color palette (black, yellow #FFB612, white)
 - Real KDAL airport diagram as background
@@ -62,7 +72,7 @@ The site features an aviation/airport theme with:
 
 ## 📁 Project Structure
 
-```
+```text
 ├── src/                 # Source code
 │   ├── main.ts         # Main application entry point
 │   ├── style.css       # Global styles and CSS variables
@@ -72,14 +82,16 @@ The site features an aviation/airport theme with:
 │   ├── icons/          # DOT transportation symbols (50+ icons)
 │   ├── images/         # Profile and company assets
 │   └── kdal.svg        # KDAL airport diagram background
+├── build.ts            # Custom build script
 ├── bunfig.toml         # Bun configuration
 ├── wrangler.toml       # Cloudflare Workers configuration
-└── vite.config.ts      # Vite build configuration
+└── tailwind.config.ts  # Tailwind CSS configuration
 ```
 
 ## 🧪 Testing
 
 The project uses Bun's native test runner with jsdom for DOM testing:
+
 - Test setup in `test-setup.ts` configures jsdom environment
 - Tests located in `src/main.test.ts`
 - Coverage reports generated in `coverage/` directory
@@ -87,6 +99,7 @@ The project uses Bun's native test runner with jsdom for DOM testing:
 ## 🌐 Deployment
 
 The site deploys to Cloudflare Workers providing:
+
 - Global edge distribution
 - Fast cold starts
 - Cost-effective hosting

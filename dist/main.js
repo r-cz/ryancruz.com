@@ -31,10 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </h1>
           <p class="text-xl md:text-2xl text-[var(--text-secondary)] mb-8">
             Cybersecurity Engineer
-          </p>
-          <div class="inline-block px-8 py-4 bg-airport-yellow text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all cursor-pointer">
-            Welcome Aboard
-          </div>
+          </p>   
         </div>
       </main>
     </div>
