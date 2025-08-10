@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Split Flap Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@hot-page/hotfx-split-flap" type="module"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 50px;
+            background: #f0f0f0;
+        }
+        
+        .test {
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+        
+        .test::part(flap) {
+            background-color: #333;
+            color: white;
+            border: 1px solid #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Split Flap Test</h1>
+    
+    <div class="test">
+        <hotfx-split-flap>HELLO WORLD</hotfx-split-flap>
+    </div>
+    
+    <div class="test">
+        <hotfx-split-flap duration="200">TEST</hotfx-split-flap>
+    </div>
+    
+    <button onclick="changeText()">Change Text</button>
+    
+    <script>
+        function changeText() {
+            const flap = document.querySelector('hotfx-split-flap');
+            flap.textContent = 'CHANGED!';
+        }
+        
+        // Debug
+        setTimeout(() => {
+            console.log('Elements found:', document.querySelectorAll('hotfx-split-flap'));
+            console.log('Custom element defined:', customElements.get('hotfx-split-flap'));
+        }, 1000);
+    </script>
+</body>
+</html>

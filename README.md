@@ -10,6 +10,7 @@ A modern, aviation-inspired personal website built with Bun and TypeScript, depl
 
 - **Aviation-themed design system** with airport signage aesthetics
 - **Real KDAL airport diagram background** with gradient overlay
+- **Animated split-flap display** with cycling professional titles
 - **Authentic DOT transportation symbols** for wayfinding
 - **Responsive design** optimized for all devices
 - **Modern CSS custom properties** for theming
@@ -69,6 +70,8 @@ The site features an aviation/airport theme with:
 
 ```text
 ├── src/                 # Source code
+│   ├── components/      # Reusable components
+│   │   └── split-flap.js # Local split-flap display component
 │   ├── main.ts         # Main application entry point
 │   ├── style.css       # Global styles and CSS variables
 │   └── main.test.ts    # Test files
