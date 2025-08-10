@@ -40,3 +40,13 @@ body {
 #app {
   min-height: 100vh;
 }
+
+hotfx-split-flap {
+  font-size: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  hotfx-split-flap {
+    font-size: 2rem;
+  }
+}
