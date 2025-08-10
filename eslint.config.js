@@ -21,6 +21,7 @@ export default [
         console: 'readonly',
         setTimeout: 'readonly',
         setInterval: 'readonly',
+        clearTimeout: 'readonly',
         customElements: 'readonly',
         HTMLElement: 'readonly',
         HTMLDivElement: 'readonly',
