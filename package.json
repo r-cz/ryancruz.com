@@ -28,5 +28,15 @@
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
     "wrangler": "^4.28.1"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.11",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.1.11",
+    "@tailwindcss/oxide-linux-arm64-gnu": "^4.1.11",
+    "@tailwindcss/oxide-linux-arm64-musl": "^4.1.11",
+    "lightningcss-linux-x64-gnu": "^1.29.0",
+    "lightningcss-linux-x64-musl": "^1.29.0",
+    "lightningcss-linux-arm64-gnu": "^1.29.0",
+    "lightningcss-linux-arm64-musl": "^1.29.0"
   }
 }
