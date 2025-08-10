@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <main class="relative z-10 flex items-center justify-center min-h-screen px-8">
         <div class="text-center max-w-4xl">
           <h1 class="text-6xl md:text-8xl font-bold mb-6 text-[var(--text-primary)]">
-            Ryan Cruz
+            RYAN CRUZ
           </h1>
           <p class="text-xl md:text-2xl text-[var(--text-secondary)] mb-8">
-            Cybersecurity Engineer
+            CYBERSECURITY ENGINEER
           </p>   
         </div>
       </main>

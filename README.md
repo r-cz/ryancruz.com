@@ -4,7 +4,7 @@ Ryan Cruz's personal website - An aviation-themed portfolio site showcasing prof
 
 ## 🛫 Overview
 
-A modern, aviation-inspired personal website built with Bun and TypeScript, featuring authentic airport design elements including a real KDAL airport diagram background and DOT transportation symbols throughout.
+A modern, aviation-inspired personal website built with Bun and TypeScript, deployed on Cloudflare Workers. Features authentic airport design elements including a real KDAL airport diagram background.
 
 ## ✈️ Features
 
@@ -18,6 +18,7 @@ A modern, aviation-inspired personal website built with Bun and TypeScript, feat
 ## 🛠 Tech Stack
 
 - **Build Tool**: Bun + Custom Build Script
+- **Deployment**: Cloudflare Workers with Static Assets
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 4
 - **Package Manager**: Bun
@@ -30,20 +31,14 @@ A modern, aviation-inspired personal website built with Bun and TypeScript, feat
 # Install dependencies
 bun install
 
-# Start development server
+# Start development server with hot reloading
 bun run dev
-
-# Start local development (no network)
-bun run dev:local
 
 # Build for production
 bun run build
 
 # Watch and rebuild on changes
 bun run build:watch
-
-# Preview built site
-bun run preview
 
 # Run tests
 bun test
@@ -54,11 +49,11 @@ bun run typecheck
 # Linting
 bun run lint
 
-# Deploy to Cloudflare
+# Deploy to Cloudflare Workers
 bun run deploy
 ```
 
-The development server will start on a port shown in your terminal (typically 8787 for Wrangler).
+The development server will start on port 8787 with automatic rebuilding when you save files.
 
 ## 🎨 Design System
 
@@ -76,7 +71,6 @@ The site features an aviation/airport theme with:
 ├── src/                 # Source code
 │   ├── main.ts         # Main application entry point
 │   ├── style.css       # Global styles and CSS variables
-│   ├── worker.ts       # Cloudflare Worker for deployment
 │   └── main.test.ts    # Test files
 ├── public/
 │   ├── icons/          # DOT transportation symbols (50+ icons)
@@ -98,12 +92,13 @@ The project uses Bun's native test runner with jsdom for DOM testing:
 
 ## 🌐 Deployment
 
-The site deploys to Cloudflare Workers providing:
+The site deploys to Cloudflare Workers with static assets providing:
 
 - Global edge distribution
-- Fast cold starts
-- Cost-effective hosting
+- Automatic static file serving
+- Cost-effective hosting (static assets are free)
 - Custom domain support
+- No custom worker code needed
 
 ## 📄 License
 
