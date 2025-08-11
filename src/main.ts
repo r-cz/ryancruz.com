@@ -19,7 +19,8 @@ const TITLES = [
   'HOMELABBER',
   'GEORGIAN',
   'TEXAN',
-  'PENNSYLVANIAN'
+  'FOODIE',
+  'HIKER',
 ] as const
 
 // Global cleanup tracking
