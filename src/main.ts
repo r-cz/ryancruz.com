@@ -5,10 +5,8 @@ import './components/split-flap.js'
 const TITLE_CYCLING_CONFIG = {
   INITIAL_DELAY: 3000,
   FIRST_TRANSITION_DELAY: 4000,
-  DYNAMIC_CYCLE_GAP: 1000,
-  ANIMATION_DURATION: 100,
-  TIME_PER_CHANGED_CHAR: 500,
-  BASE_DISPLAY_TIME: 3000
+  WAIT_AFTER_ANIMATION: 2000, // 2 seconds after animation completes
+  ANIMATION_DURATION: 100
 } as const
 
 const TITLES = [
@@ -139,7 +137,6 @@ function initTitleCycling() {
     titleElement.setAttribute('duration', TITLE_CYCLING_CONFIG.ANIMATION_DURATION.toString())
     
     let usedTitles: string[] = []
-    let currentTitle = 'CYBERSECURITY ENGINEER'
     
     function getRandomTitle(): string {
       // If we've used all titles, reset the list
@@ -160,50 +157,58 @@ function initTitleCycling() {
       return selectedTitle
     }
     
-    function calculateTransitionTime(fromTitle: string, toTitle: string): number {
-      const maxLength = Math.max(fromTitle.length, toTitle.length)
-      let changedCharacters = 0
-      
-      for (let i = 0; i < maxLength; i++) {
-        const fromChar = fromTitle[i] || ' '
-        const toChar = toTitle[i] || ' '
+    function waitForAnimationComplete(): Promise<void> {
+      return new Promise((resolve) => {
+        console.log(`[${new Date().toISOString()}] Waiting for animation to complete...`)
         
-        if (fromChar !== toChar) {
-          changedCharacters++
-        }
-      }
-      
-      // Calculate estimated time based on character changes
-      return (changedCharacters * TITLE_CYCLING_CONFIG.TIME_PER_CHANGED_CHAR) + 
-             TITLE_CYCLING_CONFIG.BASE_DISPLAY_TIME
+        // Simple approach: Fixed timing that works for users
+        // Most split-flap animations complete within 3-5 seconds regardless of content
+        const fixedWaitTime = 4000 // 4 seconds - reasonable for any transition
+        
+        console.log(`[${new Date().toISOString()}] Using fixed wait time: ${fixedWaitTime}ms`)
+        
+        setTimeout(() => {
+          console.log(`[${new Date().toISOString()}] Animation completed!`)
+          resolve()
+        }, fixedWaitTime)
+      })
     }
     
-    function scheduleNextChange(): void {
+    async function scheduleNextChange(): Promise<void> {
       // Check if component is still active and element exists
       if (!isComponentActive || !document.querySelector('hotfx-split-flap')) {
         return
       }
       
       const nextTitle = getRandomTitle()
-      const transitionTime = calculateTransitionTime(currentTitle, nextTitle)
+      const element = document.querySelector('hotfx-split-flap') as HTMLElement
+      if (!element || !isComponentActive) {
+        return
+      }
       
+      console.log(`[${new Date().toISOString()}] Starting transition to: "${nextTitle}"`)
+      
+      // Set the new title
+      element.textContent = nextTitle
+      
+      // Wait for the animation to complete
+      await waitForAnimationComplete()
+      
+      console.log(`[${new Date().toISOString()}] Starting ${TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION}ms delay before next transition`)
+      
+      // Wait additional time before next transition
       titleCyclingTimeout = window.setTimeout(() => {
-        // Double-check element still exists before updating
-        const element = document.querySelector('hotfx-split-flap') as HTMLElement
-        if (!element || !isComponentActive) {
-          return
+        if (isComponentActive) {
+          console.log(`[${new Date().toISOString()}] Delay complete, scheduling next change`)
+          scheduleNextChange()
         }
-        
-        element.textContent = nextTitle
-        currentTitle = nextTitle
-        
-        // Schedule the next change
-        scheduleNextChange()
-      }, transitionTime)
+      }, TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION)
     }
     
-    // Start the first transition sooner, then use dynamic timing
-    titleCyclingTimeout = window.setTimeout(() => {
+    // Start the first transition after configured delay
+    console.log(`[${new Date().toISOString()}] Title cycling initialized, first transition in ${TITLE_CYCLING_CONFIG.FIRST_TRANSITION_DELAY}ms`)
+    
+    titleCyclingTimeout = window.setTimeout(async () => {
       // Check if still active
       if (!isComponentActive) return
       
@@ -212,15 +217,21 @@ function initTitleCycling() {
       const element = document.querySelector('hotfx-split-flap') as HTMLElement
       if (!element) return
       
+      console.log(`[${new Date().toISOString()}] Starting first transition to: "${firstTitle}"`)
       element.textContent = firstTitle
-      currentTitle = firstTitle
       
-      // Now start the dynamic scheduling
+      // Wait for the first animation to complete
+      await waitForAnimationComplete()
+      
+      console.log(`[${new Date().toISOString()}] First animation complete, starting continuous cycling with ${TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION}ms delay`)
+      
+      // Now start the continuous cycling
       titleCyclingTimeout = window.setTimeout(() => {
         if (isComponentActive) {
+          console.log(`[${new Date().toISOString()}] Initial delay complete, starting continuous cycling`)
           scheduleNextChange()
         }
-      }, TITLE_CYCLING_CONFIG.DYNAMIC_CYCLE_GAP)
+      }, TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION)
       
     }, TITLE_CYCLING_CONFIG.FIRST_TRANSITION_DELAY)
     
