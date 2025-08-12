@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = document.querySelector<HTMLDivElement>('#app')
     
     if (!app) {
-      console.error('App element not found')
+      // App element not found
       return
     }
     
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, TITLE_CYCLING_CONFIG.INITIAL_DELAY)
     
   } catch (error) {
-    console.error('Failed to initialize app:', error)
+    // Failed to initialize app
   }
 })
 
@@ -119,7 +119,7 @@ function initGradientOverlay() {
       )
     `
   } catch (error) {
-    console.error('Failed to initialize gradient overlay:', error)
+    // Failed to initialize gradient overlay
   }
 }
 
@@ -127,7 +127,7 @@ function initTitleCycling() {
   try {
     const titleElement = document.querySelector('hotfx-split-flap') as HTMLElement
     if (!titleElement) {
-      console.warn('Split-flap element not found, skipping title cycling')
+      // Split-flap element not found, skipping title cycling
       return
     }
     
@@ -159,16 +159,13 @@ function initTitleCycling() {
     
     function waitForAnimationComplete(): Promise<void> {
       return new Promise((resolve) => {
-        console.log(`[${new Date().toISOString()}] Waiting for animation to complete...`)
         
         // Simple approach: Fixed timing that works for users
         // Most split-flap animations complete within 3-5 seconds regardless of content
         const fixedWaitTime = 4000 // 4 seconds - reasonable for any transition
         
-        console.log(`[${new Date().toISOString()}] Using fixed wait time: ${fixedWaitTime}ms`)
         
         setTimeout(() => {
-          console.log(`[${new Date().toISOString()}] Animation completed!`)
           resolve()
         }, fixedWaitTime)
       })
@@ -186,7 +183,6 @@ function initTitleCycling() {
         return
       }
       
-      console.log(`[${new Date().toISOString()}] Starting transition to: "${nextTitle}"`)
       
       // Set the new title
       element.textContent = nextTitle
@@ -194,19 +190,16 @@ function initTitleCycling() {
       // Wait for the animation to complete
       await waitForAnimationComplete()
       
-      console.log(`[${new Date().toISOString()}] Starting ${TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION}ms delay before next transition`)
       
       // Wait additional time before next transition
       titleCyclingTimeout = window.setTimeout(() => {
         if (isComponentActive) {
-          console.log(`[${new Date().toISOString()}] Delay complete, scheduling next change`)
           scheduleNextChange()
         }
       }, TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION)
     }
     
     // Start the first transition after configured delay
-    console.log(`[${new Date().toISOString()}] Title cycling initialized, first transition in ${TITLE_CYCLING_CONFIG.FIRST_TRANSITION_DELAY}ms`)
     
     titleCyclingTimeout = window.setTimeout(async () => {
       // Check if still active
@@ -217,18 +210,15 @@ function initTitleCycling() {
       const element = document.querySelector('hotfx-split-flap') as HTMLElement
       if (!element) return
       
-      console.log(`[${new Date().toISOString()}] Starting first transition to: "${firstTitle}"`)
       element.textContent = firstTitle
       
       // Wait for the first animation to complete
       await waitForAnimationComplete()
       
-      console.log(`[${new Date().toISOString()}] First animation complete, starting continuous cycling with ${TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION}ms delay`)
       
       // Now start the continuous cycling
       titleCyclingTimeout = window.setTimeout(() => {
         if (isComponentActive) {
-          console.log(`[${new Date().toISOString()}] Initial delay complete, starting continuous cycling`)
           scheduleNextChange()
         }
       }, TITLE_CYCLING_CONFIG.WAIT_AFTER_ANIMATION)
@@ -236,7 +226,7 @@ function initTitleCycling() {
     }, TITLE_CYCLING_CONFIG.FIRST_TRANSITION_DELAY)
     
   } catch (error) {
-    console.error('Failed to initialize title cycling:', error)
+    // Failed to initialize title cycling
     isComponentActive = false
   }
 }
