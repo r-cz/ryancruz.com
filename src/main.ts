@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initTitleCycling()
     }, TITLE_CYCLING_CONFIG.INITIAL_DELAY)
     
-  } catch (error) {
+  } catch {
     // Failed to initialize app
   }
 })
@@ -118,7 +118,7 @@ function initGradientOverlay() {
         var(--bg-primary) 80%
       )
     `
-  } catch (error) {
+  } catch {
     // Failed to initialize gradient overlay
   }
 }
@@ -225,7 +225,7 @@ function initTitleCycling() {
       
     }, TITLE_CYCLING_CONFIG.FIRST_TRANSITION_DELAY)
     
-  } catch (error) {
+  } catch {
     // Failed to initialize title cycling
     isComponentActive = false
   }
