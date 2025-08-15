@@ -6,7 +6,6 @@
   --bg-secondary: #f8fafc;
   --text-primary: #000000;
   --text-secondary: #64748b;
-  --airport-diagram-opacity: 0.1;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,7 +15,6 @@
     --bg-secondary: #0f172a;
     --text-primary: #ffffff;
     --text-secondary: #94a3b8;
-    --airport-diagram-opacity: 0.05;
   }
 }
 
@@ -39,6 +37,52 @@ body {
 
 #app {
   min-height: 100vh;
+}
+
+/* Page container with pseudo-element background */
+.page-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+.page-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('../public/kdal.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-container::before {
+    opacity: 0.15;
+    filter: invert(1);
+  }
+}
+
+/* Gradient overlay using pseudo-element */
+.page-container::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 20%,
+    var(--bg-primary) 80%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 hotfx-split-flap {

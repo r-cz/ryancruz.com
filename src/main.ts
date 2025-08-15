@@ -36,23 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     app.innerHTML = `
-      <div class="relative min-h-screen">
-        <!-- Airport Diagram Background -->
-        <div 
-          id="airport-bg" 
-          class="fixed inset-0 pointer-events-none airport-background"
-          style="
-            background-image: url('/kdal.svg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: var(--airport-diagram-opacity);
-          "
-        ></div>
-        
-        <!-- Gradient Overlay -->
-        <div class="fixed inset-0 pointer-events-none gradient-overlay"></div>
-        
+      <div class="page-container">
         <!-- Hero Section -->
         <main class="relative z-10 flex items-center justify-center min-h-screen px-8">
           <div class="text-center max-w-4xl">
@@ -66,9 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </main>
       </div>
     `
-    
-    // Initialize components
-    initGradientOverlay()
     
     // Initialize title cycling after a delay
     setTimeout(() => {
@@ -103,24 +84,6 @@ function cleanup() {
     titleCyclingTimeout = undefined
   }
   isComponentActive = false
-}
-
-function initGradientOverlay() {
-  try {
-    const overlay = document.querySelector('.gradient-overlay') as HTMLElement
-    if (!overlay) return
-    
-    // Create radial gradient that fades from center to edges
-    overlay.style.background = `
-      radial-gradient(
-        ellipse at center,
-        transparent 20%,
-        var(--bg-primary) 80%
-      )
-    `
-  } catch {
-    // Failed to initialize gradient overlay
-  }
 }
 
 function initTitleCycling() {
