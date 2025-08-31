@@ -1,4 +1,3 @@
-import './style.css'
 import './components/split-flap.js'
 
 // Configuration constants
@@ -88,6 +87,12 @@ function cleanup() {
 
 function initTitleCycling() {
   try {
+    // Respect reduced motion: disable cycling
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      isComponentActive = false
+      return
+    }
+
     const titleElement = document.querySelector('hotfx-split-flap') as HTMLElement
     if (!titleElement) {
       // Split-flap element not found, skipping title cycling

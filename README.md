@@ -21,7 +21,7 @@ A modern, aviation-inspired personal website built with Bun and TypeScript, depl
 - **Build Tool**: Bun + Custom Build Script
 - **Deployment**: Cloudflare Workers with Static Assets
 - **Language**: TypeScript 5
-- **Styling**: Tailwind CSS 4
+- **Styling**: Tailwind CSS 4 with `@theme` tokens
 - **Package Manager**: Bun
 - **Testing**: Bun Test with jsdom
 - **Deployment**: Cloudflare Workers
@@ -38,7 +38,7 @@ bun run dev
 # Build for production
 bun run build
 
-# Watch and rebuild on changes
+# Watch and rebuild on changes (JS + CSS)
 bun run build:watch
 
 # Run tests
@@ -52,6 +52,20 @@ bun run lint
 
 # Deploy to Cloudflare Workers
 bun run deploy
+
+## 🗜 SVG Optimization
+
+This repo uses SVGO to compress SVGs (notably `public/kdal.svg`).
+
+```bash
+# Optimize a single file (in-place)
+bunx svgo public/kdal.svg --multipass -o public/kdal.svg
+
+# Or optimize all SVGs under public/
+bun run svgo:all
+```
+
+Config: `svgo.config.js` (keeps viewBox, simplifies paths, cleans IDs).
 ```
 
 The development server will start on port 8787 with automatic rebuilding when you save files.
@@ -101,7 +115,9 @@ The site deploys to Cloudflare Workers with static assets providing:
 - Automatic static file serving
 - Cost-effective hosting (static assets are free)
 - Custom domain support
-- No custom worker code needed
+- Custom worker sets caching headers:
+  - HTML: `Cache-Control: no-store`
+  - Static assets: `Cache-Control: public, max-age=31536000, immutable`
 
 ## 📄 License
 

@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "bun run build:site && bun run build:watch & wrangler dev",
-    "build": "bun run typecheck && bun run lint && bun run build:site",
+    "build": "bun run typecheck && bun run lint && bun run svgo:all && bun run build:site",
     "build:site": "bun run build.ts --minify",
     "build:watch": "bun run build.ts --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
     "test": "bun test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "svgo": "svgo ./public/kdal.svg --multipass -o ./public/kdal.svg",
+    "svgo:all": "svgo ./public/**/*.svg --multipass --config=./svgo.config.js",
     "deploy": "bun run build && wrangler deploy",
     "clean": "rm -rf node_modules dist .vite bun.lock && echo '🧹 Cleaned: node_modules, dist, .vite, bun.lock' && echo '📦 Run: bun install'"
   },
@@ -27,7 +31,10 @@
     "jsdom": "^26.1.0",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2",
-    "wrangler": "^4.31.0"
+    "wrangler": "^4.31.0",
+    "prettier": "^3.3.3",
+    "svgo": "^3.3.2",
+    "@fontsource-variable/inter": "^5.1.0"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.12",
