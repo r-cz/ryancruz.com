@@ -1,10 +1,13 @@
 #!/usr/bin/env bun
-import { readFileSync, writeFileSync, cpSync, mkdirSync, existsSync } from 'fs'
-import { join, dirname } from 'path'
+import { writeFileSync, cpSync, mkdirSync, existsSync } from 'fs'
+import { join } from 'path'
 
 const srcDir = 'src'
 const distDir = 'dist'
 const publicDir = 'public'
+
+const watchMode = process.argv.includes('--watch')
+const minifyWanted = process.argv.includes('--minify')
 
 // Clean and create dist directory
 if (existsSync(distDir)) {
@@ -17,11 +20,40 @@ if (existsSync(publicDir)) {
   cpSync(publicDir, distDir, { recursive: true })
 }
 
-// Process CSS with Tailwind
+// Copy local fonts (Inter variable latin normal/italic)
+const fontSrcDir = 'node_modules/@fontsource-variable/inter/files'
+const fontDestDir = join(distDir, 'fonts')
+mkdirSync(fontDestDir, { recursive: true })
+const fontsToCopy = [
+  'inter-latin-wght-normal.woff2',
+  'inter-latin-wght-italic.woff2',
+]
+for (const f of fontsToCopy) {
+  const src = join(fontSrcDir, f)
+  if (existsSync(src)) {
+    cpSync(src, join(fontDestDir, f))
+  }
+}
+
+// Process CSS with Tailwind (and optionally watch)
 console.log('Processing CSS with Tailwind...')
-const minifyFlag = process.argv.includes('--minify') ? '--minify' : ''
+const tailwindArgs = [
+  '-i', `${srcDir}/style.css`,
+  '-o', `${distDir}/style.css`,
+]
+if (watchMode) tailwindArgs.push('-w')
+if (minifyWanted) tailwindArgs.push('--minify')
+
+let tailwindProc: ReturnType<typeof Bun.spawn> | undefined
 try {
-  await Bun.$`./node_modules/.bin/tailwindcss -i ${srcDir}/style.css -o ${distDir}/style.css ${minifyFlag}`.quiet()
+  if (watchMode) {
+    tailwindProc = Bun.spawn([
+      './node_modules/.bin/tailwindcss',
+      ...tailwindArgs,
+    ], { stdio: ['inherit', 'inherit', 'inherit'] })
+  } else {
+    await Bun.$`./node_modules/.bin/tailwindcss ${tailwindArgs}`.quiet()
+  }
   console.log('✓ CSS processed')
 } catch (error) {
   console.error('CSS processing failed:', error)
@@ -33,8 +65,18 @@ const buildResult = await Bun.build({
   entrypoints: [`${srcDir}/main.ts`],
   outdir: distDir,
   target: 'browser',
-  minify: process.argv.includes('--minify'),
+  minify: minifyWanted,
   splitting: true,
+  sourcemap: watchMode ? 'external' : undefined,
+  watch: watchMode ? {
+    onRebuild(result) {
+      if (result.success) {
+        console.log('✓ Rebuilt JS')
+      } else {
+        console.error('✗ Rebuild failed:', result.logs)
+      }
+    }
+  } : false,
 })
 
 if (!buildResult.success) {
@@ -42,14 +84,8 @@ if (!buildResult.success) {
   process.exit(1)
 }
 
-// Generate index.html
-const jsFiles = buildResult.outputs
-  .filter(output => output.path.endsWith('.js'))
-  .map(output => output.path.split('/').pop())
-
-const cssFiles = buildResult.outputs
-  .filter(output => output.path.endsWith('.css'))
-  .map(output => output.path.split('/').pop())
+// Generate index.html (link only entry module & main stylesheet)
+const entryScript = '/main.js'
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -57,19 +93,21 @@ const html = `<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ryan Cruz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-latin-wght-italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/style.css" />
-  ${cssFiles.map(css => `  <link rel="stylesheet" href="/${css}" />`).join('\n')}
 </head>
 <body>
   <div id="app"></div>
-  ${jsFiles.map(js => `  <script type="module" src="/${js}"></script>`).join('\n')}
+  <script type="module" src="${entryScript}"></script>
 </body>
 </html>`
 
 writeFileSync(join(distDir, 'index.html'), html)
 
 console.log('✓ Build complete!')
-console.log(`✓ Generated ${jsFiles.length} JS files, ${cssFiles.length} CSS files`)
+
+if (watchMode && tailwindProc) {
+  console.log('👀 Watching for changes (JS & CSS)...')
+  await tailwindProc.exited
+}

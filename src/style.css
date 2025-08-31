@@ -1,5 +1,23 @@
 @import 'tailwindcss';
 
+:root {}
+
+/* Self-hosted Inter Variable (latin) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-wght-italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   /* Light theme colors */
   --bg-primary: #ffffff;
@@ -16,6 +34,23 @@
     --text-primary: #ffffff;
     --text-secondary: #94a3b8;
   }
+}
+
+/* Tailwind v4 design tokens */
+@theme {
+  /* Map app vars to Tailwind tokens */
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-muted: var(--text-secondary);
+
+  /* Airport palette */
+  --color-airport-yellow: #ffb612;
+  --color-airport-blue: #003f87;
+  --color-airport-green: #009639;
+  --color-airport-red: #d50032;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 * {
@@ -52,7 +87,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('../public/kdal.svg');
+  background-image: url('/kdal.svg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -94,6 +129,15 @@ hotfx-split-flap {
 @media (min-width: 480px) {
   hotfx-split-flap {
     font-size: 1.2rem;
+  }
+}
+
+/* Respect reduced motion: contain animations visually if present */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }
 
