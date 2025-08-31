@@ -20,21 +20,21 @@
     "clean": "rm -rf node_modules dist .vite bun.lock && echo '🧹 Cleaned: node_modules, dist, .vite, bun.lock' && echo '📦 Run: bun install'"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250819.0",
-    "@eslint/js": "^9.33.0",
+    "@cloudflare/workers-types": "^4.20250831.0",
+    "@eslint/js": "^9.34.0",
     "@tailwindcss/cli": "^4.1.12",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^24.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.40.0",
-    "@typescript-eslint/parser": "^8.40.0",
-    "eslint": "^9.33.0",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "eslint": "^9.34.0",
     "jsdom": "^26.1.0",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2",
-    "wrangler": "^4.31.0",
-    "prettier": "^3.3.3",
-    "svgo": "^3.3.2",
-    "@fontsource-variable/inter": "^5.1.0"
+    "wrangler": "^4.33.1",
+    "prettier": "^3.6.2",
+    "svgo": "^4.0.0",
+    "@fontsource-variable/inter": "^5.2.6"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.12",
