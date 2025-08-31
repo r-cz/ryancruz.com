@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom'
 const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
   url: 'http://localhost',
   pretendToBeVisual: true,
-  resources: 'usable'
+  resources: 'usable',
 })
 
 // Make DOM globals available

@@ -24,10 +24,7 @@ if (existsSync(publicDir)) {
 const fontSrcDir = 'node_modules/@fontsource-variable/inter/files'
 const fontDestDir = join(distDir, 'fonts')
 mkdirSync(fontDestDir, { recursive: true })
-const fontsToCopy = [
-  'inter-latin-wght-normal.woff2',
-  'inter-latin-wght-italic.woff2',
-]
+const fontsToCopy = ['inter-latin-wght-normal.woff2', 'inter-latin-wght-italic.woff2']
 for (const f of fontsToCopy) {
   const src = join(fontSrcDir, f)
   if (existsSync(src)) {
@@ -37,20 +34,16 @@ for (const f of fontsToCopy) {
 
 // Process CSS with Tailwind (and optionally watch)
 console.log('Processing CSS with Tailwind...')
-const tailwindArgs = [
-  '-i', `${srcDir}/style.css`,
-  '-o', `${distDir}/style.css`,
-]
+const tailwindArgs = ['-i', `${srcDir}/style.css`, '-o', `${distDir}/style.css`]
 if (watchMode) tailwindArgs.push('-w')
 if (minifyWanted) tailwindArgs.push('--minify')
 
 let tailwindProc: ReturnType<typeof Bun.spawn> | undefined
 try {
   if (watchMode) {
-    tailwindProc = Bun.spawn([
-      './node_modules/.bin/tailwindcss',
-      ...tailwindArgs,
-    ], { stdio: ['inherit', 'inherit', 'inherit'] })
+    tailwindProc = Bun.spawn(['./node_modules/.bin/tailwindcss', ...tailwindArgs], {
+      stdio: ['inherit', 'inherit', 'inherit'],
+    })
   } else {
     await Bun.$`./node_modules/.bin/tailwindcss ${tailwindArgs}`.quiet()
   }
@@ -68,15 +61,17 @@ const buildResult = await Bun.build({
   minify: minifyWanted,
   splitting: true,
   sourcemap: watchMode ? 'external' : undefined,
-  watch: watchMode ? {
-    onRebuild(result) {
-      if (result.success) {
-        console.log('✓ Rebuilt JS')
-      } else {
-        console.error('✗ Rebuild failed:', result.logs)
+  watch: watchMode
+    ? {
+        onRebuild(result) {
+          if (result.success) {
+            console.log('✓ Rebuilt JS')
+          } else {
+            console.error('✗ Rebuild failed:', result.logs)
+          }
+        },
       }
-    }
-  } : false,
+    : false,
 })
 
 if (!buildResult.success) {

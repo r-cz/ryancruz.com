@@ -9,11 +9,11 @@ describe('main.ts', () => {
   it('should initialize app without errors when app element exists', () => {
     const app = document.querySelector('#app')
     expect(app).toBeTruthy()
-    
+
     // Trigger DOMContentLoaded event
     const event = new Event('DOMContentLoaded')
     document.dispatchEvent(event)
-    
+
     // Check if app content was added
     expect(app?.innerHTML).toContain('RYAN CRUZ')
     expect(app?.innerHTML).toContain('CYBERSECURITY ENGINEER')

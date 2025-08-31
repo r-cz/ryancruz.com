@@ -52,6 +52,7 @@ bun run lint
 
 # Deploy to Cloudflare Workers
 bun run deploy
+```
 
 ## 🗜 SVG Optimization
 
@@ -66,7 +67,6 @@ bun run svgo:all
 ```
 
 Config: `svgo.config.js` (keeps viewBox, simplifies paths, cleans IDs).
-```
 
 The development server will start on port 8787 with automatic rebuilding when you save files.
 

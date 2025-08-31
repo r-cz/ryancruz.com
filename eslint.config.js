@@ -4,7 +4,7 @@ import parser from '@typescript-eslint/parser'
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', '.vite/**']
+    ignores: ['dist/**', 'node_modules/**', '.vite/**'],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -12,7 +12,7 @@ export default [
       parser: parser,
       parserOptions: {
         ecmaVersion: 2022,
-        sourceType: 'module'
+        sourceType: 'module',
       },
       globals: {
         // DOM globals
@@ -32,26 +32,29 @@ export default [
         URL: 'readonly',
         Headers: 'readonly',
         ExecutionContext: 'readonly',
-        // Bun test globals  
+        // Bun test globals
         describe: 'readonly',
         it: 'readonly',
         expect: 'readonly',
         beforeEach: 'readonly',
-        spyOn: 'readonly'
-      }
+        spyOn: 'readonly',
+      },
     },
     plugins: {
-      '@typescript-eslint': typescript
+      '@typescript-eslint': typescript,
     },
     rules: {
       ...js.configs.recommended.rules,
       ...typescript.configs.recommended.rules,
       // Base no-undef misfires on TS type-only names like Fetcher
       'no-undef': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'error'
-    }
-  }
+      '@typescript-eslint/no-non-null-assertion': 'error',
+    },
+  },
 ]
