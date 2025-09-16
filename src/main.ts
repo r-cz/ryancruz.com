@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     app.innerHTML = `
       <div class="page-container">
         <!-- Hero Section -->
-        <main class="relative z-10 flex items-center justify-center min-h-screen px-8">
+        <main class="hero-section relative z-10 flex items-center justify-center min-h-screen px-8">
           <div class="text-center max-w-4xl">
             <div class="hero-title-wrapper">
               <h1 class="text-6xl md:text-8xl font-bold text-[var(--text-primary)]">

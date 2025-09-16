@@ -75,23 +75,30 @@ html {
     'Open Sans',
     'Helvetica Neue',
     sans-serif;
+  height: 100%;
 }
 
 body {
+  height: 100%;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 #app {
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 
 /* Page container with pseudo-element background */
 .page-container {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 
 .page-container::before {
@@ -142,6 +149,13 @@ body {
   border-radius: 9999px;
   text-align: center;
   isolation: isolate;
+}
+
+.hero-section {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
 }
 
 .hero-title-wrapper::before {
