@@ -39,11 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- Hero Section -->
         <main class="relative z-10 flex items-center justify-center min-h-screen px-8">
           <div class="text-center max-w-4xl">
-            <h1 class="text-6xl md:text-8xl font-bold mb-6 text-[var(--text-primary)]">
-              RYAN CRUZ
-            </h1>
-            <div class="mb-8">
-              <hotfx-split-flap>CYBERSECURITY ENGINEER</hotfx-split-flap>
+            <div class="hero-title-wrapper">
+              <h1 class="text-6xl md:text-8xl font-bold text-[var(--text-primary)]">
+                RYAN CRUZ
+              </h1>
+              <div class="hero-subtitle">
+                <hotfx-split-flap>CYBERSECURITY ENGINEER</hotfx-split-flap>
+              </div>
             </div>
           </div>
         </main>
