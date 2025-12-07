@@ -1,9 +1,24 @@
 @import 'tailwindcss';
 
-:root {
+/* Bebas Neue - Bold condensed display font with aviation signage character */
+@font-face {
+  font-family: 'Bebas Neue';
+  src: url('/fonts/bebas-neue-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* Self-hosted Inter Variable (latin) */
+/* JetBrains Mono - Technical monospace for data elements */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Self-hosted Inter Variable (latin) - body text fallback */
 @font-face {
   font-family: 'Inter';
   src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2');
@@ -11,48 +26,44 @@
   font-style: normal;
   font-display: swap;
 }
-@font-face {
-  font-family: 'Inter';
-  src: url('/fonts/inter-latin-wght-italic.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
 
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --text-primary: #000000;
-  --text-secondary: #64748b;
-}
+  /* Night Terminal Palette */
+  --bg-deep: #030508;
+  --bg-primary: #0a0e14;
+  --bg-elevated: #111820;
+  --bg-surface: #1a2332;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark theme colors */
-    --bg-primary: #000000;
-    --bg-secondary: #0f172a;
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
-  }
+  /* Text hierarchy */
+  --text-primary: #f0ebe3;
+  --text-secondary: #8b9bb4;
+  --text-muted: #4a5a6e;
+
+  /* Airport accent colors */
+  --amber: #ffb612;
+  --amber-glow: #ffc94d;
+  --amber-dim: #b38200;
+  --cyan: #00d4ff;
+  --cyan-glow: #66e5ff;
+  --green: #00ff88;
+  --red: #ff3366;
+
+  /* Functional */
+  --border: rgba(255, 182, 18, 0.15);
+  --border-strong: rgba(255, 182, 18, 0.3);
 }
 
 /* Tailwind v4 design tokens */
 @theme {
-  /* Map app vars to Tailwind tokens */
   --color-background: var(--bg-primary);
   --color-foreground: var(--text-primary);
   --color-muted: var(--text-secondary);
+  --color-amber: var(--amber);
+  --color-cyan: var(--cyan);
 
-  /* Airport palette */
-  --color-airport-yellow: #ffb612;
-  --color-airport-blue: #003f87;
-  --color-airport-green: #009639;
-  --color-airport-red: #d50032;
-
-  /* Typography */
-  --font-sans:
-    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -62,25 +73,14 @@
 }
 
 html {
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Open Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
   height: 100%;
+  background: var(--bg-deep);
 }
 
 body {
   height: 100%;
-  background-color: var(--bg-primary);
+  background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
   overflow: hidden;
@@ -93,38 +93,42 @@ body {
   overflow: hidden;
 }
 
-/* Page container with pseudo-element background */
+/* ============================================
+   Page Container with Atmospheric Background
+   ============================================ */
 .page-container {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 0%, var(--bg-elevated) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(255, 182, 18, 0.03) 0%, transparent 50%),
+    var(--bg-primary);
 }
 
+/* Airport diagram background - glowing radar effect */
 .page-container::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 50%;
+  left: 50%;
+  width: 140vmax;
+  height: 140vmax;
+  transform: translate(-50%, -50%);
   background-image: url('/kdal.svg');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.1;
+  opacity: 0.06;
+  filter: invert(1) sepia(1) saturate(3) hue-rotate(15deg) brightness(0.8);
+  mask-image: radial-gradient(ellipse 70% 70% at center, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at center, black 0%, transparent 70%);
 }
 
-@media (prefers-color-scheme: dark) {
-  .page-container::before {
-    opacity: 0.15;
-    filter: invert(1);
-  }
-}
-
-/* Gradient overlay using pseudo-element */
+/* Subtle scan line animation */
 .page-container::after {
   content: '';
   position: fixed;
@@ -132,102 +136,380 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at center, transparent 20%, var(--bg-primary) 80%);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 182, 18, 0.008) 2px,
+    rgba(255, 182, 18, 0.008) 4px
+  );
   pointer-events: none;
-  z-index: 1;
+  z-index: 100;
+  animation: scanlines 8s linear infinite;
 }
 
-.hero-title-wrapper {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1rem, 3vw, 1.75rem);
-  padding: clamp(1.75rem, 5vw, 3rem) clamp(2.5rem, 7vw, 4.5rem);
-  margin: 0 auto;
-  border-radius: 9999px;
-  text-align: center;
-  isolation: isolate;
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
 }
 
+/* ============================================
+   Hero Section
+   ============================================ */
 .hero-section {
+  position: relative;
+  z-index: 10;
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
 
-.hero-title-wrapper::before {
+/* ============================================
+   Main Content Card
+   ============================================ */
+.hero-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 4rem;
+}
+
+/* Subtle glow behind content */
+.hero-content::before {
   content: '';
   position: absolute;
-  inset: -3rem;
+  inset: -4rem;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 182, 18, 0.04) 0%,
+    transparent 60%
+  );
   border-radius: 50%;
-  background:
-    radial-gradient(
-      ellipse at center,
-      rgba(255, 255, 255, 0.85) 0%,
-      rgba(255, 255, 255, 0.48) 45%,
-      rgba(255, 255, 255, 0.16) 72%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  filter: blur(32px);
-  -webkit-filter: blur(32px);
-  z-index: -1;
   pointer-events: none;
-  opacity: 0.65;
+  z-index: -1;
 }
 
-@media (prefers-color-scheme: dark) {
-  .hero-title-wrapper::before {
-    background:
-      radial-gradient(
-        ellipse at center,
-        rgba(17, 17, 17, 0.82) 0%,
-        rgba(17, 17, 17, 0.46) 50%,
-        rgba(17, 17, 17, 0.2) 75%,
-        rgba(17, 17, 17, 0) 100%
-      );
-  }
+/* ============================================
+   Status Indicator
+   ============================================ */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
 }
 
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse-glow 2s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--green);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+/* ============================================
+   Name / Title
+   ============================================ */
+.hero-name {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 15vw, 10rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 0.9;
+  color: var(--text-primary);
+  text-align: center;
+  position: relative;
+}
+
+/* Subtle text shadow for depth */
+.hero-name span {
+  position: relative;
+  display: inline-block;
+  text-shadow:
+    0 0 60px rgba(255, 182, 18, 0.15),
+    0 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Split Flap Subtitle
+   ============================================ */
 .hero-subtitle {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.subtitle-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--amber-dim);
+}
+
+/* Split flap wrapper with board styling */
+.split-flap-wrapper {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.5),
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 182, 18, 0.1);
+}
+
+/* Corner accents */
+.split-flap-wrapper::before,
+.split-flap-wrapper::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--amber-dim);
+  opacity: 0.4;
+}
+
+.split-flap-wrapper::before {
+  top: 4px;
+  left: 4px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.split-flap-wrapper::after {
+  bottom: 4px;
+  right: 4px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Custom styling for the split-flap component */
+hotfx-split-flap {
+  font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+  --hotfx-split-flap-grid-gap: 0.12em;
+}
+
+/* Style the split-flap parts via CSS custom properties and ::part */
+hotfx-split-flap::part(flap) {
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 49%, #151515 51%, #0a0a0a 100%) !important;
+  color: var(--amber) !important;
+  font-family: var(--font-mono) !important;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+hotfx-split-flap::part(divider) {
+  background: rgba(0, 0, 0, 0.6) !important;
+  height: 2px !important;
+}
+
+/* ============================================
+   Navigation / Social Links
+   ============================================ */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.nav-link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--amber);
+}
+
+.nav-link-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover .nav-link-icon {
+  transform: translateY(-2px);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--amber);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
   width: 100%;
 }
 
-hotfx-split-flap {
-  font-size: 1rem;
-  max-width: 100vw;
-  overflow: hidden;
+/* ============================================
+   Footer / Coordinates
+   ============================================ */
+.footer-info {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  opacity: 0.6;
 }
 
-@media (min-width: 480px) {
-  hotfx-split-flap {
-    font-size: 1.2rem;
-  }
+.footer-info span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-/* Respect reduced motion: contain animations visually if present */
+.coord-symbol {
+  color: var(--amber-dim);
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-}
 
-@media (min-width: 768px) {
-  hotfx-split-flap {
-    font-size: 1.5rem;
+  .page-container::after {
+    animation: none;
+  }
+
+  .status-dot {
+    animation: none;
   }
 }
 
-@media (min-width: 1024px) {
-  hotfx-split-flap {
-    font-size: 2rem;
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+@media (max-width: 640px) {
+  .hero-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .nav-links {
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .footer-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Light mode override - keeping dark as primary but supporting light */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-deep: #f8f6f3;
+    --bg-primary: #ffffff;
+    --bg-elevated: #fafafa;
+    --bg-surface: #f0ede8;
+
+    --text-primary: #0a0e14;
+    --text-secondary: #5a6577;
+    --text-muted: #9aa3b2;
+
+    --amber: #c48a00;
+    --amber-glow: #e6a200;
+    --amber-dim: #8a6200;
+
+    --border: rgba(10, 14, 20, 0.1);
+    --border-strong: rgba(10, 14, 20, 0.2);
+  }
+
+  .page-container {
+    background:
+      radial-gradient(ellipse 120% 100% at 50% 0%, var(--bg-elevated) 0%, transparent 50%),
+      var(--bg-primary);
+  }
+
+  .page-container::before {
+    opacity: 0.08;
+    filter: sepia(0.3) saturate(0.5) brightness(0.3);
+  }
+
+  .page-container::after {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(10, 14, 20, 0.01) 2px,
+      rgba(10, 14, 20, 0.01) 4px
+    );
+  }
+
+  .hero-name span {
+    text-shadow:
+      0 0 60px rgba(196, 138, 0, 0.1),
+      0 2px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .split-flap-wrapper {
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 -2px 8px rgba(0, 0, 0, 0.5),
+      0 8px 32px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(0, 0, 0, 0.1);
   }
 }
