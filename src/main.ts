@@ -67,12 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="page-container">
         <main class="hero-section">
           <div class="hero-content">
-            <!-- Status indicator -->
-            <div class="status-indicator">
-              <span class="status-dot"></span>
-              <span>Available for opportunities</span>
-            </div>
-
             <!-- Name -->
             <h1 class="hero-name">
               <span>RYAN CRUZ</span>
@@ -80,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <!-- Split flap subtitle -->
             <div class="hero-subtitle">
-              <span class="subtitle-label">Currently</span>
               <div class="split-flap-wrapper">
                 <hotfx-split-flap>CYBERSECURITY ENGINEER</hotfx-split-flap>
               </div>
