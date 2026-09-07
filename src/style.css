@@ -97,14 +97,6 @@ svg {
   width: 100%;
   height: 100%;
 }
-.scene-dom-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.scene-dom-layer .laptop-screen {
-  pointer-events: auto;
-}
 .scene-loading {
   position: absolute;
   inset: 0;
@@ -116,66 +108,21 @@ svg {
   display: none;
 }
 .laptop-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
-  width: 603px;
-  height: 371px;
-  overflow: hidden;
-  background: #f6f5f1;
-  color: #262822;
-  border-radius: 3px;
-  backface-visibility: hidden;
   cursor: pointer;
+  border-radius: 3px;
+}
+/* The visible preview is a texture on the 3D display; this remains a native link. */
+.laptop-screen > * {
+  display: none;
 }
 .laptop-screen:focus-visible {
-  outline: 4px solid #f6ca56;
-  outline-offset: 4px;
-}
-.screen-masthead {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 22px 24px;
-  font-size: 8px;
-  letter-spacing: 0.02em;
-}
-.screen-masthead > span:first-child {
-  font-family: var(--font-serif);
-  font-size: 10px;
-}
-.screen-intro {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 33px 20px 0;
-}
-.screen-name {
-  font: 78px/0.99 var(--font-serif);
-  letter-spacing: -4px;
-}
-.screen-role {
-  font: 15px/1.3 var(--font-serif);
-  margin-top: 16px;
-}
-.screen-description {
-  font-size: 10px;
-  line-height: 1.8;
-  margin-top: 19px;
-}
-.screen-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 11px 19px;
-  background: var(--color-navy);
-  color: #fff;
-  font-size: 9px;
-  margin-top: 21px;
-}
-.screen-cta svg {
-  width: 12px;
-  height: 12px;
+  outline: 3px solid #f6ca56;
+  outline-offset: 5px;
+  background: #f6ca5614;
 }
 /* Keep the monogram readable against the dark exterior after sunset. */
 .scene-camera[data-night='true'] ~ .scene-header .scene-monogram {
@@ -662,6 +609,25 @@ svg {
   .portfolio-colophon {
     font-size: 10px;
     gap: 10px;
+  }
+}
+@media (max-height: 500px) and (min-aspect-ratio: 1/1) {
+  .scene-footer {
+    bottom: 10px;
+  }
+  .explore-cue,
+  .explore-cue span::after {
+    font-size: 12px;
+  }
+  .explore-cue {
+    gap: 4px;
+  }
+  .explore-cue svg {
+    width: 14px;
+    height: 14px;
+  }
+  .motion-toggle {
+    transform: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {

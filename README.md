@@ -29,15 +29,18 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 
 - `src/terminal-environment.ts`: instanced terminal architecture, furnishings, portrait digital gate displays and aircraft taxi path. Physical sign text is drawn on small canvas textures; there is no generated background image.
 - `src/boarding-gate.ts`: modeled Ops Agent kiosk, boarding door and exterior jetbridge at gate 20.
-- `src/scene3d.ts`: WebGL renderer, MacBook model, CSS3D laptop screen, responsive camera path, resource disposal.
+- `src/scene3d.ts`: WebGL renderer, MacBook model and display, projected native laptop link, responsive camera path, resource disposal.
+- `src/laptop-screen.ts`: high-resolution canvas preview drawn from the page’s existing portfolio copy, with a font-ready redraw for paused scenes.
 - `src/scene-lighting.ts`: smoothly interpolated local-clock sky, sun, ambient light and warm interior fixtures.
 - `src/aircraft.ts`: asynchronously loads the compressed aircraft GLB, redraws paused scenes when it arrives, and handles load failure/disposal.
 - `scripts/convert-aircraft.ts`: converts the supplied FBX into an exterior-only, normalized GLB before compression.
-- `src/main.ts`: progressive enhancement, native scroll navigation, keyboard focus, motion preferences and renderer fallback.
+- `src/main.ts`: progressive enhancement, native scroll navigation, keyboard focus, motion preferences, container-based viewport sizing and renderer fallback.
 - `src/page.ts` and `src/portfolio.ts`: shared semantic page content, prerendered into the built HTML by `build.ts`.
 - `src/style.css`: scene chrome and responsive portfolio typography/layout.
 
 Portfolio content and links work without JavaScript or WebGL. A lost graphics context or renderer error reveals the same document. Reduced-motion preferences disable ambient movement and camera zoom; the motion button can also pause animation. Hidden tabs and the expanded portfolio stop the continuous render loop. The 3D engine loads separately from the initial interaction code. When motion is paused or reduced, a single frame each minute keeps lighting current. Clock refreshes also stop while the tab or terminal is hidden and catch up on return. This is a local-time atmosphere, not a weather feed or astronomical sunrise calculation; no location permission is needed.
+
+Portrait viewports use a 60° horizontal field of view to keep both gates and the window seating visible around a smaller laptop. The display is part of the same WebGL scene as the bezel, avoiding alignment drift between separate HTML and WebGL renderers. A native link covers the laptop for tapping and keyboard access; the expanded portfolio remains normal, selectable HTML. Renderer dimensions come from the scene’s layout box, with coalesced resize observation that preserves scroll progress and ignores unchanged sizes when browser controls or pinch zoom change the visual viewport.
 
 ## Content and visual references
 

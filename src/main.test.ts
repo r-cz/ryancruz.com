@@ -28,6 +28,21 @@ let cleanup: (() => void) | undefined
 let frameId = 0
 let timerId = 0
 let media: MediaQueryList
+let visualViewport: EventTarget & { width: number; height: number; scale: number }
+const originalResizeObserver = Object.getOwnPropertyDescriptor(window, 'ResizeObserver')
+const originalVisualViewport = Object.getOwnPropertyDescriptor(window, 'visualViewport')
+const sizeObservers: TestResizeObserver[] = []
+class TestResizeObserver {
+  observe = mock((_target: Element) => {})
+  unobserve = mock((_target: Element) => {})
+  disconnect = mock(() => {})
+  constructor(private callback: ResizeObserverCallback) {
+    sizeObservers.push(this)
+  }
+  notify() {
+    this.callback([], this as unknown as ResizeObserver)
+  }
+}
 const frames = new Map<number, FrameRequestCallback>()
 const timers = new Map<number, { callback: () => void; delay: number }>()
 const intervals = new Map<number, { callback: () => void; delay: number }>()
@@ -41,6 +56,13 @@ function element<T extends HTMLElement = HTMLElement>(selector: string): T {
   const found = document.querySelector<T>(selector)
   if (!found) throw new Error(`Missing test element: ${selector}`)
   return found
+}
+
+function setViewportSize(width: number, height = 900) {
+  Object.defineProperties(element('.scene-viewport'), {
+    clientWidth: { configurable: true, value: width },
+    clientHeight: { configurable: true, value: height },
+  })
 }
 
 function flushFrame(time = 16) {
@@ -70,7 +92,11 @@ beforeEach(() => {
   Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280 })
   Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
   Object.defineProperty(document, 'hidden', { configurable: true, value: false })
-  Object.defineProperty(element('.scene-viewport'), 'clientHeight', { value: 900 })
+  setViewportSize(1280)
+  sizeObservers.length = 0
+  visualViewport = Object.assign(new window.EventTarget(), { width: 1280, height: 900, scale: 1 })
+  Object.defineProperty(window, 'visualViewport', { configurable: true, value: visualViewport })
+  Object.defineProperty(window, 'ResizeObserver', { configurable: true, value: TestResizeObserver })
   media = Object.assign(new window.EventTarget(), {
     matches: false,
     media: '(prefers-reduced-motion: reduce)',
@@ -125,6 +151,12 @@ afterEach(() => {
   setSystemTime()
   document.body.innerHTML = ''
   mock.restore()
+  if (originalResizeObserver)
+    Object.defineProperty(window, 'ResizeObserver', originalResizeObserver)
+  else Reflect.deleteProperty(window, 'ResizeObserver')
+  if (originalVisualViewport)
+    Object.defineProperty(window, 'visualViewport', originalVisualViewport)
+  else Reflect.deleteProperty(window, 'visualViewport')
 })
 
 describe('portfolio document', () => {
@@ -161,6 +193,7 @@ describe('camera transition', () => {
     expect(element('#portfolio')).toBe(portfolio)
     expect(createLiveScene).toHaveBeenCalledTimes(1)
     expect(renderer.resize).toHaveBeenLastCalledWith(1280, 900)
+    expect(renderer.resize).toHaveBeenCalledTimes(1)
     expect(document.documentElement.classList.contains('scene-ready')).toBe(true)
     expect(document.querySelector('.scene-loading')).toBeNull()
   })
@@ -213,6 +246,7 @@ describe('camera transition', () => {
 
   it('keeps the portfolio visible when resizing from mobile to desktop', async () => {
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
+    setViewportSize(390)
     await start()
     element('.skip-scene').click()
     expect(window.scrollY).toBeCloseTo(495)
@@ -220,10 +254,11 @@ describe('camera transition', () => {
     flushFrame()
     expect(element('#portfolio').style.opacity).toBe('1')
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1440 })
+    setViewportSize(1440)
     window.dispatchEvent(new Event('resize'))
+    flushFrame()
     expect(renderer.resize).toHaveBeenLastCalledWith(1440, 900)
     expect(scrollTo).toHaveBeenLastCalledWith({ top: 855, behavior: 'instant' })
-    flushFrame()
     expect(element('#portfolio').style.opacity).toBe('1')
     expect(document.activeElement).toBe(element('#portfolio'))
   })
@@ -234,6 +269,7 @@ describe('camera transition', () => {
     flushFrame()
     expect(renderer.render.mock.calls.at(-1)?.[0]).toBeCloseTo(0.5)
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
+    setViewportSize(390)
     window.dispatchEvent(new Event('resize'))
     flushFrame()
     expect(renderer.render.mock.calls.at(-1)?.[0]).toBeCloseTo(0.5)
@@ -253,6 +289,144 @@ describe('camera transition', () => {
       expect(window.scrollY).toBe(0)
       expect(document.activeElement).not.toBe(element('#portfolio'))
       expect(document.documentElement.classList.contains('in-portfolio')).toBe(false)
+    })
+  }
+})
+
+describe('scene viewport measurements', () => {
+  it('uses the scene layout dimensions when the window reports a different size', async () => {
+    setViewportSize(390, 744)
+    await start()
+    expect(renderer.resize).toHaveBeenLastCalledWith(390, 744)
+    expect(sizeObservers[0].observe).toHaveBeenCalledWith(element('.scene-viewport'))
+    element('.skip-scene').click()
+    expect(scrollTo).toHaveBeenLastCalledWith({ top: 409, behavior: 'instant' })
+  })
+
+  it('coalesces element-only resizes and draws one updated frame while paused', async () => {
+    window.localStorage.setItem('ryan-motion-paused', 'true')
+    await start()
+    const rendered = renderer.render.mock.calls.length
+    setViewportSize(390, 744)
+    sizeObservers[0].notify()
+    sizeObservers[0].notify()
+    expect(frames.size).toBe(1)
+    expect(renderer.resize).toHaveBeenCalledTimes(1)
+    flushFrame()
+    expect(renderer.resize).toHaveBeenLastCalledWith(390, 744)
+    expect(renderer.resize).toHaveBeenCalledTimes(2)
+    expect(renderer.render).toHaveBeenCalledTimes(rendered + 1)
+    expect(frames.size).toBe(0)
+  })
+
+  it('does not resize or rewrite scroll when only browser chrome or pinch zoom changes', async () => {
+    window.localStorage.setItem('ryan-motion-paused', 'true')
+    setViewportSize(390, 744)
+    await start()
+    window.scrollTo({ top: 200, behavior: 'instant' })
+    flushFrame()
+    scrollTo.mockClear()
+    const rendered = renderer.render.mock.calls.length
+    Object.assign(visualViewport, { width: 195, height: 350, scale: 2 })
+    visualViewport.dispatchEvent(new Event('resize'))
+    visualViewport.dispatchEvent(new Event('resize'))
+    window.dispatchEvent(new Event('resize'))
+    window.dispatchEvent(new Event('pageshow'))
+    expect(frames.size).toBe(1)
+    flushFrame()
+    expect(renderer.resize).toHaveBeenCalledTimes(1)
+    expect(renderer.render).toHaveBeenCalledTimes(rendered + 1)
+    expect(scrollTo).not.toHaveBeenCalled()
+    expect(window.scrollY).toBe(200)
+    expect(frames.size).toBe(0)
+  })
+
+  it('preserves progress and portfolio position through observed orientation changes', async () => {
+    setViewportSize(390, 744)
+    await start()
+    window.scrollTo({ top: 204.5, behavior: 'instant' })
+    flushFrame()
+    setViewportSize(844, 390)
+    sizeObservers[0].notify()
+    flushFrame()
+    expect(renderer.render.mock.calls.at(-1)?.[0]).toBeCloseTo(0.5)
+    expect(window.scrollY).toBe(185.5)
+    window.scrollTo({ top: 471, behavior: 'instant' })
+    flushFrame()
+    setViewportSize(390, 744)
+    sizeObservers[0].notify()
+    flushFrame()
+    expect(window.scrollY).toBe(509)
+    expect(element('#portfolio').style.opacity).toBe('1')
+  })
+
+  it('normalizes the pointer against the scene rectangle', async () => {
+    await start()
+    const viewport = element('.scene-viewport')
+    spyOn(viewport, 'getBoundingClientRect').mockReturnValue({
+      x: 40,
+      y: 80,
+      left: 40,
+      top: 80,
+      right: 440,
+      bottom: 680,
+      width: 400,
+      height: 600,
+      toJSON: () => ({}),
+    })
+    viewport.dispatchEvent(
+      Object.assign(new Event('pointermove'), {
+        pointerType: 'mouse',
+        clientX: 340,
+        clientY: 230,
+      }),
+    )
+    flushFrame()
+    expect(renderer.render.mock.calls.at(-1)?.[2]).toEqual({ x: 0.5, y: 0.5 })
+  })
+
+  it('waits for a nonzero scene size before rendering', async () => {
+    setViewportSize(0, 0)
+    await start()
+    expect(renderer.resize).not.toHaveBeenCalled()
+    expect(renderer.render).not.toHaveBeenCalled()
+    setViewportSize(390, 744)
+    sizeObservers[0].notify()
+    flushFrame()
+    expect(renderer.resize).toHaveBeenLastCalledWith(390, 744)
+    expect(renderer.render).toHaveBeenCalledTimes(1)
+  })
+
+  it('falls back to window events when optional viewport APIs are unavailable', async () => {
+    Object.defineProperty(window, 'ResizeObserver', { configurable: true, value: undefined })
+    Object.defineProperty(window, 'visualViewport', { configurable: true, value: undefined })
+    await start()
+    setViewportSize(390, 744)
+    window.dispatchEvent(new Event('resize'))
+    flushFrame()
+    expect(renderer.resize).toHaveBeenLastCalledWith(390, 744)
+  })
+
+  for (const outcome of ['fallback', 'disposal'] as const) {
+    it(`disconnects size observation and rejects queued callbacks after ${outcome}`, async () => {
+      await start()
+      const observer = sizeObservers[0]
+      sizeObservers[0].notify()
+      if (outcome === 'fallback') element('canvas').dispatchEvent(new Event('webglcontextlost'))
+      else {
+        cleanup?.()
+        cleanup = undefined
+      }
+      const resized = renderer.resize.mock.calls.length
+      expect(observer.disconnect).toHaveBeenCalled()
+      expect(frames.size).toBe(0)
+      setViewportSize(390, 744)
+      observer.notify()
+      visualViewport.dispatchEvent(new Event('resize'))
+      window.dispatchEvent(new Event('resize'))
+      window.dispatchEvent(new Event('pageshow'))
+      expect(frames.size).toBe(0)
+      expect(renderer.resize).toHaveBeenCalledTimes(resized)
     })
   }
 })
@@ -409,7 +583,9 @@ describe('motion and graceful degradation', () => {
         flushFrame()
       } else {
         failResize = true
+        setViewportSize(390)
         window.dispatchEvent(new Event('resize'))
+        flushFrame()
       }
       expect(document.documentElement.classList.contains('enhanced')).toBe(false)
       expect(element('#portfolio').style.opacity).toBe('')
