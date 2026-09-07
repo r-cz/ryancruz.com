@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import { CSS3DObject, CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { createTerminalEnvironment } from './terminal-environment'
 import { getSceneLighting } from './scene-lighting'
+import { createLaptopScreenTexture } from './laptop-screen'
 
 export interface LiveScene {
   resize(width: number, height: number): void
@@ -16,14 +16,23 @@ export function createLiveScene(
   screenElement: HTMLElement,
   onChange: () => void = () => {},
 ): LiveScene {
+  // Prepare the fallible 2D preview before allocating WebGL resources or
+  // starting aircraft loading, and release it if WebGL is unavailable.
+  const preview = createLaptopScreenTexture(screenElement, onChange)
+  let renderer: THREE.WebGLRenderer
+  try {
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: 'low-power',
+    })
+  } catch (error) {
+    preview.dispose()
+    throw error
+  }
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#dce7e9')
   scene.fog = new THREE.Fog('#dce7e9', 36, 95)
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false,
-    powerPreference: 'low-power',
-  })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFShadowMap
@@ -35,9 +44,6 @@ export function createLiveScene(
   )
   renderer.domElement.setAttribute('role', 'img')
   container.appendChild(renderer.domElement)
-  const css = new CSS3DRenderer()
-  css.domElement.className = 'scene-dom-layer'
-  container.appendChild(css.domElement)
   const camera = new THREE.PerspectiveCamera(44, 1, 0.04, 150)
 
   const hemisphere = new THREE.HemisphereLight('#eef5ff', '#99806a', 2.4)
@@ -72,6 +78,8 @@ export function createLiveScene(
 
   const environment = createTerminalEnvironment(onChange)
   scene.add(environment.group)
+  const foreground = new THREE.Group()
+  scene.add(foreground)
   const stone = new THREE.MeshStandardMaterial({ color: '#c8c4b9', roughness: 0.85 })
   const aluminum = new THREE.MeshStandardMaterial({
     color: '#4b4f52',
@@ -104,7 +112,7 @@ export function createLiveScene(
     mesh.position.set(x, y, z)
     mesh.castShadow = true
     mesh.receiveShadow = true
-    scene.add(mesh)
+    foreground.add(mesh)
     meshes.push(mesh)
     return mesh
   }
@@ -127,7 +135,7 @@ export function createLiveScene(
       keys.setMatrixAt(row * 14 + col, matrix)
     }
   keys.castShadow = true
-  scene.add(keys)
+  foreground.add(keys)
   box(0.94, 0.012, 0.1, 0, 0.948, 0.968, keyMaterial, 0.01)
   box(0.99, 0.01, 0.43, 0, 0.929, 1.367, chrome, 0.02)
   box(0.966, 0.01, 0.408, 0, 0.934, 1.367, aluminum, 0.018)
@@ -136,15 +144,54 @@ export function createLiveScene(
     matrix.makeTranslation((i < 12 ? -1.2 : 1.09) + (i % 12) * 0.01, 0.925, 0.64)
     grille.setMatrixAt(i, matrix)
   }
-  scene.add(grille)
+  foreground.add(grille)
   box(0.15, 0.024, 0.023, 0, 2.466, 0.158, bezel, 0.01)
 
   const screenCenter = new THREE.Vector3(0, 1.69, 0.234)
-  const screen = new CSS3DObject(screenElement)
+  const screenMaterial = new THREE.MeshBasicMaterial({ map: preview.texture, toneMapped: false })
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(2.45, (2.45 * 371) / 603), screenMaterial)
   screen.position.copy(screenCenter)
   screen.rotation.x = -0.085
-  screen.scale.setScalar(2.45 / 603)
-  scene.add(screen)
+  foreground.add(screen)
+  meshes.push(screen)
+
+  // Keep a native link over the entire laptop for touch, keyboard and assistive
+  // technology. Only WebGL draws the display, so browser zoom cannot separate
+  // its contents from the bezel as it can with a second, CSS 3D renderer.
+  const originalScreenParent = screenElement.parentElement
+  container.appendChild(screenElement)
+  const laptopCorners = [
+    new THREE.Vector3(-1.34, 0.92, 1.78),
+    new THREE.Vector3(1.34, 0.92, 1.78),
+    new THREE.Vector3(-1.32, 2.53, 0.11),
+    new THREE.Vector3(1.32, 2.53, 0.11),
+    new THREE.Vector3(-1.34, 0.86, 0.06),
+    new THREE.Vector3(1.34, 0.86, 0.06),
+  ]
+  const projected = new THREE.Vector3()
+  function positionLaptopLink() {
+    let left = width
+    let right = 0
+    let top = height
+    let bottom = 0
+    for (const corner of laptopCorners) {
+      projected.copy(corner).applyMatrix4(foreground.matrixWorld).project(camera)
+      const x = ((projected.x + 1) * width) / 2
+      const y = ((1 - projected.y) * height) / 2
+      left = Math.min(left, x)
+      right = Math.max(right, x)
+      top = Math.min(top, y)
+      bottom = Math.max(bottom, y)
+    }
+    // Clamp the target as the camera enters the laptop and corners pass behind it.
+    left = THREE.MathUtils.clamp(left, 0, width)
+    right = THREE.MathUtils.clamp(right, left, width)
+    top = THREE.MathUtils.clamp(top, 0, height)
+    bottom = THREE.MathUtils.clamp(bottom, top, height)
+    screenElement.style.transform = `translate(${left}px, ${top}px)`
+    screenElement.style.width = `${right - left}px`
+    screenElement.style.height = `${bottom - top}px`
+  }
 
   let width = 1
   let height = 1
@@ -159,13 +206,18 @@ export function createLiveScene(
       width = w
       height = h
       renderer.setSize(w, h)
-      css.setSize(w, h)
       camera.aspect = w / h
-      camera.fov = w <= 700 ? 48 : 44
+      const portrait = camera.aspect < 0.85
+      // Preserve the horizontal view on portrait screens so both gates and the
+      // window seating remain in view instead of cropping to the laptop alone.
+      camera.fov = portrait
+        ? THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(Math.PI / 6) / camera.aspect))
+        : 44
       camera.updateProjectionMatrix()
-      const mobile = w <= 700
-      initialPosition.set(mobile ? 0.85 : 0.35, mobile ? 2.55 : 2.5, mobile ? 8.2 : 6.0)
-      initialTarget.set(0, mobile ? 2.1 : 2.05, -1.8)
+      foreground.position.x = portrait ? 0.85 : 0
+      screenCenter.set(foreground.position.x, 1.69, 0.234)
+      initialPosition.set(portrait ? 0.85 : 0.35, portrait ? 2.25 : 2.5, portrait ? 5.1 : 6)
+      initialTarget.set(foreground.position.x, portrait ? 2.1 : 2.05, -1.8)
       // End just inside the screen so the HTML portfolio can take over edge-to-edge.
       const verticalDistance = 1.505 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))
       const horizontalDistance =
@@ -203,7 +255,7 @@ export function createLiveScene(
       camera.lookAt(currentTarget)
       environment.update(elapsed)
       renderer.render(scene, camera)
-      css.render(scene, camera)
+      positionLaptopLink()
       container.dataset.renderSize = `${width}x${height}`
     },
     dispose() {
@@ -214,10 +266,14 @@ export function createLiveScene(
       sunlight.shadow.dispose()
       keys.geometry.dispose()
       grille.geometry.dispose()
-      for (const material of [stone, aluminum, bezel, keyMaterial, chrome]) material.dispose()
+      preview.dispose()
+      for (const material of [stone, aluminum, bezel, keyMaterial, chrome, screenMaterial])
+        material.dispose()
       renderer.dispose()
       renderer.domElement.remove()
-      css.domElement.remove()
+      screenElement.removeAttribute('style')
+      if (originalScreenParent) originalScreenParent.appendChild(screenElement)
+      else screenElement.remove()
     },
   }
 }

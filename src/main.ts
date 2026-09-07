@@ -25,6 +25,11 @@ export function initSite() {
   }
   let liveScene: LiveScene | undefined
   let frame = 0
+  let needsResize = false
+  let sceneWidth = 0
+  let sceneHeight = 0
+  let resizeObserver: ResizeObserver | undefined
+  const visualViewport = window.visualViewport
   let entering: number | undefined
   let clockInterval: number | undefined
   let travel = 1
@@ -59,8 +64,12 @@ export function initSite() {
     schedule()
   }
   function render(time = 0) {
+    if (needsResize) {
+      needsResize = false
+      resize()
+    }
     frame = 0
-    if (disposed || failed || !camera || !portfolio || !laptop) return
+    if (disposed || failed || !measured || !camera || !portfolio || !laptop) return
     const progress = transitionProgress(window.scrollY, travel)
     updateClock(progress)
     const animated = !manuallyPaused && !reduced.matches && !document.hidden && progress < 1
@@ -87,7 +96,20 @@ export function initSite() {
     if (liveScene && animated) schedule()
   }
   function schedule() {
-    if (!frame && !document.hidden && !disposed) frame = window.requestAnimationFrame(render)
+    if (!frame && !document.hidden && !disposed && !failed)
+      frame = window.requestAnimationFrame(render)
+  }
+  function queueResize() {
+    if (disposed || failed) return
+    needsResize = true
+    schedule()
+  }
+  function stopObservingSize() {
+    resizeObserver?.disconnect()
+    window.removeEventListener('resize', queueResize)
+    window.removeEventListener('pageshow', queueResize)
+    visualViewport?.removeEventListener('resize', queueResize)
+    needsResize = false
   }
   function stopClock() {
     if (clockInterval !== undefined) window.clearInterval(clockInterval)
@@ -107,11 +129,15 @@ export function initSite() {
     }
   }
   function resize() {
-    if (!viewport || !track || failed) return
+    if (!viewport || !track || failed || disposed) return
+    // Canvas, camera and projected controls all use this same layout box.
+    // Pinch zoom changes the visual viewport, not these CSS dimensions.
+    const width = viewport.clientWidth
+    const height = viewport.clientHeight
+    if (width <= 0 || height <= 0) return
     const oldTravel = travel
     const oldScroll = window.scrollY
-    const height = viewport.clientHeight
-    travel = Math.round(height * (window.innerWidth <= 700 || reduced.matches ? 0.55 : 0.95))
+    travel = Math.round(height * (width <= 700 || reduced.matches ? 0.55 : 0.95))
     track.style.height = `${height + travel}px`
     document.documentElement.style.setProperty('--scene-height', `${height}px`)
     if (measured && travel !== oldTravel) {
@@ -123,15 +149,20 @@ export function initSite() {
     }
     measured = true
     try {
-      liveScene?.resize(window.innerWidth, height)
+      // Initial layout is measured before the asynchronous scene exists.
+      if (liveScene && (width !== sceneWidth || height !== sceneHeight)) {
+        liveScene.resize(width, height)
+        sceneWidth = width
+        sceneHeight = height
+      }
     } catch {
       revealContent()
       return
     }
-    schedule()
   }
   function revealContent() {
     failed = true
+    stopObservingSize()
     stopClock()
     if (entering) {
       window.clearTimeout(entering)
@@ -218,7 +249,7 @@ export function initSite() {
     updateMotionControls()
   }
   function onPreference() {
-    resize()
+    queueResize()
     updateMotionControls()
   }
   function onVisibility() {
@@ -229,13 +260,15 @@ export function initSite() {
       frame = 0
     } else {
       updateClock()
-      schedule()
+      queueResize()
     }
   }
   function onPointer(event: PointerEvent) {
     if (event.pointerType !== 'mouse') return
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-    pointer.y = 1 - (event.clientY / window.innerHeight) * 2
+    const rect = viewport?.getBoundingClientRect()
+    if (!rect || rect.width <= 0 || rect.height <= 0) return
+    pointer.x = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1)
+    pointer.y = clamp(1 - ((event.clientY - rect.top) / rect.height) * 2, -1, 1)
     schedule()
   }
   app.addEventListener('click', navigate)
@@ -243,9 +276,14 @@ export function initSite() {
   toggle.addEventListener('click', onToggle)
   viewport.addEventListener('pointermove', onPointer)
   window.addEventListener('scroll', schedule, { passive: true })
-  window.addEventListener('resize', resize)
+  window.addEventListener('resize', queueResize)
   window.addEventListener('hashchange', followHash)
-  window.addEventListener('pageshow', resize)
+  window.addEventListener('pageshow', queueResize)
+  visualViewport?.addEventListener('resize', queueResize)
+  if (typeof window.ResizeObserver === 'function') {
+    resizeObserver = new window.ResizeObserver(queueResize)
+    resizeObserver.observe(viewport)
+  }
   document.addEventListener('visibilitychange', onVisibility)
   reduced.addEventListener('change', onPreference)
   resize()
@@ -253,7 +291,7 @@ export function initSite() {
   if (window.location.hash) followHash()
   void import('./scene3d')
     .then(({ createLiveScene }) => {
-      if (disposed) return
+      if (disposed || failed) return
       liveScene = createLiveScene(camera, laptop, schedule)
       camera.querySelector('.scene-loading')?.remove()
       document.documentElement.classList.add('scene-ready')
@@ -274,6 +312,7 @@ export function initSite() {
     })
   return () => {
     disposed = true
+    stopObservingSize()
     stopClock()
     window.cancelAnimationFrame(frame)
     if (entering) window.clearTimeout(entering)
@@ -283,9 +322,7 @@ export function initSite() {
     toggle.removeEventListener('click', onToggle)
     viewport.removeEventListener('pointermove', onPointer)
     window.removeEventListener('scroll', schedule)
-    window.removeEventListener('resize', resize)
     window.removeEventListener('hashchange', followHash)
-    window.removeEventListener('pageshow', resize)
     document.removeEventListener('visibilitychange', onVisibility)
     reduced.removeEventListener('change', onPreference)
   }
