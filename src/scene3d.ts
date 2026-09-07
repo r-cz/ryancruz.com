@@ -1,0 +1,197 @@
+import * as THREE from 'three'
+import { CSS3DObject, CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js'
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
+import { createTerminalEnvironment } from './terminal-environment'
+
+export interface LiveScene {
+  resize(width: number, height: number): void
+  render(progress: number, elapsed: number, pointer: { x: number; y: number }): void
+  dispose(): void
+}
+
+/** The whole terminal, laptop and aircraft are geometry rendered every frame. */
+export function createLiveScene(
+  container: HTMLElement,
+  screenElement: HTMLElement,
+  boardElement: HTMLElement,
+): LiveScene {
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color('#dce7e9')
+  scene.fog = new THREE.Fog('#dce7e9', 36, 95)
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: false,
+    powerPreference: 'low-power',
+  })
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.PCFShadowMap
+  renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1.25
+  renderer.domElement.setAttribute(
+    'aria-label',
+    'Live 3D rendering of a gate at Dallas Love Field, with a MacBook on a table and aircraft beyond the windows',
+  )
+  renderer.domElement.setAttribute('role', 'img')
+  container.appendChild(renderer.domElement)
+  const css = new CSS3DRenderer()
+  css.domElement.className = 'scene-dom-layer'
+  container.appendChild(css.domElement)
+  const camera = new THREE.PerspectiveCamera(44, 1, 0.04, 150)
+
+  scene.add(new THREE.HemisphereLight('#eef5ff', '#99806a', 2.4))
+  const sunlight = new THREE.DirectionalLight('#fff0d9', 3.2)
+  sunlight.position.set(-12, 14, -7)
+  sunlight.target.position.set(1, 0, -5)
+  sunlight.castShadow = true
+  sunlight.shadow.mapSize.set(2048, 2048)
+  sunlight.shadow.camera.left = -16
+  sunlight.shadow.camera.right = 16
+  sunlight.shadow.camera.top = 14
+  sunlight.shadow.camera.bottom = -14
+  sunlight.shadow.camera.far = 55
+  sunlight.shadow.normalBias = 0.025
+  sunlight.shadow.bias = -0.0002
+  scene.add(sunlight, sunlight.target)
+  const fill = new THREE.DirectionalLight('#e6f0ff', 1.5)
+  fill.position.set(2, 5, 9)
+  scene.add(fill)
+
+  const environment = createTerminalEnvironment()
+  scene.add(environment.group)
+  const stone = new THREE.MeshStandardMaterial({ color: '#c8c4b9', roughness: 0.85 })
+  const aluminum = new THREE.MeshStandardMaterial({
+    color: '#4b4f52',
+    metalness: 0.75,
+    roughness: 0.32,
+  })
+  const bezel = new THREE.MeshStandardMaterial({
+    color: '#101315',
+    metalness: 0.25,
+    roughness: 0.5,
+  })
+  const keyMaterial = new THREE.MeshStandardMaterial({ color: '#171a1c', roughness: 0.62 })
+  const chrome = new THREE.MeshStandardMaterial({
+    color: '#a6aaac',
+    metalness: 0.85,
+    roughness: 0.28,
+  })
+  const meshes: THREE.Mesh[] = []
+  function box(
+    w: number,
+    h: number,
+    d: number,
+    x: number,
+    y: number,
+    z: number,
+    material: THREE.Material,
+    radius = 0.015,
+  ) {
+    const mesh = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, radius), material)
+    mesh.position.set(x, y, z)
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    scene.add(mesh)
+    meshes.push(mesh)
+    return mesh
+  }
+  box(8.5, 0.14, 3.05, 0, 0.78, 1, stone, 0.05)
+  box(0.14, 0.73, 1.7, -2.8, 0.34, 1, aluminum)
+  box(0.14, 0.73, 1.7, 2.8, 0.34, 1, aluminum)
+  // MacBook Pro: beveled unibody, hinge, keyboard, speaker grilles and trackpad.
+  box(2.68, 0.065, 1.72, 0, 0.888, 0.92, aluminum, 0.03)
+  const lid = box(2.64, 1.69, 0.065, 0, 1.69, 0.18, aluminum, 0.045)
+  lid.rotation.x = -0.085
+  const frame = box(2.58, 1.63, 0.018, 0, 1.69, 0.221, bezel, 0.034)
+  frame.rotation.x = -0.085
+  box(2.12, 0.015, 0.76, 0, 0.932, 0.63, bezel, 0.02)
+  const keyGeometry = new RoundedBoxGeometry(0.135, 0.014, 0.095, 1, 0.009)
+  const keys = new THREE.InstancedMesh(keyGeometry, keyMaterial, 70)
+  const matrix = new THREE.Matrix4()
+  for (let row = 0; row < 5; row++)
+    for (let col = 0; col < 14; col++) {
+      matrix.makeTranslation((col - 6.5) * 0.143, 0.948, 0.36 + row * 0.122)
+      keys.setMatrixAt(row * 14 + col, matrix)
+    }
+  keys.castShadow = true
+  scene.add(keys)
+  box(0.94, 0.012, 0.1, 0, 0.948, 0.968, keyMaterial, 0.01)
+  box(0.99, 0.01, 0.43, 0, 0.929, 1.367, chrome, 0.02)
+  box(0.966, 0.01, 0.408, 0, 0.934, 1.367, aluminum, 0.018)
+  const grille = new THREE.InstancedMesh(new THREE.BoxGeometry(0.011, 0.005, 0.55), keyMaterial, 24)
+  for (let i = 0; i < 24; i++) {
+    matrix.makeTranslation((i < 12 ? -1.2 : 1.09) + (i % 12) * 0.01, 0.925, 0.64)
+    grille.setMatrixAt(i, matrix)
+  }
+  scene.add(grille)
+  box(0.15, 0.024, 0.023, 0, 2.466, 0.158, bezel, 0.01)
+
+  const screenCenter = new THREE.Vector3(0, 1.69, 0.234)
+  const screen = new CSS3DObject(screenElement)
+  screen.position.copy(screenCenter)
+  screen.rotation.x = -0.085
+  screen.scale.setScalar(2.45 / 603)
+  scene.add(screen)
+  // An actual mounted monitor, with live HTML flight rows on its front face.
+  const board = new CSS3DObject(boardElement)
+  board.position.set(4.05, 3.6, -4.46)
+  board.scale.setScalar(0.0055)
+  scene.add(board)
+  box(2.56, 1.46, 0.13, 4.05, 3.6, -4.55, bezel, 0.025)
+  box(0.07, 1.65, 0.07, 4.05, 4.99, -4.6, aluminum)
+
+  let width = 1
+  let height = 1
+  const initialPosition = new THREE.Vector3()
+  const initialTarget = new THREE.Vector3()
+  const finalPosition = new THREE.Vector3()
+  const currentTarget = new THREE.Vector3()
+  const screenNormal = new THREE.Vector3(0, Math.sin(0.085), Math.cos(0.085))
+  const ease = (t: number) => t * t * (3 - 2 * t)
+  return {
+    resize(w, h) {
+      width = w
+      height = h
+      renderer.setSize(w, h)
+      css.setSize(w, h)
+      camera.aspect = w / h
+      camera.fov = w <= 700 ? 48 : 44
+      camera.updateProjectionMatrix()
+      const mobile = w <= 700
+      initialPosition.set(mobile ? 0.85 : 0.35, mobile ? 2.55 : 2.5, mobile ? 8.2 : 6.0)
+      initialTarget.set(0, mobile ? 2.1 : 2.05, -1.8)
+      // End just inside the screen so the HTML portfolio can take over edge-to-edge.
+      const verticalDistance = 1.505 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))
+      const horizontalDistance =
+        2.45 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect)
+      finalPosition
+        .copy(screenCenter)
+        .addScaledVector(screenNormal, Math.min(verticalDistance, horizontalDistance) * 0.985)
+    },
+    render(progress, elapsed, pointer) {
+      const t = ease(progress)
+      camera.position.lerpVectors(initialPosition, finalPosition, t)
+      camera.position.x += pointer.x * 0.16 * (1 - t)
+      camera.position.y += pointer.y * 0.07 * (1 - t)
+      currentTarget.lerpVectors(initialTarget, screenCenter, t)
+      camera.lookAt(currentTarget)
+      environment.update(elapsed)
+      renderer.render(scene, camera)
+      css.render(scene, camera)
+      container.dataset.renderSize = `${width}x${height}`
+    },
+    dispose() {
+      environment.dispose()
+      for (const mesh of meshes) mesh.geometry.dispose()
+      keys.dispose()
+      grille.dispose()
+      sunlight.shadow.dispose()
+      keys.geometry.dispose()
+      grille.geometry.dispose()
+      for (const material of [stone, aluminum, bezel, keyMaterial, chrome]) material.dispose()
+      renderer.dispose()
+      renderer.domElement.remove()
+      css.domElement.remove()
+    },
+  }
+}

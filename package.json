@@ -34,7 +34,8 @@
     "wrangler": "^4.56.0",
     "prettier": "^3.7.4",
     "svgo": "^4.0.0",
-    "@fontsource-variable/inter": "^5.2.8"
+    "@fontsource-variable/inter": "^5.2.8",
+    "@types/three": "^0.185.4"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.18",
@@ -45,5 +46,8 @@
     "lightningcss-linux-x64-musl": "^1.30.2",
     "lightningcss-linux-arm64-gnu": "^1.30.2",
     "lightningcss-linux-arm64-musl": "^1.30.2"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
   }
 }

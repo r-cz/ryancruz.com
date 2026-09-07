@@ -1,124 +1,44 @@
 # ryancruz.com
 
-Ryan Cruz's personal website - An aviation-themed portfolio site showcasing professional experience and technical expertise.
+Ryan Cruz’s personal portfolio, set inside a live 3D interpretation of Dallas Love Field.
 
-## 🛫 Overview
+The terminal, MacBook Pro, linked gate seating, window grids, beams and Southwest-inspired aircraft are modeled Three.js geometry. Aircraft movement and departure-board updates are simulated. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
 
-A modern, aviation-inspired personal website built with Bun and TypeScript, deployed on Cloudflare Workers. Features authentic airport design elements including a real KDAL airport diagram background.
+## Development
 
-## ✈️ Features
+Requires Bun. The site uses TypeScript, Three.js, Tailwind CSS v4, and Cloudflare Workers with static assets.
 
-- **Aviation-themed design system** with airport signage aesthetics
-- **Real KDAL airport diagram background** with gradient overlay
-- **Animated split-flap display** with cycling professional titles
-- **Authentic DOT transportation symbols** for wayfinding
-- **Responsive design** optimized for all devices
-- **Modern CSS custom properties** for theming
-- **Clean, minimal interface** with professional focus
-
-## 🛠 Tech Stack
-
-- **Build Tool**: Bun + Custom Build Script
-- **Deployment**: Cloudflare Workers with Static Assets
-- **Language**: TypeScript 5
-- **Styling**: Tailwind CSS 4 with `@theme` tokens
-- **Package Manager**: Bun
-- **Testing**: Bun Test with jsdom
-- **Deployment**: Cloudflare Workers
-
-## 🚀 Getting Started
-
-```bash
-# Install dependencies
+```sh
 bun install
+bun run build:site
+bunx wrangler dev --port 8787
+```
 
-# Start development server with hot reloading
-bun run dev
+For live source, content, CSS and asset updates, run `bun run build:watch` in a second terminal. The existing `bun run dev` also starts the build watcher and Wrangler.
 
-# Build for production
-bun run build
-
-# Watch and rebuild on changes (JS + CSS)
-bun run build:watch
-
-# Run tests
-bun test
-
-# Type checking
+```sh
 bun run typecheck
-
-# Linting
 bun run lint
-
-# Deploy to Cloudflare Workers
-bun run deploy
+bun test
+bun run build
 ```
 
-## 🗜 SVG Optimization
+Changes use a feature branch and PR. Merging into `main` runs the existing GitHub Actions deployment to Cloudflare Workers. The Worker runs before static assets so HTML is not stored and JavaScript/CSS revalidate; other assets use a bounded one-hour cache.
 
-This repo uses SVGO to compress SVGs (notably `public/kdal.svg`).
+## Implementation
 
-```bash
-# Optimize a single file (in-place)
-bunx svgo public/kdal.svg --multipass -o public/kdal.svg
+- `src/terminal-environment.ts`: instanced terminal architecture, furnishings, signs and animated aircraft. Physical sign text is drawn on small canvas textures; there is no generated background image.
+- `src/scene3d.ts`: WebGL renderer, lighting, MacBook model, CSS3D screen and departure monitor, responsive camera path, resource disposal.
+- `src/main.ts`: progressive enhancement, native scroll navigation, keyboard focus, motion preferences and renderer fallback.
+- `src/page.ts` and `src/portfolio.ts`: shared semantic page content, prerendered into the built HTML by `build.ts`.
+- `src/style.css`: scene chrome and responsive portfolio typography/layout.
 
-# Or optimize all SVGs under public/
-bun run svgo:all
-```
+Portfolio content and links work without JavaScript or WebGL. A lost graphics context or renderer error reveals the same document. Reduced-motion preferences disable ambient movement and camera zoom; the motion button can also pause animation. Hidden tabs and the expanded portfolio stop the continuous render loop. The 3D engine loads separately from the initial interaction code.
 
-Config: `svgo.config.js` (keeps viewBox, simplifies paths, cleans IDs).
+## Content and visual references
 
-The development server will start on port 8787 with automatic rebuilding when you save files.
+Career and education are sourced from `public/Resume.pdf`, dated February 24, 2025. Project descriptions are based on the public READMEs for [IAM Tools](https://github.com/r-cz/iam-tools) and [.dsconfig Helper](https://github.com/r-cz/dsconfig-helper). Visitors do not trigger GitHub or flight-data API requests.
 
-## 🎨 Design System
+Architecture is informed by [Corgan’s DAL modernization photography](https://www.corgan.com/projects/dal-love-field-modernization-program-lfmp) and the real gate photos in [Travel Codex’s Love Field walkthrough](https://www.travelcodex.com/the-new-terminal-at-dallas-love-field-airport-in-pictures/). The geometry is an original, stylized interpretation of DAL rather than a surveyed model of a specific gate. Southwest colors and signage provide airport context; this is a personal website.
 
-The site features an aviation/airport theme with:
-
-- Clean typography optimized for readability
-- Airport signage color palette (black, yellow #FFB612, white)
-- Real KDAL airport diagram as background
-- CSS custom properties for theming
-- Airport wayfinding iconography from DOT transportation symbols
-
-## 📁 Project Structure
-
-```text
-├── src/                 # Source code
-│   ├── components/      # Reusable components
-│   │   └── split-flap.js # Local split-flap display component
-│   ├── main.ts         # Main application entry point
-│   ├── style.css       # Global styles and CSS variables
-│   └── main.test.ts    # Test files
-├── public/
-│   ├── icons/          # DOT transportation symbols (50+ icons)
-│   ├── images/         # Profile and company assets
-│   └── kdal.svg        # KDAL airport diagram background
-├── build.ts            # Custom build script
-├── bunfig.toml         # Bun configuration
-├── wrangler.toml       # Cloudflare Workers configuration
-└── tailwind.config.ts  # Tailwind CSS configuration
-```
-
-## 🧪 Testing
-
-The project uses Bun's native test runner with jsdom for DOM testing:
-
-- Test setup in `test-setup.ts` configures jsdom environment
-- Tests located in `src/main.test.ts`
-- Coverage reports generated in `coverage/` directory
-
-## 🌐 Deployment
-
-The site deploys to Cloudflare Workers with static assets providing:
-
-- Global edge distribution
-- Automatic static file serving
-- Cost-effective hosting (static assets are free)
-- Custom domain support
-- Custom worker sets caching headers:
-  - HTML: `Cache-Control: no-store`
-  - Static assets: `Cache-Control: public, max-age=31536000, immutable`
-
-## 📄 License
-
-© 2025 Ryan Cruz. All rights reserved.
+No API keys, live flight service, sound, video, or generated-image assets are required.
