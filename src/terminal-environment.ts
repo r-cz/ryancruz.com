@@ -7,7 +7,7 @@ import { createAircraft } from './aircraft'
  * https://www.corgan.com/projects/dal-love-field-modernization-program-lfmp
  * Original geometry, with no photographic or generated-image textures.
  */
-export function createTerminalEnvironment(): {
+export function createTerminalEnvironment(onChange: () => void = () => {}): {
   group: THREE.Group
   update(timeSeconds: number): void
   setDaylight(daylight: number): void
@@ -332,8 +332,8 @@ export function createTerminalEnvironment(): {
     group.add(mesh)
   }
 
-  const aircraft = createAircraft()
-  aircraft.group.position.set(-14, -0.13, -24.4)
+  const aircraft = createAircraft(onChange)
+  aircraft.group.position.set(-14, -0.1395, -24.4)
   group.add(aircraft.group)
 
   return {

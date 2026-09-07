@@ -1,13 +1,16 @@
-# Aircraft reference and provenance
+# Aircraft source and web adaptation
 
-`src/aircraft.ts` contains an original lightweight real-time Boeing 737-800-inspired mesh, not a downloaded commercial model. All geometry and the small livery textures are built in code. No reference photographs, third-party meshes, or vendor texture files ship with the site.
+The scene uses [Southwest Airlines Boeing 737](https://skfb.ly/6SnOs) by **Daniel Skomorovsky**, licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/). Ryan supplied the model as `737.fbx` and provided its attribution. Credit, source and license links appear in the portfolio footer and `public/models/ATTRIBUTION.txt`.
 
-The model proportions follow Boeing's official 737NG airport-planning document, revision C (October 2025), section 2.2.5, page 2-13 (PDF page 34): the 39.47 m overall length, narrow 3.76 m fuselage, swept wing planform, raised tail cone, engine placement and landing-gear locations. The wings have blended winglets based on the same aircraft family's configuration. The scene scales the aircraft to approximately 11 units long.
+The 6.4 MB FBX contains 422 meshes and 163,312 triangles. Its Southwest livery is colored geometry. The web adaptation removes 319 enclosed cabin meshes (77,316 triangles) and two source scene objects, retaining the exterior. The remaining meshes are normalized to an 11-unit length, nose toward -X, wheels at Y=0. Materials are converted to PBR. Three external engine fan bitmap references (`hub.png`, `hub2.png`, `blade.png`) were not included with the supplied file; those small surfaces use dark metal instead.
 
-- [Boeing 737NG airport-planning reference](https://www.boeing.com/content/dam/boeing/v2/airports/acaps/737NG_REV_C.pdf)
-- [Boeing 737NG technical specifications](https://www.boeing.com/commercial/737ng)
-- [Southwest's Heart livery history and reference photography](https://history.southwest.com/our-stories/our-heart-livery/)
+The final `public/models/southwest-737.glb` is about 320 KB with 67,175 triangles, compressed with meshoptimizer. Floating-point quantization preserves the model's small details and nested transforms. The runtime uses Three.js's GLTFLoader and bundled Meshopt decoder, with no remote model or texture requests. The model loads independently of the terminal, and load failure leaves the portfolio usable.
 
-Real 3D model listings were researched as requested, including [iljujjkin's Boeing 737-800 Southwest model](https://www.turbosquid.com/FullPreview/Index.cfm/ID/2485677) and the [CC Attribution Boeing 737-800 by Yo Boy on Sketchfab](https://sketchfab.com/3d-models/boeing-737-800-44892d3760284d51a4849dd322b610a1). These files were not downloaded or incorporated. The original geometry avoids account-gated downloads and does not require redistributing paid model assets.
+To regenerate with the supplied source file:
 
-This is a stylized personal-portfolio scene, not an engineering or flight-simulator model. Southwest and Boeing names and liveries identify the scene's real-world inspiration; this project is not an official product of either company.
+```sh
+bun scripts/convert-aircraft.ts /path/to/737.fbx /tmp/737-exterior.glb
+bunx gltfpack -i /tmp/737-exterior.glb -o public/models/southwest-737.glb -cc -vpf
+```
+
+The original FBX is not required for normal builds. The conversion script is tailored to this model; `__DEFAULT` meshes in this source are its enclosed cabin fittings. Changes to the source model should be inspected before using that removal rule.

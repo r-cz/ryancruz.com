@@ -595,6 +595,12 @@ svg {
   padding-top: 24px;
   font: 12px var(--font-serif);
   color: #656d60;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.model-credit a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .scene-unavailable .scene-track {
   display: none;

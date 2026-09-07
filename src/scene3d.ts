@@ -15,6 +15,7 @@ export function createLiveScene(
   container: HTMLElement,
   screenElement: HTMLElement,
   boardElement: HTMLElement,
+  onChange: () => void = () => {},
 ): LiveScene {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#dce7e9')
@@ -70,7 +71,7 @@ export function createLiveScene(
   })
   let lightingMinute = ''
 
-  const environment = createTerminalEnvironment()
+  const environment = createTerminalEnvironment(onChange)
   scene.add(environment.group)
   const stone = new THREE.MeshStandardMaterial({ color: '#c8c4b9', roughness: 0.85 })
   const aluminum = new THREE.MeshStandardMaterial({

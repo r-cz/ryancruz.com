@@ -268,7 +268,7 @@ export function initSite() {
   void import('./scene3d')
     .then(({ createLiveScene }) => {
       if (disposed) return
-      liveScene = createLiveScene(camera, laptop, board)
+      liveScene = createLiveScene(camera, laptop, board, schedule)
       camera.querySelector('.scene-loading')?.remove()
       document.documentElement.classList.add('scene-ready')
       camera.querySelector('canvas')?.addEventListener(
