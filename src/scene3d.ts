@@ -2,10 +2,11 @@ import * as THREE from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { createTerminalEnvironment } from './terminal-environment'
+import { getSceneLighting } from './scene-lighting'
 
 export interface LiveScene {
   resize(width: number, height: number): void
-  render(progress: number, elapsed: number, pointer: { x: number; y: number }): void
+  render(progress: number, elapsed: number, pointer: { x: number; y: number }, date?: Date): void
   dispose(): void
 }
 
@@ -39,7 +40,8 @@ export function createLiveScene(
   container.appendChild(css.domElement)
   const camera = new THREE.PerspectiveCamera(44, 1, 0.04, 150)
 
-  scene.add(new THREE.HemisphereLight('#eef5ff', '#99806a', 2.4))
+  const hemisphere = new THREE.HemisphereLight('#eef5ff', '#99806a', 2.4)
+  scene.add(hemisphere)
   const sunlight = new THREE.DirectionalLight('#fff0d9', 3.2)
   sunlight.position.set(-12, 14, -7)
   sunlight.target.position.set(1, 0, -5)
@@ -56,6 +58,17 @@ export function createLiveScene(
   const fill = new THREE.DirectionalLight('#e6f0ff', 1.5)
   fill.position.set(2, 5, 9)
   scene.add(fill)
+  const practicals = [
+    [0, 4.9, 1.3],
+    [2.5, 4.9, -7.2],
+    [-3.2, 4.9, -14.5],
+  ].map(([x, y, z]) => {
+    const light = new THREE.PointLight('#ffe3b5', 20, 15, 2)
+    light.position.set(x, y, z)
+    scene.add(light)
+    return light
+  })
+  let lightingMinute = ''
 
   const environment = createTerminalEnvironment()
   scene.add(environment.group)
@@ -168,7 +181,27 @@ export function createLiveScene(
         .copy(screenCenter)
         .addScaledVector(screenNormal, Math.min(verticalDistance, horizontalDistance) * 0.985)
     },
-    render(progress, elapsed, pointer) {
+    render(progress, elapsed, pointer, date = new Date()) {
+      const minute = `${date.getHours()}:${date.getMinutes()}:${date.getTimezoneOffset()}`
+      if (minute !== lightingMinute) {
+        const lighting = getSceneLighting(date)
+        ;(scene.background as THREE.Color).copy(lighting.sky)
+        ;(scene.fog as THREE.Fog).color.copy(lighting.sky)
+        hemisphere.color.copy(lighting.hemisphere)
+        hemisphere.groundColor.copy(lighting.ground)
+        hemisphere.intensity = lighting.ambient
+        sunlight.color.copy(lighting.sun)
+        sunlight.intensity = lighting.sunlight
+        sunlight.position.set(...lighting.sunPosition)
+        fill.color.copy(lighting.fill)
+        fill.intensity = lighting.fillIntensity
+        for (const practical of practicals) practical.intensity = lighting.practical
+        environment.setDaylight(lighting.daylight)
+        container.dataset.localHour = String(lighting.hour)
+        container.dataset.daylight = lighting.daylight.toFixed(3)
+        container.dataset.night = String(lighting.daylight < 0.2)
+        lightingMinute = minute
+      }
       const t = ease(progress)
       camera.position.lerpVectors(initialPosition, finalPosition, t)
       camera.position.x += pointer.x * 0.16 * (1 - t)

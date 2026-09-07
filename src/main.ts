@@ -27,6 +27,7 @@ export function initSite() {
   let liveScene: LiveScene | undefined
   let frame = 0
   let entering: number | undefined
+  let clockInterval: number | undefined
   let travel = 1
   let measured = false
   let disposed = false
@@ -64,6 +65,7 @@ export function initSite() {
     frame = 0
     if (disposed || failed || !camera || !portfolio || !laptop) return
     const progress = transitionProgress(window.scrollY, travel)
+    updateClock(progress)
     const animated = !manuallyPaused && !reduced.matches && !document.hidden && progress < 1
     if (animated && previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.06)
     previousTime = time
@@ -83,6 +85,7 @@ export function initSite() {
         reduced.matches ? 0 : progress,
         elapsed,
         animated ? pointer : { x: 0, y: 0 },
+        new Date(),
       )
     } catch {
       revealContent()
@@ -99,6 +102,23 @@ export function initSite() {
   }
   function schedule() {
     if (!frame && !document.hidden && !disposed) frame = window.requestAnimationFrame(render)
+  }
+  function stopClock() {
+    if (clockInterval !== undefined) window.clearInterval(clockInterval)
+    clockInterval = undefined
+  }
+  function updateClock(progress = transitionProgress(window.scrollY, travel)) {
+    if (!liveScene || disposed || failed || document.hidden || progress >= 1) {
+      stopClock()
+      return
+    }
+    if (clockInterval === undefined) {
+      // The visitor's clock keeps advancing even when ambient motion is paused.
+      clockInterval = window.setInterval(() => {
+        updateClock()
+        if (clockInterval !== undefined) schedule()
+      }, 60_000)
+    }
   }
   function resize() {
     if (!viewport || !track || failed) return
@@ -126,6 +146,7 @@ export function initSite() {
   }
   function revealContent() {
     failed = true
+    stopClock()
     if (entering) {
       window.clearTimeout(entering)
       entering = undefined
@@ -217,9 +238,13 @@ export function initSite() {
   function onVisibility() {
     previousTime = 0
     if (document.hidden) {
+      stopClock()
       window.cancelAnimationFrame(frame)
       frame = 0
-    } else schedule()
+    } else {
+      updateClock()
+      schedule()
+    }
   }
   function onPointer(event: PointerEvent) {
     if (event.pointerType !== 'mouse') return
@@ -263,6 +288,7 @@ export function initSite() {
     })
   return () => {
     disposed = true
+    stopClock()
     window.cancelAnimationFrame(frame)
     if (entering) window.clearTimeout(entering)
     liveScene?.dispose()

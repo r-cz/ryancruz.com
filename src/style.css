@@ -237,6 +237,11 @@ svg {
     transform: none;
   }
 }
+/* Keep the monogram readable against the dark exterior after sunset. */
+.scene-camera[data-night='true'] ~ .scene-header .scene-monogram {
+  color: #f6f5f1;
+  text-shadow: 0 1px 8px #172333;
+}
 .scene-chrome {
   position: absolute;
   left: 32px;
