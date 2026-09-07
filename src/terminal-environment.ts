@@ -69,6 +69,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   const cylinder = geometry(new THREE.CylinderGeometry(1, 1, 1, 20))
   const sphere = geometry(new THREE.SphereGeometry(1, 20, 12))
   const dummy = new THREE.Object3D()
+  let assemblyTransform: THREE.Matrix4 | undefined
   const batches = new Map<
     string,
     {
@@ -97,7 +98,9 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     dummy.scale.set(...scale)
     dummy.rotation.set(...rotation)
     dummy.updateMatrix()
-    batch.matrices.push(dummy.matrix.clone())
+    const matrix = dummy.matrix.clone()
+    if (assemblyTransform) matrix.premultiply(assemblyTransform)
+    batch.matrices.push(matrix)
   }
 
   const box = (
@@ -179,14 +182,33 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
       }
     }
   }
-  addSeatRow(2.65, -4.4, 6)
-  addSeatRow(2.65, -5.65, 6, -1)
-  addSeatRow(2.65, -9.1, 6)
-  addSeatRow(2.65, -10.35, 6, -1)
-  addSeatRow(-5.7, -12.6, 5)
-  addSeatRow(-5.7, -13.85, 5, -1)
-  // A quieter left-hand row preserves a visible aisle beyond the laptop.
-  addSeatRow(-5.75, -5.9, 3)
+  // Turn each seating bank a quarter turn around its center, keeping its aisle
+  // and paired back-to-back rows. Bake the transform into the existing instances.
+  const addSeatingBank = (
+    centerX: number,
+    centerZ: number,
+    rows: [startX: number, z: number, count: number, facing?: number][],
+  ) => {
+    assemblyTransform = new THREE.Matrix4()
+      .makeTranslation(centerX, 0, centerZ)
+      .multiply(new THREE.Matrix4().makeRotationY(Math.PI / 2))
+      .multiply(new THREE.Matrix4().makeTranslation(-centerX, 0, -centerZ))
+    rows.forEach(([x, z, count, facing]) => addSeatRow(x, z, count, facing))
+    assemblyTransform = undefined
+  }
+  addSeatingBank(4.7, -5.025, [
+    [2.65, -4.4, 6],
+    [2.65, -5.65, 6, -1],
+  ])
+  addSeatingBank(4.7, -10.725, [
+    [2.65, -10.1, 6],
+    [2.65, -11.35, 6, -1],
+  ])
+  addSeatingBank(-4.06, -13.225, [
+    [-5.7, -12.6, 5],
+    [-5.7, -13.85, 5, -1],
+  ])
+  addSeatingBank(-4.93, -5.9, [[-5.75, -5.9, 3]])
 
   // Broad daylight apron and distant low buildings beyond the glass.
   box(concrete, [-3, -0.19, -30], [120, 0.12, 110], false)
@@ -203,36 +225,6 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   for (let x = -44; x <= 44; x += 5.5) {
     for (const z of [-27, -46]) {
       instance(sphere, taxiLight, [x, 0.015, z], [0.055, 0.04, 0.055], [0, 0, 0], false)
-    }
-  }
-
-  // Physical signs use crisp canvas text independent of the scene's daylight exposure.
-  const canvas = document.createElement('canvas')
-  canvas.width = 1024
-  canvas.height = 270
-  const context = canvas.getContext('2d')
-  if (context) {
-    context.fillStyle = '#172f43'
-    context.fillRect(0, 0, canvas.width, canvas.height)
-    context.fillStyle = '#f5f1e5'
-    context.font = '600 110px system-ui, sans-serif'
-    context.fillText('DAL', 40, 162)
-    context.font = '42px system-ui, sans-serif'
-    context.fillText('Dallas Love Field', 312, 153)
-    context.fillStyle = '#bd9b66'
-    context.fillRect(42, 210, 940, 3)
-    const texture = new THREE.CanvasTexture(canvas)
-    texture.colorSpace = THREE.SRGBColorSpace
-    textures.add(texture)
-    const signMaterial = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false })
-    materials.add(signMaterial)
-    const sign = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.8, 1)), signMaterial)
-    sign.name = 'DAL terminal sign'
-    sign.position.set(-3.5, 3.5, -12.5)
-    group.add(sign)
-    box(darkMetal, [-3.5, 3.5, -12.57], [3.9, 1.1, 0.12])
-    for (const x of [-4.95, -2.05]) {
-      instance(cylinder, aluminum, [x, 4.81, -12.57], [0.018, 1.56, 0.018])
     }
   }
 
@@ -316,10 +308,8 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     gateDisplays.push(display)
     drawGate(display, false)
   }
-  addGate('14', 'Tulsa, OK', '2146', '2:35 PM', 7.4, -7.62, -0.35)
-  addGate('16', 'Sacramento, CA', '1620', '3:10 PM', 7.4, -15.12, -0.35)
-  addGate('11', 'Houston, TX', '1158', '2:20 PM', -5.48, -7.61, 0.25)
-  addGate('13', 'Denver, CO', '1382', '2:50 PM', -5.48, -15.11, 0.25)
+  addGate('18', 'Tulsa, OK', '2146', '2:35 PM', 7.4, -7.62, -0.35)
+  addGate('20', 'Houston, TX', '1158', '2:20 PM', -5.48, -7.61, 0.25)
   let gatePhase = 0
 
   for (const { shape, surface, matrices, castShadow } of batches.values()) {
@@ -333,7 +323,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   }
 
   const aircraft = createAircraft(onChange)
-  aircraft.group.position.set(-14, -0.1395, -24.4)
+  aircraft.group.position.set(-14, -0.13, -24.4)
   group.add(aircraft.group)
 
   return {

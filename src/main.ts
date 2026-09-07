@@ -14,9 +14,8 @@ export function initSite() {
   const camera = app.querySelector<HTMLElement>('.scene-camera')
   const portfolio = app.querySelector<HTMLElement>('#portfolio')
   const laptop = app.querySelector<HTMLElement>('.laptop-screen')
-  const board = app.querySelector<HTMLElement>('.departure-board')
   const toggle = app.querySelector<HTMLButtonElement>('.motion-toggle')
-  if (!track || !viewport || !camera || !portfolio || !laptop || !board || !toggle) return () => {}
+  if (!track || !viewport || !camera || !portfolio || !laptop || !toggle) return () => {}
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
   let manuallyPaused = false
   try {
@@ -33,8 +32,6 @@ export function initSite() {
   let disposed = false
   let elapsed = 0
   let previousTime = 0
-  let lastBoardUpdate = 0
-  let flightStep = 0
   let failed = false
   const pointer = { x: 0, y: 0 }
   document.documentElement.classList.add('enhanced')
@@ -69,17 +66,6 @@ export function initSite() {
     const animated = !manuallyPaused && !reduced.matches && !document.hidden && progress < 1
     if (animated && previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.06)
     previousTime = time
-    if (elapsed - lastBoardUpdate > 11) {
-      const cells = board?.querySelectorAll<HTMLElement>('[data-flight-status]')
-      if (cells?.length) {
-        const cell = cells[flightStep++ % cells.length]
-        cell.textContent = cell.textContent === 'ON TIME' ? 'BOARDING' : 'ON TIME'
-        cell.classList.remove('board-updated')
-        void cell.offsetWidth
-        cell.classList.add('board-updated')
-      }
-      lastBoardUpdate = elapsed
-    }
     try {
       liveScene?.render(
         reduced.matches ? 0 : progress,
@@ -268,7 +254,7 @@ export function initSite() {
   void import('./scene3d')
     .then(({ createLiveScene }) => {
       if (disposed) return
-      liveScene = createLiveScene(camera, laptop, board, schedule)
+      liveScene = createLiveScene(camera, laptop, schedule)
       camera.querySelector('.scene-loading')?.remove()
       document.documentElement.classList.add('scene-ready')
       camera.querySelector('canvas')?.addEventListener(

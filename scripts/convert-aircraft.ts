@@ -38,7 +38,7 @@ const bounds = new THREE.Box3().setFromObject(model)
 const center = bounds.getCenter(new THREE.Vector3())
 const length = bounds.max.z - bounds.min.z
 const remove: THREE.Object3D[] = []
-const materials = new Map<THREE.Material, THREE.MeshStandardMaterial>()
+const materials = new Map<string, THREE.MeshStandardMaterial>()
 let triangles = 0
 model.traverse((object) => {
   object.userData = {}
@@ -55,8 +55,12 @@ model.traverse((object) => {
     remove.push(object)
     return
   }
-  object.material = originals.map((original) => {
-    let surface = materials.get(original)
+  // The source's tire and hub assemblies include open, inward-facing sidewalls.
+  // Render those existing surfaces from both sides, without changing the airframe.
+  const wheelAssembly = originals.some(({ name }) => name === 'Material1' || name === 'Material7')
+  const convertedMaterials = originals.map((original) => {
+    const key = `${original.uuid}:${wheelAssembly ? 'wheel' : 'exterior'}`
+    let surface = materials.get(key)
     if (!surface) {
       const fan = Boolean(original.map)
       const glazing = /Glass/i.test(original.name)
@@ -65,14 +69,17 @@ model.traverse((object) => {
         color: fan ? '#26313b' : original.color,
         roughness: glazing ? 0.18 : 0.44,
         metalness: fan ? 0.65 : 0.16,
-        side: original.side,
+        side: wheelAssembly ? THREE.DoubleSide : original.side,
         transparent: !fan && original.transparent,
         opacity: fan ? 1 : original.opacity,
       })
-      materials.set(original, surface)
+      materials.set(key, surface)
     }
     return surface
   })
+  // A single-material FBX mesh has no geometry groups. Changing it to an array
+  // makes GLTFExporter omit its faces, including wheels and engine exhausts.
+  object.material = Array.isArray(object.material) ? convertedMaterials : convertedMaterials[0]
   triangles += (object.geometry.index?.count ?? object.geometry.attributes.position.count) / 3
 })
 remove.forEach((object) => object.removeFromParent())

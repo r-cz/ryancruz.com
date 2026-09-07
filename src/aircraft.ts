@@ -48,7 +48,7 @@ export function createAircraft(onChange: () => void = () => {}): Aircraft {
   let loadedScenes: THREE.Group[] = []
 
   async function load() {
-    const response = await fetch('/models/southwest-737.glb', { signal: controller.signal })
+    const response = await fetch('/models/southwest-737.glb?v=2', { signal: controller.signal })
     if (disposed) return
     if (!response.ok) throw new Error(`Aircraft request failed (${response.status})`)
     const data = await response.arrayBuffer()

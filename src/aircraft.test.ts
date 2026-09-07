@@ -45,6 +45,26 @@ function fixture() {
   }
 }
 
+async function loadShippedAircraft() {
+  const bytes = await Bun.file(
+    new URL('../public/models/southwest-737.glb', import.meta.url),
+  ).arrayBuffer()
+  spyOn(globalThis, 'fetch').mockResolvedValue(new Response(bytes))
+  const ready = deferred<void>()
+  const value = start(() => ready.resolve())
+  await ready.promise
+  value.group.updateMatrixWorld(true)
+  return value
+}
+
+function hitMaterialName(hit: THREE.Intersection) {
+  if (!(hit.object instanceof THREE.Mesh)) return undefined
+  const material = Array.isArray(hit.object.material)
+    ? hit.object.material[hit.face?.materialIndex ?? 0]
+    : hit.object.material
+  return material?.name
+}
+
 function requestSucceeds() {
   return spyOn(globalThis, 'fetch').mockResolvedValue(new Response(new Uint8Array([1, 2, 3])))
 }
@@ -57,13 +77,7 @@ afterEach(async () => {
 
 describe('downloaded aircraft lifecycle', () => {
   it('decodes the shipped Meshopt asset at terminal scale', async () => {
-    const bytes = await Bun.file(
-      new URL('../public/models/southwest-737.glb', import.meta.url),
-    ).arrayBuffer()
-    spyOn(globalThis, 'fetch').mockResolvedValue(new Response(bytes))
-    const ready = deferred<void>()
-    const value = start(() => ready.resolve())
-    await ready.promise
+    const value = await loadShippedAircraft()
     const bounds = new THREE.Box3().setFromObject(value.group)
     const size = bounds.getSize(new THREE.Vector3())
     let triangles = 0
@@ -79,9 +93,61 @@ describe('downloaded aircraft lifecycle', () => {
     expect(size.z).toBeGreaterThan(9.8)
     expect(size.z).toBeLessThan(10.2)
     expect(Math.abs(bounds.min.y)).toBeLessThan(0.02)
-    expect(triangles).toBeGreaterThan(10000)
-    expect(triangles).toBeLessThan(80000)
+    expect(triangles).toBeGreaterThan(80000)
+    expect(triangles).toBeLessThan(90000)
   })
+  it('retains engine exhausts, stabilizers and visible tire and hub faces on both sides', async () => {
+    const value = await loadShippedAircraft()
+    for (const side of [-1, 1]) {
+      // These rays pass through the sidewalls rather than the tread. The source
+      // has inward-facing wheel surfaces that must also be visible from outside.
+      const tires = new THREE.Raycaster(
+        new THREE.Vector3(0.02, 0.28, side * 2),
+        new THREE.Vector3(0, 0, -side),
+        0,
+        1.5,
+      )
+        .intersectObject(value.group, true)
+        .filter((hit) => hitMaterialName(hit) === 'Material7')
+      expect(tires.some(({ point }) => Math.abs(point.z) > 0.82)).toBe(true)
+      expect(tires.some(({ point }) => Math.abs(point.z) > 0.6 && Math.abs(point.z) < 0.75)).toBe(
+        true,
+      )
+      const hubs = new THREE.Raycaster(
+        new THREE.Vector3(0.02, 0.1, side * 2),
+        new THREE.Vector3(0, 0, -side),
+        0,
+        1.5,
+      )
+        .intersectObject(value.group, true)
+        .filter((hit) => hitMaterialName(hit) === 'Material1')
+      expect(hubs.some(({ point }) => Math.abs(point.z) > 0.82)).toBe(true)
+      expect(hubs.some(({ point }) => Math.abs(point.z) > 0.6 && Math.abs(point.z) < 0.75)).toBe(
+        true,
+      )
+
+      // Single-material engine aft sections were accidentally omitted when the
+      // exporter received a material array without matching geometry groups.
+      const exhaust = value.group.getObjectByName(side > 0 ? 'Group_065' : 'Group_019')
+      expect(exhaust).toBeDefined()
+      if (!exhaust) throw new Error('Missing engine exhaust')
+      const exhaustHits = new THREE.Raycaster(
+        new THREE.Vector3(1, 0.55, side * 1.37),
+        new THREE.Vector3(-1, 0, 0),
+        0,
+        4,
+      ).intersectObject(exhaust, true)
+      expect(exhaustHits.length).toBeGreaterThan(0)
+      const stabilizerHits = new THREE.Raycaster(
+        new THREE.Vector3(5, 3, side * 1.3),
+        new THREE.Vector3(0, -1, 0),
+        0,
+        3,
+      ).intersectObject(value.group, true)
+      expect(stabilizerHits.length).toBeGreaterThan(0)
+    }
+  })
+
   it('loads the compressed model and requests one frame without an animation loop', async () => {
     const result = fixture()
     const fetch = requestSucceeds()
@@ -94,7 +160,7 @@ describe('downloaded aircraft lifecycle', () => {
     await settle()
 
     expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch.mock.calls[0]?.[0]).toBe('/models/southwest-737.glb')
+    expect(fetch.mock.calls[0]?.[0]).toBe('/models/southwest-737.glb?v=2')
     expect(fetch.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal)
     expect(decoder).toHaveBeenCalledWith(MeshoptDecoder)
     expect(parse).toHaveBeenCalledTimes(1)

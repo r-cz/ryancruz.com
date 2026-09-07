@@ -15,15 +15,6 @@ export function renderPage(): string {
           <div class="scene-loading">Taking a seat at Love Field…</div>
         </div>
         <div class="scene-surfaces">
-            <div class="departure-board" aria-hidden="true">
-              <div class="board-heading"><span>DEPARTURES</span><span>DAL</span></div>
-              <div class="board-columns"><span>TIME</span><span>DESTINATION</span><span>STATUS</span></div>
-              <div class="board-row"><span>12:15</span><span>HOUSTON</span><span>ON TIME</span></div>
-              <div class="board-row"><span>13:05</span><span>DENVER</span><span data-flight-status>ON TIME</span></div>
-              <div class="board-row"><span>13:50</span><span>LAS VEGAS</span><span>ON TIME</span></div>
-              <div class="board-row"><span>14:35</span><span>CHICAGO</span><span data-flight-status>ON TIME</span></div>
-              <div class="board-note">A LITTLE IMAGINATION. NO LIVE FLIGHTS.</div>
-            </div>
             <a class="laptop-screen" href="#portfolio" aria-label="Open Ryan Cruz’s portfolio">
               <div class="screen-masthead" aria-hidden="true"><span>RYAN CRUZ</span><span>ABOUT &nbsp; EXPERIENCE &nbsp; PROJECTS</span></div>
               <div class="screen-intro" aria-hidden="true">

@@ -14,7 +14,6 @@ export interface LiveScene {
 export function createLiveScene(
   container: HTMLElement,
   screenElement: HTMLElement,
-  boardElement: HTMLElement,
   onChange: () => void = () => {},
 ): LiveScene {
   const scene = new THREE.Scene()
@@ -146,13 +145,6 @@ export function createLiveScene(
   screen.rotation.x = -0.085
   screen.scale.setScalar(2.45 / 603)
   scene.add(screen)
-  // An actual mounted monitor, with live HTML flight rows on its front face.
-  const board = new CSS3DObject(boardElement)
-  board.position.set(4.05, 3.6, -4.46)
-  board.scale.setScalar(0.0055)
-  scene.add(board)
-  box(2.56, 1.46, 0.13, 4.05, 3.6, -4.55, bezel, 0.025)
-  box(0.07, 1.65, 0.07, 4.05, 4.99, -4.6, aluminum)
 
   let width = 1
   let height = 1

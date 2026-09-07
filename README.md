@@ -2,7 +2,7 @@
 
 Ryan Cruz’s personal portfolio, set inside a live 3D interpretation of Dallas Love Field.
 
-The terminal, MacBook Pro, linked gate seating, window grids and beams are modeled Three.js geometry. The aircraft is an optimized version of Daniel Skomorovsky’s Southwest Airlines Boeing 737 model. Aircraft movement, departure-board updates and digital gate information are simulated. Lighting follows the visitor’s local device time, from dawn through daylight and sunset to a warmly lit terminal at night. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
+The terminal, MacBook Pro, linked gate seating, window grids and beams are modeled Three.js geometry. The aircraft is an optimized version of Daniel Skomorovsky’s Southwest Airlines Boeing 737 model. Aircraft movement and digital gate information are simulated. The western-wing layout has two column displays, gate 20 on the left and gate 18 on the right, with seating banks turned along the concourse. Lighting follows the visitor’s local device time, from dawn through daylight and sunset to a warmly lit terminal at night. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
 
 ## Development
 
@@ -28,7 +28,7 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 ## Implementation
 
 - `src/terminal-environment.ts`: instanced terminal architecture, furnishings, portrait digital gate displays and aircraft taxi path. Physical sign text is drawn on small canvas textures; there is no generated background image.
-- `src/scene3d.ts`: WebGL renderer, MacBook model, CSS3D screen and departure monitor, responsive camera path, resource disposal.
+- `src/scene3d.ts`: WebGL renderer, MacBook model, CSS3D laptop screen, responsive camera path, resource disposal.
 - `src/scene-lighting.ts`: smoothly interpolated local-clock sky, sun, ambient light and warm interior fixtures.
 - `src/aircraft.ts`: asynchronously loads the compressed aircraft GLB, redraws paused scenes when it arrives, and handles load failure/disposal.
 - `scripts/convert-aircraft.ts`: converts the supplied FBX into an exterior-only, normalized GLB before compression.
