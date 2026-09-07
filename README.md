@@ -2,7 +2,7 @@
 
 Ryan Cruz’s personal portfolio, set inside a live 3D interpretation of Dallas Love Field.
 
-The terminal, MacBook Pro, linked gate seating, window grids, beams and Southwest-inspired aircraft are modeled Three.js geometry. Aircraft movement and departure-board updates are simulated. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
+The terminal, MacBook Pro, linked gate seating, window grids and beams are modeled Three.js geometry. The aircraft is an optimized version of Daniel Skomorovsky’s Southwest Airlines Boeing 737 model. Aircraft movement and digital gate information are simulated. The western-wing layout has two column displays, gate 20 on the left and gate 18 on the right, with back-to-back seating banks along the concourse, including window-facing seats on the left. Gate 20 shows Philadelphia (PHL), and gate 18 shows Atlanta (ATL). A small Ops Agent kiosk and boarding door occupy the rear-left corner, with a modeled jetbridge descending toward the lower apron. The aircraft taxis to the right beyond the windows. The window wall, timber roof and floor continue beyond the right edge on wide screens. Lighting follows the visitor’s local device time, from dawn through daylight and sunset to a warmly lit terminal at night. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
 
 ## Development
 
@@ -27,18 +27,24 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 
 ## Implementation
 
-- `src/terminal-environment.ts`: instanced terminal architecture, furnishings, signs and animated aircraft. Physical sign text is drawn on small canvas textures; there is no generated background image.
-- `src/scene3d.ts`: WebGL renderer, lighting, MacBook model, CSS3D screen and departure monitor, responsive camera path, resource disposal.
+- `src/terminal-environment.ts`: instanced terminal architecture, furnishings, portrait digital gate displays and aircraft taxi path. Physical sign text is drawn on small canvas textures; there is no generated background image.
+- `src/boarding-gate.ts`: modeled Ops Agent kiosk, boarding door and exterior jetbridge at gate 20.
+- `src/scene3d.ts`: WebGL renderer, MacBook model, CSS3D laptop screen, responsive camera path, resource disposal.
+- `src/scene-lighting.ts`: smoothly interpolated local-clock sky, sun, ambient light and warm interior fixtures.
+- `src/aircraft.ts`: asynchronously loads the compressed aircraft GLB, redraws paused scenes when it arrives, and handles load failure/disposal.
+- `scripts/convert-aircraft.ts`: converts the supplied FBX into an exterior-only, normalized GLB before compression.
 - `src/main.ts`: progressive enhancement, native scroll navigation, keyboard focus, motion preferences and renderer fallback.
 - `src/page.ts` and `src/portfolio.ts`: shared semantic page content, prerendered into the built HTML by `build.ts`.
 - `src/style.css`: scene chrome and responsive portfolio typography/layout.
 
-Portfolio content and links work without JavaScript or WebGL. A lost graphics context or renderer error reveals the same document. Reduced-motion preferences disable ambient movement and camera zoom; the motion button can also pause animation. Hidden tabs and the expanded portfolio stop the continuous render loop. The 3D engine loads separately from the initial interaction code.
+Portfolio content and links work without JavaScript or WebGL. A lost graphics context or renderer error reveals the same document. Reduced-motion preferences disable ambient movement and camera zoom; the motion button can also pause animation. Hidden tabs and the expanded portfolio stop the continuous render loop. The 3D engine loads separately from the initial interaction code. When motion is paused or reduced, a single frame each minute keeps lighting current. Clock refreshes also stop while the tab or terminal is hidden and catch up on return. This is a local-time atmosphere, not a weather feed or astronomical sunrise calculation; no location permission is needed.
 
 ## Content and visual references
 
 Career and education are sourced from `public/Resume.pdf`, dated February 24, 2025. Project descriptions are based on the public READMEs for [IAM Tools](https://github.com/r-cz/iam-tools) and [.dsconfig Helper](https://github.com/r-cz/dsconfig-helper). Visitors do not trigger GitHub or flight-data API requests.
 
-Architecture is informed by [Corgan’s DAL modernization photography](https://www.corgan.com/projects/dal-love-field-modernization-program-lfmp) and the real gate photos in [Travel Codex’s Love Field walkthrough](https://www.travelcodex.com/the-new-terminal-at-dallas-love-field-airport-in-pictures/). The geometry is an original, stylized interpretation of DAL rather than a surveyed model of a specific gate. Southwest colors and signage provide airport context; this is a personal website.
+Architecture is informed by [Corgan’s DAL modernization photography](https://www.corgan.com/projects/dal-love-field-modernization-program-lfmp) and the real gate photos in [Travel Codex’s Love Field walkthrough](https://www.travelcodex.com/the-new-terminal-at-dallas-love-field-airport-in-pictures/). The geometry is an original, stylized interpretation of DAL rather than a surveyed model of a specific gate. The portrait gate displays follow the reference photo supplied by Ryan: brushed-metal frames, large blue gate numbers, and light flight-information panels. Southwest colors and signage provide airport context; this is a personal website.
+
+The aircraft is [Southwest Airlines Boeing 737](https://skfb.ly/6SnOs) by Daniel Skomorovsky, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Ryan supplied the source FBX. The web adaptation removes the enclosed cabin, normalizes scale/orientation, adapts materials and compresses geometry. Attribution is included in the portfolio footer and alongside the model. See [aircraft references and provenance](docs/aircraft-reference.md) for details.
 
 No API keys, live flight service, sound, video, or generated-image assets are required.

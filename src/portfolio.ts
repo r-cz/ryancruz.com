@@ -129,7 +129,7 @@ export function renderPortfolio(): string {
         <a href="https://linkedin.com/in/cruzryan">LinkedIn ${linkArrow}</a>
         <a href="/Resume.pdf">Résumé ${linkArrow}<small>PDF · February 2025</small></a>
       </nav>
-      <div class="portfolio-colophon"><span>Ryan Cruz · Dallas, Texas</span></div>
+      <div class="portfolio-colophon"><span>Ryan Cruz · Dallas, Texas</span><span class="model-credit">3D aircraft by <a href="https://skfb.ly/6SnOs">Daniel Skomorovsky</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · adapted for web</span></div>
     </footer>
   `
 }

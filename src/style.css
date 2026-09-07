@@ -177,65 +177,10 @@ svg {
   width: 12px;
   height: 12px;
 }
-.departure-board {
-  width: 440px;
-  height: 238px;
-  padding: 15px 18px;
-  background: #192423;
-  color: #d8ddd0;
-  font-family: var(--font-sans);
-  backface-visibility: hidden;
-}
-.board-heading {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #64736c;
-  padding-bottom: 9px;
-  font-size: 18px;
-  letter-spacing: 2px;
-}
-.board-heading span:last-child {
-  color: #f1c659;
-}
-.board-columns,
-.board-row {
-  display: grid;
-  grid-template-columns: 65px 1fr 92px;
-  column-gap: 8px;
-}
-.board-columns {
-  color: #90a5a1;
-  font-size: 10px;
-  padding: 10px 0 7px;
-}
-.board-row {
-  font-size: 12px;
-  padding: 6px 0;
-}
-.board-row > :last-child {
-  color: #e0c679;
-  text-align: right;
-}
-.board-note {
-  border-top: 1px solid #485954;
-  margin-top: 10px;
-  padding-top: 8px;
-  font-size: 7px;
-  letter-spacing: 0.7px;
-  color: #b7c0b9;
-}
-.board-updated {
-  animation: board-refresh 700ms ease-out;
-}
-@keyframes board-refresh {
-  from {
-    opacity: 0.12;
-    transform: translateY(3px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+/* Keep the monogram readable against the dark exterior after sunset. */
+.scene-camera[data-night='true'] ~ .scene-header .scene-monogram {
+  color: #f6f5f1;
+  text-shadow: 0 1px 8px #172333;
 }
 .scene-chrome {
   position: absolute;
@@ -270,18 +215,6 @@ svg {
 }
 .scene-footer {
   bottom: 30px;
-}
-.scene-location {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1.4px;
-}
-.scene-location > span {
-  margin: 0 8px;
-  opacity: 0.5;
-}
-.scene-note {
-  font: italic 15px var(--font-serif);
 }
 .explore-cue {
   position: absolute;
@@ -590,14 +523,17 @@ svg {
   padding-top: 24px;
   font: 12px var(--font-serif);
   color: #656d60;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.model-credit a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .scene-unavailable .scene-track {
   display: none;
 }
 @media (max-width: 1000px) {
-  .scene-note {
-    display: none;
-  }
   .experience-detail .experience-date {
     position: static;
   }
@@ -622,9 +558,6 @@ svg {
   .scene-footer {
     bottom: 33px;
     justify-content: center;
-  }
-  .scene-location {
-    display: none;
   }
   .explore-cue {
     font-size: 14px;

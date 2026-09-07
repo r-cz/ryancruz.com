@@ -14,9 +14,8 @@ export function initSite() {
   const camera = app.querySelector<HTMLElement>('.scene-camera')
   const portfolio = app.querySelector<HTMLElement>('#portfolio')
   const laptop = app.querySelector<HTMLElement>('.laptop-screen')
-  const board = app.querySelector<HTMLElement>('.departure-board')
   const toggle = app.querySelector<HTMLButtonElement>('.motion-toggle')
-  if (!track || !viewport || !camera || !portfolio || !laptop || !board || !toggle) return () => {}
+  if (!track || !viewport || !camera || !portfolio || !laptop || !toggle) return () => {}
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
   let manuallyPaused = false
   try {
@@ -27,13 +26,12 @@ export function initSite() {
   let liveScene: LiveScene | undefined
   let frame = 0
   let entering: number | undefined
+  let clockInterval: number | undefined
   let travel = 1
   let measured = false
   let disposed = false
   let elapsed = 0
   let previousTime = 0
-  let lastBoardUpdate = 0
-  let flightStep = 0
   let failed = false
   const pointer = { x: 0, y: 0 }
   document.documentElement.classList.add('enhanced')
@@ -64,25 +62,16 @@ export function initSite() {
     frame = 0
     if (disposed || failed || !camera || !portfolio || !laptop) return
     const progress = transitionProgress(window.scrollY, travel)
+    updateClock(progress)
     const animated = !manuallyPaused && !reduced.matches && !document.hidden && progress < 1
     if (animated && previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.06)
     previousTime = time
-    if (elapsed - lastBoardUpdate > 11) {
-      const cells = board?.querySelectorAll<HTMLElement>('[data-flight-status]')
-      if (cells?.length) {
-        const cell = cells[flightStep++ % cells.length]
-        cell.textContent = cell.textContent === 'ON TIME' ? 'BOARDING' : 'ON TIME'
-        cell.classList.remove('board-updated')
-        void cell.offsetWidth
-        cell.classList.add('board-updated')
-      }
-      lastBoardUpdate = elapsed
-    }
     try {
       liveScene?.render(
         reduced.matches ? 0 : progress,
         elapsed,
         animated ? pointer : { x: 0, y: 0 },
+        new Date(),
       )
     } catch {
       revealContent()
@@ -99,6 +88,23 @@ export function initSite() {
   }
   function schedule() {
     if (!frame && !document.hidden && !disposed) frame = window.requestAnimationFrame(render)
+  }
+  function stopClock() {
+    if (clockInterval !== undefined) window.clearInterval(clockInterval)
+    clockInterval = undefined
+  }
+  function updateClock(progress = transitionProgress(window.scrollY, travel)) {
+    if (!liveScene || disposed || failed || document.hidden || progress >= 1) {
+      stopClock()
+      return
+    }
+    if (clockInterval === undefined) {
+      // The visitor's clock keeps advancing even when ambient motion is paused.
+      clockInterval = window.setInterval(() => {
+        updateClock()
+        if (clockInterval !== undefined) schedule()
+      }, 60_000)
+    }
   }
   function resize() {
     if (!viewport || !track || failed) return
@@ -126,6 +132,7 @@ export function initSite() {
   }
   function revealContent() {
     failed = true
+    stopClock()
     if (entering) {
       window.clearTimeout(entering)
       entering = undefined
@@ -217,9 +224,13 @@ export function initSite() {
   function onVisibility() {
     previousTime = 0
     if (document.hidden) {
+      stopClock()
       window.cancelAnimationFrame(frame)
       frame = 0
-    } else schedule()
+    } else {
+      updateClock()
+      schedule()
+    }
   }
   function onPointer(event: PointerEvent) {
     if (event.pointerType !== 'mouse') return
@@ -243,7 +254,7 @@ export function initSite() {
   void import('./scene3d')
     .then(({ createLiveScene }) => {
       if (disposed) return
-      liveScene = createLiveScene(camera, laptop, board)
+      liveScene = createLiveScene(camera, laptop, schedule)
       camera.querySelector('.scene-loading')?.remove()
       document.documentElement.classList.add('scene-ready')
       camera.querySelector('canvas')?.addEventListener(
@@ -263,6 +274,7 @@ export function initSite() {
     })
   return () => {
     disposed = true
+    stopClock()
     window.cancelAnimationFrame(frame)
     if (entering) window.clearTimeout(entering)
     liveScene?.dispose()

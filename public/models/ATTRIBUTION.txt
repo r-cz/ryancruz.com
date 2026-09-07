@@ -1,0 +1,11 @@
+Southwest Airlines Boeing 737
+Author: Daniel Skomorovsky
+Source: https://skfb.ly/6SnOs
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+Adapted for ryancruz.com: enclosed cabin meshes and source scene lights removed;
+scale and orientation normalized; materials converted to PBR; missing engine fan
+bitmaps replaced with dark metal; open wheel and hub surfaces rendered from both
+sides; exterior geometry preserved, optimized and compressed as GLB.
+The Southwest livery and exterior geometry derive from the source model.

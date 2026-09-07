@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, it, mock, setSystemTime, spyOn } from 'bun:test'
 import { renderPage } from './page'
 import type { LiveScene } from './scene3d'
 
@@ -6,8 +6,12 @@ let failRenderer = false
 let failRender = false
 let failResize = false
 const renderer = {
-  render: mock<LiveScene['render']>(() => { if (failRender) throw new Error('Render failed') }),
-  resize: mock<LiveScene['resize']>(() => { if (failResize) throw new Error('Resize failed') }),
+  render: mock<LiveScene['render']>(() => {
+    if (failRender) throw new Error('Render failed')
+  }),
+  resize: mock<LiveScene['resize']>(() => {
+    if (failResize) throw new Error('Resize failed')
+  }),
   dispose: mock<LiveScene['dispose']>(() => {}),
 }
 const createLiveScene = mock((container: HTMLElement) => {
@@ -26,6 +30,7 @@ let timerId = 0
 let media: MediaQueryList
 const frames = new Map<number, FrameRequestCallback>()
 const timers = new Map<number, { callback: () => void; delay: number }>()
+const intervals = new Map<number, { callback: () => void; delay: number }>()
 const scrollTo = mock((options: ScrollToOptions | number, _y?: number) => {
   if (typeof options !== 'object') throw new Error('Expected scroll options')
   Object.defineProperty(window, 'scrollY', { configurable: true, value: options.top ?? 0 })
@@ -81,16 +86,29 @@ beforeEach(() => {
     frames.set(++frameId, callback)
     return frameId
   })
-  spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => { frames.delete(id) })
+  spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => {
+    frames.delete(id)
+  })
   spyOn(window, 'setTimeout').mockImplementation((callback: TimerHandler, delay?: number) => {
     if (typeof callback !== 'function') throw new Error('Expected a timer callback')
     timers.set(++timerId, { callback: callback as () => void, delay: delay ?? 0 })
     return timerId
   })
-  spyOn(window, 'clearTimeout').mockImplementation((id) => { if (id) timers.delete(id) })
+  spyOn(window, 'clearTimeout').mockImplementation((id) => {
+    if (id) timers.delete(id)
+  })
+  spyOn(window, 'setInterval').mockImplementation((callback: TimerHandler, delay?: number) => {
+    if (typeof callback !== 'function') throw new Error('Expected an interval callback')
+    intervals.set(++timerId, { callback: callback as () => void, delay: delay ?? 0 })
+    return timerId
+  })
+  spyOn(window, 'clearInterval').mockImplementation((id) => {
+    if (id) intervals.delete(id)
+  })
   failRenderer = failRender = failResize = false
   frames.clear()
   timers.clear()
+  intervals.clear()
   createLiveScene.mockClear()
   renderer.render.mockClear()
   renderer.resize.mockClear()
@@ -103,6 +121,8 @@ afterEach(() => {
   cleanup = undefined
   frames.clear()
   timers.clear()
+  intervals.clear()
+  setSystemTime()
   document.body.innerHTML = ''
   mock.restore()
 })
@@ -298,6 +318,63 @@ describe('motion and graceful degradation', () => {
     expect(frames.size).toBe(1)
   })
 
+  for (const preference of ['paused', 'reduced'] as const) {
+    it(`refreshes local time without advancing ${preference} ambient motion`, async () => {
+      const noon = new Date(2026, 8, 7, 12, 0)
+      setSystemTime(noon)
+      if (preference === 'paused') window.localStorage.setItem('ryan-motion-paused', 'true')
+      else Object.assign(media, { matches: true })
+      await start()
+      const elapsed = renderer.render.mock.calls.at(-1)?.[1]
+      expect(renderer.render.mock.calls.at(-1)?.[3]).toEqual(noon)
+      expect(frames.size).toBe(0)
+      expect([...intervals.values()].map(({ delay }) => delay)).toEqual([60_000])
+
+      const nextMinute = new Date(noon.getTime() + 60_000)
+      setSystemTime(nextMinute)
+      for (const { callback } of intervals.values()) callback()
+      expect(frames.size).toBe(1)
+      flushFrame(60_016)
+      expect(renderer.render.mock.calls.at(-1)?.[3]).toEqual(nextMinute)
+      expect(renderer.render.mock.calls.at(-1)?.[1]).toBe(elapsed)
+      expect(frames.size).toBe(0)
+      expect(intervals.size).toBe(1)
+    })
+  }
+
+  it('suspends clock refreshes when hidden and catches up when visible', async () => {
+    window.localStorage.setItem('ryan-motion-paused', 'true')
+    await start()
+    expect(intervals.size).toBe(1)
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true })
+    document.dispatchEvent(new Event('visibilitychange'))
+    expect(intervals.size).toBe(0)
+    expect(frames.size).toBe(0)
+
+    const evening = new Date(2026, 8, 7, 20, 0)
+    setSystemTime(evening)
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false })
+    document.dispatchEvent(new Event('visibilitychange'))
+    flushFrame(16)
+    expect(renderer.render.mock.calls.at(-1)?.[3]).toEqual(evening)
+    expect(intervals.size).toBe(1)
+    expect(frames.size).toBe(0)
+  })
+
+  it('only refreshes the clock while the terminal is visible', async () => {
+    window.localStorage.setItem('ryan-motion-paused', 'true')
+    await start()
+    element('.skip-scene').click()
+    flushTimers()
+    flushFrame()
+    expect(intervals.size).toBe(0)
+    element('.back-to-terminal').click()
+    flushTimers()
+    flushFrame()
+    expect(intervals.size).toBe(1)
+    expect(frames.size).toBe(0)
+  })
+
   it('leaves a readable portfolio when the renderer cannot initialize', async () => {
     failRenderer = true
     await start()
@@ -307,6 +384,7 @@ describe('motion and graceful degradation', () => {
     expect(element('.scene-track').style.height).toBe('')
     expect(element('#portfolio').textContent).toContain('Southwest Airlines')
     expect(frames.size).toBe(0)
+    expect(intervals.size).toBe(0)
   })
 
   it('reveals the document and releases the scene after WebGL context loss', async () => {
@@ -319,18 +397,25 @@ describe('motion and graceful degradation', () => {
     expect(document.documentElement.classList.contains('enhanced')).toBe(false)
     expect(element('#portfolio').style.opacity).toBe('')
     expect(frames.size).toBe(0)
+    expect(intervals.size).toBe(0)
   })
 
   for (const failure of ['render', 'resize'] as const) {
     it(`reveals content and cancels pending focus after a runtime ${failure} failure`, async () => {
       await start()
       element('.laptop-screen').click()
-      if (failure === 'render') { failRender = true; flushFrame() }
-      else { failResize = true; window.dispatchEvent(new Event('resize')) }
+      if (failure === 'render') {
+        failRender = true
+        flushFrame()
+      } else {
+        failResize = true
+        window.dispatchEvent(new Event('resize'))
+      }
       expect(document.documentElement.classList.contains('enhanced')).toBe(false)
       expect(element('#portfolio').style.opacity).toBe('')
       expect(timers.size).toBe(0)
       expect(frames.size).toBe(0)
+      expect(intervals.size).toBe(0)
       expect(renderer.dispose).toHaveBeenCalledTimes(1)
     })
   }
@@ -342,6 +427,7 @@ describe('motion and graceful degradation', () => {
     cleanup = undefined
     expect(frames.size).toBe(0)
     expect(timers.size).toBe(0)
+    expect(intervals.size).toBe(0)
     expect(renderer.dispose).toHaveBeenCalledTimes(1)
     const count = scrollTo.mock.calls.length
     window.dispatchEvent(new Event('scroll'))

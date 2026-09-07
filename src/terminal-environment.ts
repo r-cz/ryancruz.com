@@ -1,14 +1,17 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
+import { createAircraft } from './aircraft'
+import { apronLevel, boardingDoorOpening, createBoardingGate } from './boarding-gate'
 
 /**
  * Modeled architecture informed by Corgan's DAL modernization photography:
  * https://www.corgan.com/projects/dal-love-field-modernization-program-lfmp
  * Original geometry, with no photographic or generated-image textures.
  */
-export function createTerminalEnvironment(): {
+export function createTerminalEnvironment(onChange: () => void = () => {}): {
   group: THREE.Group
   update(timeSeconds: number): void
+  setDaylight(daylight: number): void
   dispose(): void
 } {
   const group = new THREE.Group()
@@ -35,14 +38,9 @@ export function createTerminalEnvironment(): {
   const aluminum = material(0xadb5b5, 0.3, 0.68)
   const darkMetal = material(0x555c5b, 0.4, 0.65)
   const upholstery = material(0x303b3d, 0.85)
-  const rubber = material(0x232a2c, 0.94)
   const concrete = material(0xaeb5b4, 0.95)
   const distantBuilding = material(0xc2c9c8, 0.86)
   const marking = material(0xd3b054, 0.9)
-  const blue = material(0x254f9c, 0.39, 0.15)
-  const red = material(0xd44339, 0.44)
-  const yellow = material(0xf0b541, 0.47)
-  const planeWindow = material(0x233947, 0.2, 0.3)
   const ceilingLight = new THREE.MeshStandardMaterial({
     color: 0xfff4df,
     emissive: 0xffe9c2,
@@ -50,6 +48,12 @@ export function createTerminalEnvironment(): {
     roughness: 0.55,
   })
   materials.add(ceilingLight)
+  const taxiLight = new THREE.MeshStandardMaterial({
+    color: 0x83bcff,
+    emissive: 0x327de8,
+    emissiveIntensity: 0.15,
+  })
+  materials.add(taxiLight)
   const glass = new THREE.MeshStandardMaterial({
     color: 0xb2d2dc,
     transparent: true,
@@ -66,6 +70,7 @@ export function createTerminalEnvironment(): {
   const cylinder = geometry(new THREE.CylinderGeometry(1, 1, 1, 20))
   const sphere = geometry(new THREE.SphereGeometry(1, 20, 12))
   const dummy = new THREE.Object3D()
+  let assemblyTransform: THREE.Matrix4 | undefined
   const batches = new Map<
     string,
     {
@@ -94,7 +99,9 @@ export function createTerminalEnvironment(): {
     dummy.scale.set(...scale)
     dummy.rotation.set(...rotation)
     dummy.updateMatrix()
-    batch.matrices.push(dummy.matrix.clone())
+    const matrix = dummy.matrix.clone()
+    if (assemblyTransform) matrix.premultiply(assemblyTransform)
+    batch.matrices.push(matrix)
   }
 
   const box = (
@@ -104,34 +111,41 @@ export function createTerminalEnvironment(): {
     castShadow = true,
   ) => instance(cube, surface, position, size, [0, 0, 0], castShadow)
 
+  // Continue the concourse beyond the right edge of wide desktop views.
+  const terminalLeft = -7
+  const terminalRight = 37.2
+  const terminalWidth = terminalRight - terminalLeft
+  const terminalCenter = (terminalLeft + terminalRight) / 2
   // An open foreground keeps the camera move into the laptop unobstructed.
-  box(stone, [2, -0.07, -7], [18, 0.14, 24], false)
-  for (let z = -17; z <= 3; z += 2) box(tileJoint, [2, 0.002, z], [18, 0.004, 0.013], false)
-  for (let x = -5; x <= 11; x += 2) box(tileJoint, [x, 0.003, -7], [0.013, 0.004, 24], false)
+  box(stone, [terminalCenter, -0.07, -7], [terminalWidth, 0.14, 24], false)
+  for (let z = -17; z <= 3; z += 2)
+    box(tileJoint, [terminalCenter, 0.002, z], [terminalWidth, 0.004, 0.013], false)
+  for (let x = -5; x <= terminalRight; x += 2)
+    box(tileJoint, [x, 0.003, -7], [0.013, 0.004, 24], false)
   // Small inset bands recall the terrazzo pattern without a tiled image texture.
-  box(material(0xc2baab, 0.8), [2, 0.006, -3.7], [18, 0.006, 0.23], false)
-  box(material(0xc2baab, 0.8), [2, 0.006, -12.4], [18, 0.006, 0.23], false)
+  box(material(0xc2baab, 0.8), [terminalCenter, 0.006, -3.7], [terminalWidth, 0.006, 0.23], false)
+  box(material(0xc2baab, 0.8), [terminalCenter, 0.006, -12.4], [terminalWidth, 0.006, 0.23], false)
 
   // Exposed glulam beams and a warm wood ceiling are DAL's defining structure.
-  box(lightWood, [1.9, 6.05, -7.4], [18.3, 0.16, 24.5], false)
+  box(lightWood, [terminalCenter, 6.05, -7.4], [terminalWidth + 0.3, 0.16, 24.5], false)
   for (let z = -17.5; z <= 3.5; z += 2.45) {
-    box(warmWood, [1.9, 5.73, z], [18.3, 0.54, 0.28])
-    box(woodEdge, [1.9, 5.46, z], [18.3, 0.018, 0.3])
-    box(lightWood, [1.9, 5.67, z + 0.145], [18.3, 0.026, 0.014])
+    box(warmWood, [terminalCenter, 5.73, z], [terminalWidth + 0.3, 0.54, 0.28])
+    box(woodEdge, [terminalCenter, 5.46, z], [terminalWidth + 0.3, 0.018, 0.3])
+    box(lightWood, [terminalCenter, 5.67, z + 0.145], [terminalWidth + 0.3, 0.026, 0.014])
     for (const y of [5.54, 5.63, 5.81, 5.9]) {
-      box(woodEdge, [1.9, y, z + 0.145], [18.3, 0.007, 0.01], false)
+      box(woodEdge, [terminalCenter, y, z + 0.145], [terminalWidth + 0.3, 0.007, 0.01], false)
     }
   }
-  for (let x = -6.8; x <= 10.8; x += 0.58) {
+  for (let x = -6.8; x <= terminalRight; x += 0.58) {
     box(woodEdge, [x, 5.962, -7.4], [0.012, 0.012, 24.5], false)
   }
   for (const z of [-13.8, -8.9, -4, 0.9]) {
-    for (const x of [-2.7, 4.2]) {
+    for (let x = -2.7; x < terminalRight - 2; x += 6.9) {
       box(aluminum, [x, 5.935, z], [3.5, 0.05, 0.12], false)
       box(ceilingLight, [x, 5.906, z], [3.36, 0.013, 0.068], false)
     }
   }
-  for (const x of [-5.7, 7.65]) {
+  for (const x of [-5.7, 7.65, 21, 34.35]) {
     for (const z of [-15.5, -8, -0.4]) {
       instance(cylinder, cream, [x, 2.85, z], [0.3, 5.7, 0.3])
       instance(cylinder, aluminum, [x, 0.09, z], [0.313, 0.18, 0.313])
@@ -140,16 +154,64 @@ export function createTerminalEnvironment(): {
   }
 
   // Clear gridded curtain walls on the left and back expose the live apron.
-  box(cream, [-7.08, 0.2, -7.4], [0.24, 0.4, 22.2])
-  box(cream, [1.9, 0.2, -18.1], [18.3, 0.4, 0.24])
+  const doorBack = boardingDoorOpening.z - boardingDoorOpening.width / 2
+  const doorFront = boardingDoorOpening.z + boardingDoorOpening.width / 2
+  // Keep the boarding doorway clear through the sill, glazing and window grid.
+  for (const [back, front] of [
+    [-18.5, doorBack],
+    [doorFront, 3.7],
+  ]) {
+    box(cream, [-7.08, 0.2, (back + front) / 2], [0.24, 0.4, front - back])
+  }
+  box(cream, [terminalCenter, 0.2, -18.1], [terminalWidth + 0.3, 0.4, 0.24])
   const pane = geometry(new THREE.PlaneGeometry(1, 1))
-  instance(pane, glass, [-7, 3.03, -7.5], [21.2, 5.26, 1], [0, Math.PI / 2, 0], false)
-  instance(pane, glass, [1.95, 3.03, -18], [18.1, 5.26, 1], [0, 0, 0], false)
-  for (let z = -18; z <= 3.2; z += 2.65) box(aluminum, [-6.97, 3.02, z], [0.095, 5.65, 0.09])
-  for (let x = -7; x <= 11.1; x += 2.6) box(aluminum, [x, 3.02, -17.97], [0.09, 5.65, 0.095])
+  for (const [back, front] of [
+    [-18.1, doorBack],
+    [doorFront, 3.1],
+  ]) {
+    instance(
+      pane,
+      glass,
+      [-7, 3.03, (back + front) / 2],
+      [front - back, 5.26, 1],
+      [0, Math.PI / 2, 0],
+      false,
+    )
+  }
+  instance(
+    pane,
+    glass,
+    [-7, (5.66 + boardingDoorOpening.height) / 2, boardingDoorOpening.z],
+    [boardingDoorOpening.width, 5.66 - boardingDoorOpening.height, 1],
+    [0, Math.PI / 2, 0],
+    false,
+  )
+  instance(pane, glass, [terminalCenter, 3.03, -18], [terminalWidth, 5.26, 1], [0, 0, 0], false)
+  for (let z = -18; z <= 3.2; z += 2.65) {
+    if (z > doorBack && z < doorFront) {
+      box(
+        aluminum,
+        [-6.97, (5.845 + boardingDoorOpening.height) / 2, z],
+        [0.095, 5.845 - boardingDoorOpening.height, 0.09],
+      )
+    } else {
+      box(aluminum, [-6.97, 3.02, z], [0.095, 5.65, 0.09])
+    }
+  }
+  for (let x = terminalLeft; x <= terminalRight + 0.01; x += 2.6)
+    box(aluminum, [x, 3.02, -17.97], [0.09, 5.65, 0.095])
   for (const y of [0.43, 2.2, 4.28, 5.83]) {
-    box(aluminum, [-6.965, y, -7.5], [0.1, 0.065, 21.2])
-    box(aluminum, [2, y, -17.965], [18.2, 0.065, 0.1])
+    if (y < boardingDoorOpening.height) {
+      for (const [back, front] of [
+        [-18.1, doorBack],
+        [doorFront, 3.1],
+      ]) {
+        box(aluminum, [-6.965, y, (back + front) / 2], [0.1, 0.065, front - back])
+      }
+    } else {
+      box(aluminum, [-6.965, y, -7.5], [0.1, 0.065, 21.2])
+    }
+    box(aluminum, [terminalCenter, y, -17.965], [terminalWidth + 0.1, 0.065, 0.1])
   }
 
   // Linked gate chairs: rounded charcoal cushions on shared metal rails.
@@ -176,16 +238,40 @@ export function createTerminalEnvironment(): {
       }
     }
   }
-  addSeatRow(2.65, -4.4, 6)
-  addSeatRow(2.65, -5.65, 6, -1)
-  addSeatRow(2.65, -9.1, 6)
-  addSeatRow(2.65, -10.35, 6, -1)
-  addSeatRow(-5.7, -12.6, 5)
-  addSeatRow(-5.7, -13.85, 5, -1)
-  // A quieter left-hand row preserves a visible aisle beyond the laptop.
-  addSeatRow(-5.75, -5.9, 3)
+  // Turn each seating bank a quarter turn around its center, keeping its aisle
+  // and paired back-to-back rows. Bake the transform into the existing instances.
+  const addSeatingBank = (
+    centerX: number,
+    centerZ: number,
+    rows: [startX: number, z: number, count: number, facing?: number][],
+  ) => {
+    assemblyTransform = new THREE.Matrix4()
+      .makeTranslation(centerX, 0, centerZ)
+      .multiply(new THREE.Matrix4().makeRotationY(Math.PI / 2))
+      .multiply(new THREE.Matrix4().makeTranslation(-centerX, 0, -centerZ))
+    rows.forEach(([x, z, count, facing]) => addSeatRow(x, z, count, facing))
+    assemblyTransform = undefined
+  }
+  addSeatingBank(4.7, -5.025, [
+    [2.65, -4.4, 6],
+    [2.65, -5.65, 6, -1],
+  ])
+  addSeatingBank(4.7, -10.725, [
+    [2.65, -10.1, 6],
+    [2.65, -11.35, 6, -1],
+  ])
+  addSeatingBank(-4.23, -12.35, [
+    [-5.87, -11.725, 5],
+    [-5.87, -12.975, 5, -1],
+  ])
+  addSeatingBank(-4.93, -5.9, [
+    [-5.75, -5.275, 3],
+    [-5.75, -6.525, 3, -1],
+  ])
 
   // Broad daylight apron and distant low buildings beyond the glass.
+  // The concourse sits above the apron, allowing a descending boarding ramp.
+  assemblyTransform = new THREE.Matrix4().makeTranslation(0, apronLevel + 0.13, 0)
   box(concrete, [-3, -0.19, -30], [120, 0.12, 110], false)
   box(material(0x919fa0, 0.98), [0, -0.12, -41], [110, 0.018, 11], false)
   for (let x = -40; x < 40; x += 8) {
@@ -197,62 +283,106 @@ export function createTerminalEnvironment(): {
     box(aluminum, [x, 1.85, -55], [7.85, 0.12, 7.2], false)
   }
 
-  // Physical signs use crisp canvas text independent of the scene's daylight exposure.
-  const canvas = document.createElement('canvas')
-  canvas.width = 1024
-  canvas.height = 270
-  const context = canvas.getContext('2d')
-  if (context) {
-    context.fillStyle = '#172f43'
-    context.fillRect(0, 0, canvas.width, canvas.height)
-    context.fillStyle = '#f5f1e5'
-    context.font = '600 110px system-ui, sans-serif'
-    context.fillText('DAL', 40, 162)
-    context.font = '42px system-ui, sans-serif'
-    context.fillText('Dallas Love Field', 312, 153)
-    context.fillStyle = '#bd9b66'
-    context.fillRect(42, 210, 940, 3)
-    const texture = new THREE.CanvasTexture(canvas)
-    texture.colorSpace = THREE.SRGBColorSpace
-    textures.add(texture)
-    const signMaterial = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false })
-    materials.add(signMaterial)
-    const sign = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.8, 1)), signMaterial)
-    sign.name = 'DAL terminal sign'
-    sign.position.set(-3.5, 3.5, -12.5)
-    group.add(sign)
-    box(darkMetal, [-3.5, 3.5, -12.57], [3.9, 1.1, 0.12])
-    for (const x of [-4.95, -2.05]) {
-      instance(cylinder, aluminum, [x, 4.81, -12.57], [0.018, 1.56, 0.018])
+  for (let x = -44; x <= 44; x += 5.5) {
+    for (const z of [-27, -46]) {
+      instance(sphere, taxiLight, [x, 0.015, z], [0.055, 0.04, 0.055], [0, 0, 0], false)
     }
   }
+  assemblyTransform = undefined
 
-  const gateCanvas = document.createElement('canvas')
-  gateCanvas.width = 256
-  gateCanvas.height = 320
-  const gateContext = gateCanvas.getContext('2d')
-  if (gateContext) {
-    gateContext.fillStyle = '#172f43'
-    gateContext.fillRect(0, 0, gateCanvas.width, gateCanvas.height)
-    gateContext.fillStyle = '#f5f1e5'
-    gateContext.textAlign = 'center'
-    gateContext.font = '500 34px system-ui, sans-serif'
-    gateContext.fillText('GATE', 128, 64)
-    gateContext.font = '500 200px system-ui, sans-serif'
-    gateContext.fillText('8', 128, 262)
-    const gateTexture = new THREE.CanvasTexture(gateCanvas)
-    gateTexture.colorSpace = THREE.SRGBColorSpace
-    textures.add(gateTexture)
-    const gateMaterial = new THREE.MeshBasicMaterial({ map: gateTexture, toneMapped: false })
-    materials.add(gateMaterial)
-    const gateSign = new THREE.Mesh(geometry(new THREE.PlaneGeometry(0.7, 0.875)), gateMaterial)
-    gateSign.name = 'Gate 8 column sign'
-    // The nearest visible right column; the foreground column is outside the camera frame.
-    gateSign.position.set(7.46, 3.3, -7.63)
-    gateSign.rotation.y = -0.48
-    group.add(gateSign)
-    instance(cube, darkMetal, [7.48, 3.3, -7.67], [0.76, 0.935, 0.065], [0, -0.48, 0])
+  // Column-mounted portrait displays, based on the visitor-supplied DAL photo.
+  // These are simulated gate details, drawn into backlit screen textures.
+  const gateDisplays: {
+    context: CanvasRenderingContext2D
+    texture: THREE.CanvasTexture
+    number: string
+    destination: string
+    airport: string
+    flight: string
+    boarding: string
+  }[] = []
+  const drawGate = (display: (typeof gateDisplays)[number], boarding: boolean) => {
+    const { context: ctx, number, destination, airport, flight } = display
+    ctx.fillStyle = '#f3f4ff'
+    ctx.fillRect(0, 0, 512, 960)
+    ctx.fillStyle = '#2645cf'
+    ctx.fillRect(0, 0, 512, 432)
+    ctx.fillStyle = '#ffffff'
+    ctx.textAlign = 'center'
+    ctx.font = '600 300px system-ui, sans-serif'
+    ctx.fillText(number, 256, 318)
+    ctx.textAlign = 'left'
+    ctx.font = '600 24px system-ui, sans-serif'
+    ctx.fillText(`Board: ${display.boarding}`, 34, 394)
+    ctx.fillStyle = '#34394b'
+    ctx.font = '22px system-ui, sans-serif'
+    ctx.fillText(`Flight ${flight} · Southwest`, 34, 484)
+    ctx.font = '500 47px system-ui, sans-serif'
+    ctx.fillText(destination, 34, 553, 444)
+    ctx.font = '23px system-ui, sans-serif'
+    ctx.fillText(`${airport} · Nonstop`, 34, 599)
+    ctx.fillStyle = '#dde1f1'
+    ctx.fillRect(0, 658, 512, 160)
+    ctx.fillStyle = '#293f99'
+    ctx.font = '600 28px system-ui, sans-serif'
+    ctx.fillText(boarding ? 'Now boarding' : 'On time', 34, 710)
+    ctx.fillStyle = '#535c72'
+    ctx.font = '21px system-ui, sans-serif'
+    ctx.fillText(boarding ? 'Welcome aboard.' : 'Your next stop awaits.', 34, 757)
+    ctx.fillStyle = '#263faf'
+    ctx.font = '600 25px system-ui, sans-serif'
+    ctx.fillText('Southwest', 34, 869)
+    ctx.fillStyle = '#737a91'
+    ctx.font = '17px system-ui, sans-serif'
+    ctx.fillText('SIMULATED FLIGHT INFORMATION', 34, 922)
+    display.texture.needsUpdate = true
   }
+  function addGate(
+    number: string,
+    destination: string,
+    airport: string,
+    flight: string,
+    boarding: string,
+    x: number,
+    z: number,
+    angle: number,
+  ) {
+    const gateCanvas = document.createElement('canvas')
+    gateCanvas.width = 512
+    gateCanvas.height = 960
+    const gateContext = gateCanvas.getContext('2d')
+    if (!gateContext) return
+    const texture = new THREE.CanvasTexture(gateCanvas)
+    texture.colorSpace = THREE.SRGBColorSpace
+    textures.add(texture)
+    const faceMaterial = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false })
+    materials.add(faceMaterial)
+    const mount = new THREE.Group()
+    mount.name = `Gate ${number} digital display`
+    mount.position.set(x, 3.5, z)
+    mount.rotation.y = angle
+    const housing = new THREE.Mesh(geometry(new THREE.BoxGeometry(1.13, 2.09, 0.15)), aluminum)
+    const bezel = new THREE.Mesh(geometry(new THREE.BoxGeometry(1.045, 1.99, 0.035)), darkMetal)
+    bezel.position.z = 0.086
+    const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(1, 1.875)), faceMaterial)
+    face.position.z = 0.108
+    mount.add(housing, bezel, face)
+    group.add(mount)
+    const display = {
+      context: gateContext,
+      texture,
+      number,
+      destination,
+      airport,
+      flight,
+      boarding,
+    }
+    gateDisplays.push(display)
+    drawGate(display, false)
+  }
+  addGate('18', 'Atlanta, GA', 'ATL', '2146', '2:35 PM', 7.4, -7.62, -0.35)
+  addGate('20', 'Philadelphia, PA', 'PHL', '1158', '2:20 PM', -5.48, -7.61, 0.25)
+  let gatePhase = 0
 
   for (const { shape, surface, matrices, castShadow } of batches.values()) {
     const mesh = new THREE.InstancedMesh(shape, surface, matrices.length)
@@ -264,109 +394,36 @@ export function createTerminalEnvironment(): {
     group.add(mesh)
   }
 
-  const aircraft = new THREE.Group()
-  aircraft.name = 'Taxiing Southwest-inspired aircraft'
-  aircraft.position.set(-3.5, 0, -24.4)
-  group.add(aircraft)
-  const part = (
-    shape: THREE.BufferGeometry,
-    surface: THREE.Material,
-    position: [number, number, number],
-    scale: [number, number, number] = [1, 1, 1],
-    rotation: [number, number, number] = [0, 0, 0],
-  ) => {
-    const mesh = new THREE.Mesh(shape, surface)
-    mesh.position.set(...position)
-    mesh.scale.set(...scale)
-    mesh.rotation.set(...rotation)
-    mesh.castShadow = true
-    mesh.receiveShadow = true
-    aircraft.add(mesh)
-    return mesh
-  }
-  // Fuselage runs along X, with the nose facing left and the tail on the right.
-  part(cylinder, blue, [0, 1.02, 0], [0.52, 8.1, 0.52], [0, 0, Math.PI / 2])
-  part(sphere, blue, [-4.08, 1.02, 0], [0.94, 0.515, 0.515])
-  part(sphere, blue, [3.86, 1.03, 0], [1.34, 0.42, 0.42])
-  part(sphere, red, [0, 0.72, 0], [4.23, 0.235, 0.43])
-  for (const side of [-1, 1]) {
-    part(sphere, planeWindow, [-4.32, 1.25, side * 0.37], [0.42, 0.135, 0.17])
-    for (let x = -3.2; x < 3.5; x += 0.31) {
-      part(sphere, planeWindow, [x, 1.22, side * 0.474], [0.071, 0.095, 0.016])
-    }
-  }
+  const boardingGate = createBoardingGate()
+  group.add(boardingGate.group)
 
-  function polygon(points: [number, number][], depth: number) {
-    const shape = new THREE.Shape()
-    points.forEach(([x, y], index) => (index === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y)))
-    shape.closePath()
-    return geometry(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, steps: 1 }))
-  }
-  const fin = polygon(
-    [
-      [2.8, 1.25],
-      [4.55, 1.2],
-      [4.2, 3.25],
-      [3.55, 3.25],
-    ],
-    0.1,
-  )
-  part(fin, blue, [0, 0, -0.05])
-  // Geometric red and golden bands follow the distinctive Southwest tail palette.
-  const redBand = polygon(
-    [
-      [2.94, 1.48],
-      [4.52, 1.46],
-      [4.4, 2.13],
-      [3.27, 2.08],
-    ],
-    0.114,
-  )
-  const goldBand = polygon(
-    [
-      [3.29, 2.1],
-      [4.4, 2.15],
-      [4.31, 2.68],
-      [3.45, 2.66],
-    ],
-    0.116,
-  )
-  part(redBand, red, [0, 0, -0.057])
-  part(goldBand, yellow, [0, 0, -0.058])
-  for (const side of [-1, 1]) {
-    const wing = polygon(
-      [
-        [-0.95, 0.1],
-        [1.1, 0.1],
-        [2.45, side * 3.75],
-        [1.8, side * 3.9],
-      ],
-      0.07,
-    )
-    part(wing, aluminum, [0, 0.83, 0], [1, 1, 1], [-Math.PI / 2, 0, 0])
-    const stabilizer = polygon(
-      [
-        [3.35, 0],
-        [4.48, 0],
-        [4.8, side * 1.73],
-        [4.24, side * 1.86],
-      ],
-      0.055,
-    )
-    part(stabilizer, blue, [0, 1.05, 0], [1, 1, 1], [-Math.PI / 2, 0, 0])
-    part(cylinder, blue, [-0.25, 0.52, side * 1.02], [0.31, 1.04, 0.31], [0, 0, Math.PI / 2])
-    part(cylinder, rubber, [-0.785, 0.52, side * 1.02], [0.24, 0.012, 0.24], [0, 0, Math.PI / 2])
-    part(cylinder, rubber, [1.05, 0.13, side * 0.47], [0.17, 0.13, 0.17], [Math.PI / 2, 0, 0])
-  }
-  part(cylinder, rubber, [-3.4, 0.11, 0], [0.135, 0.15, 0.135], [Math.PI / 2, 0, 0])
+  const aircraft = createAircraft(onChange)
+  // Place the taxi lane farther out so the raised concourse still sees the plane
+  // above the seating, retaining its apparent size and speed from the laptop.
+  aircraft.group.position.set(-0.7, apronLevel, -32)
+  aircraft.group.rotation.y = Math.PI
+  aircraft.group.scale.setScalar(1.25)
+  group.add(aircraft.group)
 
   return {
     group,
+    setDaylight(daylight) {
+      ceilingLight.emissiveIntensity = 0.85 + (1 - daylight) * 1.15
+      taxiLight.emissiveIntensity = 0.15 + (1 - daylight) * 3
+    },
     update(timeSeconds) {
+      const nextPhase = Math.floor(timeSeconds / 18)
+      if (nextPhase !== gatePhase) {
+        gatePhase = nextPhase
+        gateDisplays.forEach((display, index) => drawGate(display, (nextPhase + index) % 3 === 1))
+      }
       // A long, even taxi: the wrap occurs completely outside both window walls.
-      aircraft.position.x = 19 - ((timeSeconds * 0.24 + 22.5) % 52)
+      aircraft.group.position.x = -80 + ((timeSeconds * 0.3 + 79.3) % 160)
+      aircraft.update(timeSeconds)
     },
     dispose() {
+      aircraft.dispose()
+      boardingGate.dispose()
       group.traverse((object) => {
         if (object instanceof THREE.InstancedMesh) object.dispose()
       })
