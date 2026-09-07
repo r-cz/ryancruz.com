@@ -32,7 +32,7 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 - `src/scene3d.ts`: WebGL renderer, MacBook model and display, projected native laptop link, responsive camera path, resource disposal.
 - `src/laptop-screen.ts`: high-resolution canvas preview drawn from the page’s existing portfolio copy, with a font-ready redraw for paused scenes.
 - `src/scene-lighting.ts`: smoothly interpolated local-clock sky, sun, ambient light and warm interior fixtures.
-- `src/aircraft.ts`: asynchronously loads the compressed aircraft GLB, redraws paused scenes when it arrives, and handles load failure/disposal.
+- `src/aircraft.ts`: asynchronously loads the compressed aircraft GLB, batches compatible static meshes by material, adds a moving contact shadow, and handles paused redraws and load failure/disposal.
 - `scripts/convert-aircraft.ts`: converts the supplied FBX into an exterior-only, normalized GLB before compression.
 - `src/main.ts`: progressive enhancement, native scroll navigation, keyboard focus, motion preferences, container-based viewport sizing and renderer fallback.
 - `src/page.ts` and `src/portfolio.ts`: shared semantic page content, prerendered into the built HTML by `build.ts`.
@@ -40,7 +40,9 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 
 Portfolio content and links work without JavaScript or WebGL. A lost graphics context or renderer error reveals the same document. Reduced-motion preferences disable ambient movement and camera zoom; the motion button can also pause animation. Hidden tabs and the expanded portfolio stop the continuous render loop. The 3D engine loads separately from the initial interaction code. When motion is paused or reduced, a single frame each minute keeps lighting current. Clock refreshes also stop while the tab or terminal is hidden and catch up on return. This is a local-time atmosphere, not a weather feed or astronomical sunrise calculation; no location permission is needed.
 
-Portrait viewports use a 60° horizontal field of view to keep both gates and the window seating visible around a smaller laptop. The display is part of the same WebGL scene as the bezel, avoiding alignment drift between separate HTML and WebGL renderers. A native link covers the laptop for tapping and keyboard access; the expanded portfolio remains normal, selectable HTML. Renderer dimensions come from the scene’s layout box, with coalesced resize observation that preserves scroll progress and ignores unchanged sizes when browser controls or pinch zoom change the visual viewport.
+Portrait viewports use a 60° horizontal field of view to keep both gates and the window seating visible around a smaller laptop. A higher viewpoint places the nearby laptop below the distant aircraft’s path. The display is part of the same WebGL scene as the bezel, avoiding alignment drift between separate HTML and WebGL renderers. A native link covers the laptop for tapping and keyboard access; the expanded portfolio remains normal, selectable HTML and accepts pointer input after the scene transition. Renderer dimensions come from the scene’s layout box, with coalesced resize observation that preserves scroll progress and ignores unchanged sizes when browser controls or pinch zoom change the visual viewport.
+
+The stationary terminal’s shadow map is cached until lighting, layout or loaded assets change; the aircraft’s soft contact shadow moves with it. Phone-sized viewports cap render density at 1.5 device pixels per CSS pixel. Unchanged camera frames leave the projected link and page styles alone, and portfolio scrolling does not render the hidden airport. These keep native scrolling responsive without adding a delayed camera-follow effect.
 
 ## Content and visual references
 

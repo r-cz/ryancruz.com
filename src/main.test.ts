@@ -242,6 +242,7 @@ describe('camera transition', () => {
     await start()
     expect(scrollTo).toHaveBeenLastCalledWith({ top: 855, behavior: 'instant' })
     expect(element('#portfolio').style.opacity).toBe('1')
+    expect(renderer.render).not.toHaveBeenCalled()
   })
 
   it('keeps the portfolio visible when resizing from mobile to desktop', async () => {
@@ -326,6 +327,8 @@ describe('scene viewport measurements', () => {
     window.scrollTo({ top: 200, behavior: 'instant' })
     flushFrame()
     scrollTo.mockClear()
+    const mutations = new window.MutationObserver(() => {})
+    mutations.observe(document.documentElement, { attributes: true, subtree: true })
     const rendered = renderer.render.mock.calls.length
     Object.assign(visualViewport, { width: 195, height: 350, scale: 2 })
     visualViewport.dispatchEvent(new Event('resize'))
@@ -339,6 +342,8 @@ describe('scene viewport measurements', () => {
     expect(scrollTo).not.toHaveBeenCalled()
     expect(window.scrollY).toBe(200)
     expect(frames.size).toBe(0)
+    expect(mutations.takeRecords()).toHaveLength(0)
+    mutations.disconnect()
   })
 
   it('preserves progress and portfolio position through observed orientation changes', async () => {
@@ -432,6 +437,50 @@ describe('scene viewport measurements', () => {
 })
 
 describe('motion and graceful degradation', () => {
+  it('leaves presentation attributes unchanged during stationary ambient frames', async () => {
+    await start()
+    const mutations = new window.MutationObserver(() => {})
+    mutations.observe(document.documentElement, { attributes: true, subtree: true })
+    flushFrame(32)
+    flushFrame(48)
+    expect(renderer.render).toHaveBeenCalledTimes(3)
+    expect(mutations.takeRecords()).toHaveLength(0)
+    mutations.disconnect()
+    window.scrollTo({ top: 213.75, behavior: 'instant' })
+    flushFrame(64)
+    expect(element('.scene-track').style.getPropertyValue('--chrome-opacity')).toBe('0.25')
+    expect(document.documentElement.style.getPropertyValue('--chrome-opacity')).toBe('')
+  })
+
+  for (const paused of [false, true]) {
+    it(`skips hidden WebGL work and restores the ${paused ? 'paused' : 'animated'} terminal on return`, async () => {
+      if (paused) window.localStorage.setItem('ryan-motion-paused', 'true')
+      await start()
+      const rendered = renderer.render.mock.calls.length
+      element('.skip-scene').click()
+      flushTimers()
+      flushFrame(32)
+      expect(element('#portfolio').style.opacity).toBe('1')
+      expect(element('.scene-track').inert).toBe(true)
+      expect(intervals.size).toBe(0)
+      for (const top of [1000, 1300, 1800]) {
+        window.scrollTo({ top, behavior: 'instant' })
+        flushFrame(48)
+      }
+      expect(renderer.render).toHaveBeenCalledTimes(rendered)
+      expect(frames.size).toBe(0)
+      element('.back-to-terminal').click()
+      flushTimers()
+      flushFrame(64)
+      expect(renderer.render).toHaveBeenCalledTimes(rendered + 1)
+      expect(renderer.render.mock.calls.at(-1)?.[0]).toBe(0)
+      expect(document.activeElement).toBe(element('.laptop-screen'))
+      expect(element('.scene-track').inert).toBe(false)
+      expect(intervals.size).toBe(1)
+      expect(frames.size).toBe(paused ? 0 : 1)
+    })
+  }
+
   it('honors a system motion preference, including live changes', async () => {
     Object.assign(media, { matches: true })
     await start()
@@ -579,6 +628,8 @@ describe('motion and graceful degradation', () => {
       await start()
       element('.laptop-screen').click()
       if (failure === 'render') {
+        // A real smooth scroll is still inside the visible scene when rendering fails.
+        window.scrollTo({ top: 427.5, behavior: 'instant' })
         failRender = true
         flushFrame()
       } else {

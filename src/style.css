@@ -254,6 +254,9 @@ svg {
   margin-top: calc(-1 * var(--scene-height));
   opacity: 0;
 }
+.enhanced:not(.in-portfolio) .portfolio {
+  pointer-events: none;
+}
 .portfolio-header {
   display: flex;
   align-items: center;

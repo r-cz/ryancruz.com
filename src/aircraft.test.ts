@@ -69,6 +69,32 @@ function requestSucceeds() {
   return spyOn(globalThis, 'fetch').mockResolvedValue(new Response(new Uint8Array([1, 2, 3])))
 }
 
+function modelMetrics(group: THREE.Object3D) {
+  group.updateMatrixWorld(true)
+  const bounds = new THREE.Box3()
+  const materials = new Map<THREE.Material, { triangles: number; bounds: THREE.Box3 }>()
+  let meshes = 0
+  group.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || object.name === 'Aircraft contact shadow') return
+    meshes++
+    const geometry: THREE.BufferGeometry = object.geometry
+    const worldBounds = new THREE.Box3()
+    const point = new THREE.Vector3()
+    const positions = geometry.attributes.position
+    for (let vertex = 0; vertex < positions.count; vertex++)
+      worldBounds.expandByPoint(
+        point.fromBufferAttribute(positions, vertex).applyMatrix4(object.matrixWorld),
+      )
+    bounds.union(worldBounds)
+    if (Array.isArray(object.material)) throw new Error('Expected one material per model mesh')
+    const stats = materials.get(object.material) ?? { triangles: 0, bounds: new THREE.Box3() }
+    stats.triangles += (geometry.index?.count ?? geometry.attributes.position.count) / 3
+    stats.bounds.union(worldBounds)
+    materials.set(object.material, stats)
+  })
+  return { meshes, bounds, materials }
+}
+
 afterEach(async () => {
   aircraft.splice(0).forEach((value) => value.dispose())
   await settle()
@@ -78,13 +104,9 @@ afterEach(async () => {
 describe('downloaded aircraft lifecycle', () => {
   it('decodes the shipped Meshopt asset at terminal scale', async () => {
     const value = await loadShippedAircraft()
-    const bounds = new THREE.Box3().setFromObject(value.group)
+    const { bounds, meshes, materials } = modelMetrics(value.group)
     const size = bounds.getSize(new THREE.Vector3())
-    let triangles = 0
-    value.group.traverse((object) => {
-      if (!(object instanceof THREE.Mesh)) return
-      triangles += (object.geometry.index?.count ?? object.geometry.attributes.position.count) / 3
-    })
+    const triangles = [...materials.values()].reduce((sum, value) => sum + value.triangles, 0)
     // Allow the small bounds changes introduced by geometry simplification.
     expect(size.x).toBeGreaterThan(10.7)
     expect(size.x).toBeLessThan(11.3)
@@ -95,6 +117,7 @@ describe('downloaded aircraft lifecycle', () => {
     expect(Math.abs(bounds.min.y)).toBeLessThan(0.02)
     expect(triangles).toBeGreaterThan(80000)
     expect(triangles).toBeLessThan(90000)
+    expect(meshes).toBe(34)
   })
   it('retains engine exhausts, stabilizers and visible tire and hub faces on both sides', async () => {
     const value = await loadShippedAircraft()
@@ -128,15 +151,14 @@ describe('downloaded aircraft lifecycle', () => {
 
       // Single-material engine aft sections were accidentally omitted when the
       // exporter received a material array without matching geometry groups.
-      const exhaust = value.group.getObjectByName(side > 0 ? 'Group_065' : 'Group_019')
-      expect(exhaust).toBeDefined()
-      if (!exhaust) throw new Error('Missing engine exhaust')
       const exhaustHits = new THREE.Raycaster(
         new THREE.Vector3(1, 0.55, side * 1.37),
         new THREE.Vector3(-1, 0, 0),
         0,
         4,
-      ).intersectObject(exhaust, true)
+      )
+        .intersectObject(value.group, true)
+        .filter((hit) => hitMaterialName(hit) === '0135_DarkGray')
       expect(exhaustHits.length).toBeGreaterThan(0)
       const stabilizerHits = new THREE.Raycaster(
         new THREE.Vector3(5, 3, side * 1.3),
@@ -146,6 +168,123 @@ describe('downloaded aircraft lifecycle', () => {
       ).intersectObject(value.group, true)
       expect(stabilizerHits.length).toBeGreaterThan(0)
     }
+  })
+
+  it('batches the shipped model without losing geometry or changing any livery material', async () => {
+    const gltf = await new GLTFLoader()
+      .setMeshoptDecoder(MeshoptDecoder)
+      .parseAsync(
+        await Bun.file(
+          new URL('../public/models/southwest-737.glb', import.meta.url),
+        ).arrayBuffer(),
+        '/models/',
+      )
+    const original = modelMetrics(gltf.scene)
+    requestSucceeds()
+    spyOn(GLTFLoader.prototype, 'parseAsync').mockResolvedValue(gltf)
+    const value = start()
+    await settle()
+    const batched = modelMetrics(value.group)
+
+    expect(original.meshes).toBe(133)
+    expect(batched.meshes).toBe(34)
+    expect(batched.materials.size).toBe(original.materials.size)
+    for (const [material, before] of original.materials) {
+      const after = batched.materials.get(material)
+      if (!after) throw new Error(`Lost aircraft material ${material.name}`)
+      expect(after.triangles).toBe(before.triangles)
+      expect(after.bounds.min.distanceTo(before.bounds.min)).toBeLessThan(0.00001)
+      expect(after.bounds.max.distanceTo(before.bounds.max)).toBeLessThan(0.00001)
+    }
+  })
+
+  it('preserves outward faces through mirrored, nested transforms and releases baked resources', async () => {
+    const geometry = new THREE.BoxGeometry()
+    const material = new THREE.MeshStandardMaterial({ color: '#123456' })
+    const scene = new THREE.Group()
+    const parent = new THREE.Group()
+    parent.position.set(1, 0.4, -2)
+    parent.rotation.y = 0.35
+    scene.add(parent)
+    const first = new THREE.Mesh(geometry, material)
+    first.position.x = -1.5
+    const mirrored = new THREE.Mesh(geometry, material)
+    mirrored.position.x = 1.5
+    mirrored.scale.set(-0.8, 1.2, 0.7)
+    mirrored.rotation.y = -0.5
+    parent.add(first, mirrored)
+    scene.updateMatrixWorld(true)
+    const rays = [first, mirrored].flatMap((mesh) =>
+      [1, -1].map(
+        (side) =>
+          new THREE.Raycaster(
+            mesh.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0, side * 4)),
+            new THREE.Vector3(0, 0, -side),
+          ),
+      ),
+    )
+    const distances = rays.map((ray) => ray.intersectObject(scene, true)[0]?.distance)
+    expect(distances.every((distance) => distance !== undefined)).toBe(true)
+    const originalDispose = spyOn(geometry, 'dispose')
+    const materialDispose = spyOn(material, 'dispose')
+    requestSucceeds()
+    spyOn(GLTFLoader.prototype, 'parseAsync').mockResolvedValue({ scene, scenes: [scene] } as GLTF)
+    const value = start()
+    await settle()
+    value.group.updateMatrixWorld(true)
+    const meshes: THREE.Mesh[] = []
+    value.group.traverse((object) => {
+      if (object instanceof THREE.Mesh && object.name !== 'Aircraft contact shadow')
+        meshes.push(object)
+    })
+
+    expect(meshes).toHaveLength(1)
+    rays.forEach((ray, index) => {
+      expect(ray.intersectObjects(meshes)[0]?.distance).toBeCloseTo(distances[index] ?? 0, 5)
+    })
+    expect(originalDispose).toHaveBeenCalledTimes(1)
+    expect(materialDispose).not.toHaveBeenCalled()
+    const mergedDispose = spyOn(meshes[0].geometry, 'dispose')
+    value.dispose()
+    value.dispose()
+    expect(originalDispose).toHaveBeenCalledTimes(1)
+    expect(mergedDispose).toHaveBeenCalledTimes(1)
+    expect(materialDispose).toHaveBeenCalledTimes(1)
+  })
+
+  it('moves a soft contact shadow with the aircraft without invalidating cached sun shadows', async () => {
+    const value = await loadShippedAircraft()
+    const shadow = value.group.getObjectByName('Aircraft contact shadow')
+    if (!(shadow instanceof THREE.Mesh) || !(shadow.material instanceof THREE.MeshBasicMaterial))
+      throw new Error('Missing aircraft contact shadow')
+    const texture = shadow.material.map
+    if (!(texture instanceof THREE.DataTexture)) throw new Error('Missing contact shadow mask')
+    const model = modelMetrics(value.group)
+    const originalPosition = shadow.getWorldPosition(new THREE.Vector3())
+    expect(originalPosition.y - model.bounds.min.y).toBeCloseTo(0.006, 5)
+    expect(shadow.material.transparent).toBe(true)
+    expect(shadow.material.depthWrite).toBe(false)
+    const alphas = Array.from(texture.image.data).filter((_value, index) => index % 4 === 3)
+    expect(Math.min(...alphas)).toBe(0)
+    expect(Math.max(...alphas)).toBeGreaterThan(200)
+    value.group.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return
+      expect(object.castShadow).toBe(false)
+      if (object !== shadow) expect(object.receiveShadow).toBe(true)
+    })
+    value.group.position.x += 4
+    value.group.updateMatrixWorld(true)
+    const moved = shadow.getWorldPosition(new THREE.Vector3())
+    expect(moved.x - originalPosition.x).toBeCloseTo(4, 6)
+    expect(moved.y).toBe(originalPosition.y)
+    const textureDispose = spyOn(texture, 'dispose')
+    const geometryDispose = spyOn(shadow.geometry, 'dispose')
+    const materialDispose = spyOn(shadow.material, 'dispose')
+    value.dispose()
+    value.dispose()
+    expect(textureDispose).toHaveBeenCalledTimes(1)
+    expect(geometryDispose).toHaveBeenCalledTimes(1)
+    expect(materialDispose).toHaveBeenCalledTimes(1)
   })
 
   it('loads the compressed model and requests one frame without an animation loop', async () => {
@@ -166,7 +305,7 @@ describe('downloaded aircraft lifecycle', () => {
     expect(parse).toHaveBeenCalledTimes(1)
     expect(parse.mock.calls[0]?.[1]).toBe('/models/')
     expect(value.group.children).toEqual([result.scene])
-    expect(result.mesh.castShadow).toBe(true)
+    expect(result.mesh.castShadow).toBe(false)
     expect(result.mesh.receiveShadow).toBe(true)
     expect(value.group.userData.loadState).toBe('ready')
     expect(onChange).toHaveBeenCalledTimes(1)

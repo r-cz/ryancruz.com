@@ -33,9 +33,12 @@ export function createLiveScene(
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#dce7e9')
   scene.fog = new THREE.Fog('#dce7e9', 36, 95)
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFShadowMap
+  // Camera movement does not change shadows on the stationary terminal. The
+  // taxiing aircraft has its own contact shadow, so this map can be reused.
+  renderer.shadowMap.autoUpdate = false
+  renderer.shadowMap.needsUpdate = true
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.25
   renderer.domElement.setAttribute(
@@ -76,7 +79,10 @@ export function createLiveScene(
   })
   let lightingMinute = ''
 
-  const environment = createTerminalEnvironment(onChange)
+  const environment = createTerminalEnvironment(() => {
+    renderer.shadowMap.needsUpdate = true
+    onChange()
+  })
   scene.add(environment.group)
   const foreground = new THREE.Group()
   scene.add(foreground)
@@ -169,6 +175,8 @@ export function createLiveScene(
     new THREE.Vector3(1.34, 0.86, 0.06),
   ]
   const projected = new THREE.Vector3()
+  const linkCameraMatrix = new THREE.Matrix4()
+  let linkNeedsUpdate = true
   function positionLaptopLink() {
     let left = width
     let right = 0
@@ -205,7 +213,12 @@ export function createLiveScene(
     resize(w, h) {
       width = w
       height = h
+      const pixelRatio = Math.min(window.devicePixelRatio, Math.min(w, h) <= 700 ? 1.5 : 1.75)
+      if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio)
       renderer.setSize(w, h)
+      renderer.shadowMap.needsUpdate = true
+      linkNeedsUpdate = true
+      container.dataset.renderSize = `${width}x${height}`
       camera.aspect = w / h
       const portrait = camera.aspect < 0.85
       // Preserve the horizontal view on portrait screens so both gates and the
@@ -216,8 +229,10 @@ export function createLiveScene(
       camera.updateProjectionMatrix()
       foreground.position.x = portrait ? 0.85 : 0
       screenCenter.set(foreground.position.x, 1.69, 0.234)
-      initialPosition.set(portrait ? 0.85 : 0.35, portrait ? 2.25 : 2.5, portrait ? 5.1 : 6)
-      initialTarget.set(foreground.position.x, portrait ? 2.1 : 2.05, -1.8)
+      // Raise the portrait viewpoint while keeping the distant apron at the
+      // same height. The nearby laptop sits lower, clearing the plane's path.
+      initialPosition.set(portrait ? 0.85 : 0.35, portrait ? 3.25 : 2.5, portrait ? 5.1 : 6)
+      initialTarget.set(foreground.position.x, portrait ? 2.91 : 2.05, -1.8)
       // End just inside the screen so the HTML portfolio can take over edge-to-edge.
       const verticalDistance = 1.505 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))
       const horizontalDistance =
@@ -242,6 +257,7 @@ export function createLiveScene(
         fill.intensity = lighting.fillIntensity
         for (const practical of practicals) practical.intensity = lighting.practical
         environment.setDaylight(lighting.daylight)
+        renderer.shadowMap.needsUpdate = true
         container.dataset.localHour = String(lighting.hour)
         container.dataset.daylight = lighting.daylight.toFixed(3)
         container.dataset.night = String(lighting.daylight < 0.2)
@@ -255,8 +271,11 @@ export function createLiveScene(
       camera.lookAt(currentTarget)
       environment.update(elapsed)
       renderer.render(scene, camera)
-      positionLaptopLink()
-      container.dataset.renderSize = `${width}x${height}`
+      if (linkNeedsUpdate || !linkCameraMatrix.equals(camera.matrixWorld)) {
+        positionLaptopLink()
+        linkCameraMatrix.copy(camera.matrixWorld)
+        linkNeedsUpdate = false
+      }
     },
     dispose() {
       environment.dispose()
