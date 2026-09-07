@@ -216,18 +216,6 @@ svg {
 .scene-footer {
   bottom: 30px;
 }
-.scene-location {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1.4px;
-}
-.scene-location > span {
-  margin: 0 8px;
-  opacity: 0.5;
-}
-.scene-note {
-  font: italic 15px var(--font-serif);
-}
 .explore-cue {
   position: absolute;
   left: 50%;
@@ -546,9 +534,6 @@ svg {
   display: none;
 }
 @media (max-width: 1000px) {
-  .scene-note {
-    display: none;
-  }
   .experience-detail .experience-date {
     position: static;
   }
@@ -573,9 +558,6 @@ svg {
   .scene-footer {
     bottom: 33px;
     justify-content: center;
-  }
-  .scene-location {
-    display: none;
   }
   .explore-cue {
     font-size: 14px;

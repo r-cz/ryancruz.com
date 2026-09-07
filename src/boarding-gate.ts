@@ -4,6 +4,8 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 type Point = [number, number, number]
 
 export const boardingDoorOpening = { z: -15.3, width: 1.48, height: 2.83 }
+// The concourse sits above the apron; the bridge descends toward the aircraft.
+export const apronLevel = -1.1
 
 /** Small boarding station and an enclosed jetbridge at the terminal's far-left end. */
 export function createBoardingGate(): { group: THREE.Group; dispose(): void } {
@@ -248,21 +250,21 @@ export function createBoardingGate(): { group: THREE.Group; dispose(): void } {
     box(bridge, metal, [0, 2.22, seam], [width + 0.2, 0.065, 0.14], frame)
   }
   const start = new THREE.Vector3(0, 0.065, -0.125)
-  const elbow = new THREE.Vector3(0, 0.38, -3.77)
-  const end = new THREE.Vector3(-3.95, 0.8, -7.02)
+  const elbow = new THREE.Vector3(0, -0.18, -3.77)
+  const end = new THREE.Vector3(-3.95, -0.5, -7.02)
   corridor(start, elbow, 1.46)
   corridor(elbow, end, 1.35)
   // A drum joint allows the outer corridor to turn toward the aircraft apron.
-  part(bridge, cylinder, bridgeCladding, [elbow.x, 1.445, elbow.z], [0.91, 2.14, 0.91])
-  part(bridge, cylinder, roof, [elbow.x, 2.535, elbow.z], [0.965, 0.075, 0.965])
-  part(bridge, cylinder, bridgeRib, [elbow.x, 0.365, elbow.z], [0.93, 0.12, 0.93])
+  part(bridge, cylinder, bridgeCladding, [elbow.x, elbow.y + 1.065, elbow.z], [0.91, 2.14, 0.91])
+  part(bridge, cylinder, roof, [elbow.x, elbow.y + 2.155, elbow.z], [0.965, 0.075, 0.965])
+  part(bridge, cylinder, bridgeRib, [elbow.x, elbow.y - 0.015, elbow.z], [0.93, 0.12, 0.93])
   for (let i = 0; i < 20; i++) {
     const angle = (i / 20) * Math.PI * 2
     part(
       bridge,
       cube,
       bridgeRib,
-      [elbow.x + Math.sin(angle) * 0.916, 1.43, elbow.z + Math.cos(angle) * 0.916],
+      [elbow.x + Math.sin(angle) * 0.916, elbow.y + 1.05, elbow.z + Math.cos(angle) * 0.916],
       [0.026, 1.93, 0.025],
       [0, angle, 0],
     )
@@ -289,17 +291,27 @@ export function createBoardingGate(): { group: THREE.Group; dispose(): void } {
   box(bridge, charcoal, [0.901, 1.5, 0.23], [0.014, 0.64, 0.5], headFrame)
   part(bridge, plane, glass, [0.91, 1.5, 0.23], [0.45, 0.59, 1], [0, Math.PI / 2, 0], headFrame)
 
-  const support = end.clone().addScaledVector(heading, -0.87)
-  const supportFloor = 0.8 - (0.87 / elbow.distanceTo(end)) * (end.y - elbow.y)
+  const supportOffset = 0.87
+  const support = end.clone().addScaledVector(heading, -supportOffset)
+  const outerHorizontalLength = Math.hypot(end.x - elbow.x, end.z - elbow.z)
+  const supportFloor = THREE.MathUtils.lerp(end.y, elbow.y, supportOffset / outerHorizontalLength)
   const supportFrame = new THREE.Matrix4().makeRotationY(yaw).setPosition(support.x, 0, support.z)
-  box(bridge, charcoal, [0, 0.17, 0], [1.34, 0.16, 0.5], supportFrame)
-  box(bridge, metal, [0, supportFloor - 0.1, 0], [1.44, 0.12, 0.52], supportFrame)
+  const wheelRadius = 0.17
+  const wheelCenter = apronLevel + wheelRadius
+  const chassisHeight = 0.16
+  const chassisCenter = wheelCenter + 0.13
+  const upperSupportCenter = supportFloor - 0.1
+  const upperSupportThickness = 0.12
+  const supportBottom = chassisCenter + chassisHeight / 2
+  const supportTop = upperSupportCenter - upperSupportThickness / 2
+  box(bridge, charcoal, [0, chassisCenter, 0], [1.34, chassisHeight, 0.5], supportFrame)
+  box(bridge, metal, [0, upperSupportCenter, 0], [1.44, upperSupportThickness, 0.52], supportFrame)
   for (const side of [-1, 1]) {
     box(
       bridge,
       metal,
-      [side * 0.44, (supportFloor + 0.12) / 2, 0],
-      [0.12, supportFloor - 0.25, 0.16],
+      [side * 0.44, (supportTop + supportBottom) / 2, 0],
+      [0.12, supportTop - supportBottom, 0.16],
       supportFrame,
     )
     for (const z of [-0.17, 0.17]) {
@@ -307,8 +319,8 @@ export function createBoardingGate(): { group: THREE.Group; dispose(): void } {
         bridge,
         cylinder,
         rubber,
-        [side * 0.68, 0.04, z],
-        [0.17, 0.13, 0.17],
+        [side * 0.68, wheelCenter, z],
+        [wheelRadius, 0.13, wheelRadius],
         [0, 0, Math.PI / 2],
         supportFrame,
       )
@@ -316,16 +328,30 @@ export function createBoardingGate(): { group: THREE.Group; dispose(): void } {
         bridge,
         cylinder,
         metal,
-        [side * 0.75, 0.04, z],
+        [side * 0.75, wheelCenter, z],
         [0.085, 0.01, 0.085],
         [0, 0, Math.PI / 2],
         supportFrame,
       )
     }
-    box(bridge, amber, [side * 0.77, 0.23, 0], [0.013, 0.045, 0.1], supportFrame)
+    box(bridge, amber, [side * 0.77, chassisCenter + 0.06, 0], [0.013, 0.045, 0.1], supportFrame)
   }
-  part(bridge, cylinder, metal, [elbow.x, 0.105, elbow.z], [0.15, 0.48, 0.15])
-  box(bridge, charcoal, [elbow.x, -0.09, elbow.z], [0.65, 0.07, 0.65])
+  const pedestalBaseHeight = 0.07
+  const pedestalBottom = apronLevel + pedestalBaseHeight - 0.01
+  const pedestalTop = elbow.y - 0.025
+  part(
+    bridge,
+    cylinder,
+    metal,
+    [elbow.x, (pedestalBottom + pedestalTop) / 2, elbow.z],
+    [0.15, pedestalTop - pedestalBottom, 0.15],
+  )
+  box(
+    bridge,
+    charcoal,
+    [elbow.x, apronLevel + pedestalBaseHeight / 2, elbow.z],
+    [0.65, pedestalBaseHeight, 0.65],
+  )
 
   for (const batch of batches.values()) {
     const mesh = new THREE.InstancedMesh(batch.shape, batch.surface, batch.matrices.length)

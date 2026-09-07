@@ -27,9 +27,7 @@ export function renderPage(): string {
         </div>
         <header class="scene-header scene-chrome"><a class="scene-monogram" href="#terminal" aria-label="Ryan Cruz, terminal home">RC.</a><a class="skip-scene" href="#portfolio">Skip to portfolio ${arrow}</a></header>
         <div class="scene-footer scene-chrome">
-          <span class="scene-location">DAL <span>/</span> DALLAS LOVE FIELD</span>
           <a class="explore-cue" href="#portfolio" aria-label="Explore the portfolio"><span>Click the laptop or scroll to explore</span>${chevron}</a>
-          <span class="scene-note">A little closer to home.</span>
         </div>
       </div>
     </section>

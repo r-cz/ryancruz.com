@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { createAircraft } from './aircraft'
-import { boardingDoorOpening, createBoardingGate } from './boarding-gate'
+import { apronLevel, boardingDoorOpening, createBoardingGate } from './boarding-gate'
 
 /**
  * Modeled architecture informed by Corgan's DAL modernization photography:
@@ -111,34 +111,41 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     castShadow = true,
   ) => instance(cube, surface, position, size, [0, 0, 0], castShadow)
 
+  // Continue the concourse beyond the right edge of wide desktop views.
+  const terminalLeft = -7
+  const terminalRight = 37.2
+  const terminalWidth = terminalRight - terminalLeft
+  const terminalCenter = (terminalLeft + terminalRight) / 2
   // An open foreground keeps the camera move into the laptop unobstructed.
-  box(stone, [2, -0.07, -7], [18, 0.14, 24], false)
-  for (let z = -17; z <= 3; z += 2) box(tileJoint, [2, 0.002, z], [18, 0.004, 0.013], false)
-  for (let x = -5; x <= 11; x += 2) box(tileJoint, [x, 0.003, -7], [0.013, 0.004, 24], false)
+  box(stone, [terminalCenter, -0.07, -7], [terminalWidth, 0.14, 24], false)
+  for (let z = -17; z <= 3; z += 2)
+    box(tileJoint, [terminalCenter, 0.002, z], [terminalWidth, 0.004, 0.013], false)
+  for (let x = -5; x <= terminalRight; x += 2)
+    box(tileJoint, [x, 0.003, -7], [0.013, 0.004, 24], false)
   // Small inset bands recall the terrazzo pattern without a tiled image texture.
-  box(material(0xc2baab, 0.8), [2, 0.006, -3.7], [18, 0.006, 0.23], false)
-  box(material(0xc2baab, 0.8), [2, 0.006, -12.4], [18, 0.006, 0.23], false)
+  box(material(0xc2baab, 0.8), [terminalCenter, 0.006, -3.7], [terminalWidth, 0.006, 0.23], false)
+  box(material(0xc2baab, 0.8), [terminalCenter, 0.006, -12.4], [terminalWidth, 0.006, 0.23], false)
 
   // Exposed glulam beams and a warm wood ceiling are DAL's defining structure.
-  box(lightWood, [1.9, 6.05, -7.4], [18.3, 0.16, 24.5], false)
+  box(lightWood, [terminalCenter, 6.05, -7.4], [terminalWidth + 0.3, 0.16, 24.5], false)
   for (let z = -17.5; z <= 3.5; z += 2.45) {
-    box(warmWood, [1.9, 5.73, z], [18.3, 0.54, 0.28])
-    box(woodEdge, [1.9, 5.46, z], [18.3, 0.018, 0.3])
-    box(lightWood, [1.9, 5.67, z + 0.145], [18.3, 0.026, 0.014])
+    box(warmWood, [terminalCenter, 5.73, z], [terminalWidth + 0.3, 0.54, 0.28])
+    box(woodEdge, [terminalCenter, 5.46, z], [terminalWidth + 0.3, 0.018, 0.3])
+    box(lightWood, [terminalCenter, 5.67, z + 0.145], [terminalWidth + 0.3, 0.026, 0.014])
     for (const y of [5.54, 5.63, 5.81, 5.9]) {
-      box(woodEdge, [1.9, y, z + 0.145], [18.3, 0.007, 0.01], false)
+      box(woodEdge, [terminalCenter, y, z + 0.145], [terminalWidth + 0.3, 0.007, 0.01], false)
     }
   }
-  for (let x = -6.8; x <= 10.8; x += 0.58) {
+  for (let x = -6.8; x <= terminalRight; x += 0.58) {
     box(woodEdge, [x, 5.962, -7.4], [0.012, 0.012, 24.5], false)
   }
   for (const z of [-13.8, -8.9, -4, 0.9]) {
-    for (const x of [-2.7, 4.2]) {
+    for (let x = -2.7; x < terminalRight - 2; x += 6.9) {
       box(aluminum, [x, 5.935, z], [3.5, 0.05, 0.12], false)
       box(ceilingLight, [x, 5.906, z], [3.36, 0.013, 0.068], false)
     }
   }
-  for (const x of [-5.7, 7.65]) {
+  for (const x of [-5.7, 7.65, 21, 34.35]) {
     for (const z of [-15.5, -8, -0.4]) {
       instance(cylinder, cream, [x, 2.85, z], [0.3, 5.7, 0.3])
       instance(cylinder, aluminum, [x, 0.09, z], [0.313, 0.18, 0.313])
@@ -156,7 +163,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   ]) {
     box(cream, [-7.08, 0.2, (back + front) / 2], [0.24, 0.4, front - back])
   }
-  box(cream, [1.9, 0.2, -18.1], [18.3, 0.4, 0.24])
+  box(cream, [terminalCenter, 0.2, -18.1], [terminalWidth + 0.3, 0.4, 0.24])
   const pane = geometry(new THREE.PlaneGeometry(1, 1))
   for (const [back, front] of [
     [-18.1, doorBack],
@@ -179,7 +186,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     [0, Math.PI / 2, 0],
     false,
   )
-  instance(pane, glass, [1.95, 3.03, -18], [18.1, 5.26, 1], [0, 0, 0], false)
+  instance(pane, glass, [terminalCenter, 3.03, -18], [terminalWidth, 5.26, 1], [0, 0, 0], false)
   for (let z = -18; z <= 3.2; z += 2.65) {
     if (z > doorBack && z < doorFront) {
       box(
@@ -191,7 +198,8 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
       box(aluminum, [-6.97, 3.02, z], [0.095, 5.65, 0.09])
     }
   }
-  for (let x = -7; x <= 11.1; x += 2.6) box(aluminum, [x, 3.02, -17.97], [0.09, 5.65, 0.095])
+  for (let x = terminalLeft; x <= terminalRight + 0.01; x += 2.6)
+    box(aluminum, [x, 3.02, -17.97], [0.09, 5.65, 0.095])
   for (const y of [0.43, 2.2, 4.28, 5.83]) {
     if (y < boardingDoorOpening.height) {
       for (const [back, front] of [
@@ -203,7 +211,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     } else {
       box(aluminum, [-6.965, y, -7.5], [0.1, 0.065, 21.2])
     }
-    box(aluminum, [2, y, -17.965], [18.2, 0.065, 0.1])
+    box(aluminum, [terminalCenter, y, -17.965], [terminalWidth + 0.1, 0.065, 0.1])
   }
 
   // Linked gate chairs: rounded charcoal cushions on shared metal rails.
@@ -262,6 +270,8 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   ])
 
   // Broad daylight apron and distant low buildings beyond the glass.
+  // The concourse sits above the apron, allowing a descending boarding ramp.
+  assemblyTransform = new THREE.Matrix4().makeTranslation(0, apronLevel + 0.13, 0)
   box(concrete, [-3, -0.19, -30], [120, 0.12, 110], false)
   box(material(0x919fa0, 0.98), [0, -0.12, -41], [110, 0.018, 11], false)
   for (let x = -40; x < 40; x += 8) {
@@ -278,6 +288,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
       instance(sphere, taxiLight, [x, 0.015, z], [0.055, 0.04, 0.055], [0, 0, 0], false)
     }
   }
+  assemblyTransform = undefined
 
   // Column-mounted portrait displays, based on the visitor-supplied DAL photo.
   // These are simulated gate details, drawn into backlit screen textures.
@@ -387,8 +398,11 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   group.add(boardingGate.group)
 
   const aircraft = createAircraft(onChange)
-  aircraft.group.position.set(-0.5, -0.13, -24.4)
+  // Place the taxi lane farther out so the raised concourse still sees the plane
+  // above the seating, retaining its apparent size and speed from the laptop.
+  aircraft.group.position.set(-0.7, apronLevel, -32)
   aircraft.group.rotation.y = Math.PI
+  aircraft.group.scale.setScalar(1.25)
   group.add(aircraft.group)
 
   return {
@@ -404,7 +418,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
         gateDisplays.forEach((display, index) => drawGate(display, (nextPhase + index) % 3 === 1))
       }
       // A long, even taxi: the wrap occurs completely outside both window walls.
-      aircraft.group.position.x = -64 + ((timeSeconds * 0.24 + 63.5) % 128)
+      aircraft.group.position.x = -80 + ((timeSeconds * 0.3 + 79.3) % 160)
       aircraft.update(timeSeconds)
     },
     dispose() {
