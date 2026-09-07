@@ -28,6 +28,7 @@ export function initSite() {
   let needsResize = false
   let sceneWidth = 0
   let sceneHeight = 0
+  let layoutHeight = 0
   let resizeObserver: ResizeObserver | undefined
   const visualViewport = window.visualViewport
   let entering: number | undefined
@@ -38,6 +39,11 @@ export function initSite() {
   let elapsed = 0
   let previousTime = 0
   let failed = false
+  let lastSceneOpacity = -1
+  let lastPortfolioOpacity = -1
+  let lastChromeOpacity = -1
+  let lastContentVisible: boolean | undefined
+  let lastLaptopTabIndex: number | undefined
   const pointer = { x: 0, y: 0 }
   document.documentElement.classList.add('enhanced')
 
@@ -76,23 +82,46 @@ export function initSite() {
     if (animated && previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.06)
     previousTime = time
     try {
-      liveScene?.render(
-        reduced.matches ? 0 : progress,
-        elapsed,
-        animated ? pointer : { x: 0, y: 0 },
-        new Date(),
-      )
+      // Portfolio scrolling must not redraw the fully hidden airport.
+      if (progress < 1) {
+        liveScene?.render(
+          reduced.matches ? 0 : progress,
+          elapsed,
+          animated ? pointer : { x: 0, y: 0 },
+          new Date(),
+        )
+      }
     } catch {
       revealContent()
       return
     }
-    camera.style.opacity = String(1 - clamp((progress - 0.91) / 0.09))
+    const sceneOpacity = 1 - clamp((progress - 0.91) / 0.09)
+    const portfolioOpacity = clamp((progress - 0.88) / 0.12)
+    const chromeOpacity = 1 - clamp(progress * 3)
     const contentVisible = progress >= 0.995
-    portfolio.style.opacity = String(clamp((progress - 0.88) / 0.12))
-    document.documentElement.style.setProperty('--chrome-opacity', String(1 - clamp(progress * 3)))
-    document.documentElement.classList.toggle('in-portfolio', contentVisible)
-    laptop.tabIndex = progress < 0.1 ? 0 : -1
-    if (track) track.inert = contentVisible
+    const laptopTabIndex = progress < 0.1 ? 0 : -1
+    if (sceneOpacity !== lastSceneOpacity) {
+      camera.style.opacity = String(sceneOpacity)
+      lastSceneOpacity = sceneOpacity
+    }
+    if (portfolioOpacity !== lastPortfolioOpacity) {
+      portfolio.style.opacity = String(portfolioOpacity)
+      lastPortfolioOpacity = portfolioOpacity
+    }
+    if (chromeOpacity !== lastChromeOpacity) {
+      // Limit inherited style invalidation to the scene, outside the portfolio.
+      track?.style.setProperty('--chrome-opacity', String(chromeOpacity))
+      lastChromeOpacity = chromeOpacity
+    }
+    if (contentVisible !== lastContentVisible) {
+      document.documentElement.classList.toggle('in-portfolio', contentVisible)
+      if (track) track.inert = contentVisible
+      lastContentVisible = contentVisible
+    }
+    if (laptopTabIndex !== lastLaptopTabIndex) {
+      laptop.tabIndex = laptopTabIndex
+      lastLaptopTabIndex = laptopTabIndex
+    }
     if (liveScene && animated) schedule()
   }
   function schedule() {
@@ -138,8 +167,11 @@ export function initSite() {
     const oldTravel = travel
     const oldScroll = window.scrollY
     travel = Math.round(height * (width <= 700 || reduced.matches ? 0.55 : 0.95))
-    track.style.height = `${height + travel}px`
-    document.documentElement.style.setProperty('--scene-height', `${height}px`)
+    if (height !== layoutHeight || travel !== oldTravel) track.style.height = `${height + travel}px`
+    if (height !== layoutHeight) {
+      document.documentElement.style.setProperty('--scene-height', `${height}px`)
+      layoutHeight = height
+    }
     if (measured && travel !== oldTravel) {
       const top =
         oldScroll >= oldTravel - 1
