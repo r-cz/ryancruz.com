@@ -2,7 +2,7 @@
 
 Ryan Cruz’s personal portfolio, set inside a live 3D interpretation of Dallas Love Field.
 
-The terminal, MacBook Pro, linked gate seating, window grids and beams are modeled Three.js geometry. The aircraft is an optimized version of Daniel Skomorovsky’s Southwest Airlines Boeing 737 model. Aircraft movement and digital gate information are simulated. The western-wing layout has two column displays, gate 20 on the left and gate 18 on the right, with seating banks turned along the concourse. Lighting follows the visitor’s local device time, from dawn through daylight and sunset to a warmly lit terminal at night. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
+The terminal, MacBook Pro, linked gate seating, window grids and beams are modeled Three.js geometry. The aircraft is an optimized version of Daniel Skomorovsky’s Southwest Airlines Boeing 737 model. Aircraft movement and digital gate information are simulated. The western-wing layout has two column displays, gate 20 on the left and gate 18 on the right, with back-to-back seating banks along the concourse, including window-facing seats on the left. Gate 20 shows Philadelphia (PHL), and gate 18 shows Atlanta (ATL). A small Ops Agent kiosk, boarding door and modeled jetbridge occupy the rear-left corner, while the aircraft taxis to the right beyond the windows. Lighting follows the visitor’s local device time, from dawn through daylight and sunset to a warmly lit terminal at night. Clicking the laptop or scrolling moves the camera into the screen, then hands off to a normal HTML portfolio with About, Experience, Projects and Education.
 
 ## Development
 
@@ -28,6 +28,7 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 ## Implementation
 
 - `src/terminal-environment.ts`: instanced terminal architecture, furnishings, portrait digital gate displays and aircraft taxi path. Physical sign text is drawn on small canvas textures; there is no generated background image.
+- `src/boarding-gate.ts`: modeled Ops Agent kiosk, boarding door and exterior jetbridge at gate 20.
 - `src/scene3d.ts`: WebGL renderer, MacBook model, CSS3D laptop screen, responsive camera path, resource disposal.
 - `src/scene-lighting.ts`: smoothly interpolated local-clock sky, sun, ambient light and warm interior fixtures.
 - `src/aircraft.ts`: asynchronously loads the compressed aircraft GLB, redraws paused scenes when it arrives, and handles load failure/disposal.

@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { createAircraft } from './aircraft'
+import { boardingDoorOpening, createBoardingGate } from './boarding-gate'
 
 /**
  * Modeled architecture informed by Corgan's DAL modernization photography:
@@ -146,15 +147,62 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   }
 
   // Clear gridded curtain walls on the left and back expose the live apron.
-  box(cream, [-7.08, 0.2, -7.4], [0.24, 0.4, 22.2])
+  const doorBack = boardingDoorOpening.z - boardingDoorOpening.width / 2
+  const doorFront = boardingDoorOpening.z + boardingDoorOpening.width / 2
+  // Keep the boarding doorway clear through the sill, glazing and window grid.
+  for (const [back, front] of [
+    [-18.5, doorBack],
+    [doorFront, 3.7],
+  ]) {
+    box(cream, [-7.08, 0.2, (back + front) / 2], [0.24, 0.4, front - back])
+  }
   box(cream, [1.9, 0.2, -18.1], [18.3, 0.4, 0.24])
   const pane = geometry(new THREE.PlaneGeometry(1, 1))
-  instance(pane, glass, [-7, 3.03, -7.5], [21.2, 5.26, 1], [0, Math.PI / 2, 0], false)
+  for (const [back, front] of [
+    [-18.1, doorBack],
+    [doorFront, 3.1],
+  ]) {
+    instance(
+      pane,
+      glass,
+      [-7, 3.03, (back + front) / 2],
+      [front - back, 5.26, 1],
+      [0, Math.PI / 2, 0],
+      false,
+    )
+  }
+  instance(
+    pane,
+    glass,
+    [-7, (5.66 + boardingDoorOpening.height) / 2, boardingDoorOpening.z],
+    [boardingDoorOpening.width, 5.66 - boardingDoorOpening.height, 1],
+    [0, Math.PI / 2, 0],
+    false,
+  )
   instance(pane, glass, [1.95, 3.03, -18], [18.1, 5.26, 1], [0, 0, 0], false)
-  for (let z = -18; z <= 3.2; z += 2.65) box(aluminum, [-6.97, 3.02, z], [0.095, 5.65, 0.09])
+  for (let z = -18; z <= 3.2; z += 2.65) {
+    if (z > doorBack && z < doorFront) {
+      box(
+        aluminum,
+        [-6.97, (5.845 + boardingDoorOpening.height) / 2, z],
+        [0.095, 5.845 - boardingDoorOpening.height, 0.09],
+      )
+    } else {
+      box(aluminum, [-6.97, 3.02, z], [0.095, 5.65, 0.09])
+    }
+  }
   for (let x = -7; x <= 11.1; x += 2.6) box(aluminum, [x, 3.02, -17.97], [0.09, 5.65, 0.095])
   for (const y of [0.43, 2.2, 4.28, 5.83]) {
-    box(aluminum, [-6.965, y, -7.5], [0.1, 0.065, 21.2])
+    if (y < boardingDoorOpening.height) {
+      for (const [back, front] of [
+        [-18.1, doorBack],
+        [doorFront, 3.1],
+      ]) {
+        box(aluminum, [-6.965, y, (back + front) / 2], [0.1, 0.065, front - back])
+      }
+    } else {
+      box(aluminum, [-6.965, y, -7.5], [0.1, 0.065, 21.2])
+    }
     box(aluminum, [2, y, -17.965], [18.2, 0.065, 0.1])
   }
 
@@ -204,11 +252,14 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     [2.65, -10.1, 6],
     [2.65, -11.35, 6, -1],
   ])
-  addSeatingBank(-4.06, -13.225, [
-    [-5.7, -12.6, 5],
-    [-5.7, -13.85, 5, -1],
+  addSeatingBank(-4.23, -12.35, [
+    [-5.87, -11.725, 5],
+    [-5.87, -12.975, 5, -1],
   ])
-  addSeatingBank(-4.93, -5.9, [[-5.75, -5.9, 3]])
+  addSeatingBank(-4.93, -5.9, [
+    [-5.75, -5.275, 3],
+    [-5.75, -6.525, 3, -1],
+  ])
 
   // Broad daylight apron and distant low buildings beyond the glass.
   box(concrete, [-3, -0.19, -30], [120, 0.12, 110], false)
@@ -235,11 +286,12 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     texture: THREE.CanvasTexture
     number: string
     destination: string
+    airport: string
     flight: string
     boarding: string
   }[] = []
   const drawGate = (display: (typeof gateDisplays)[number], boarding: boolean) => {
-    const { context: ctx, number, destination, flight } = display
+    const { context: ctx, number, destination, airport, flight } = display
     ctx.fillStyle = '#f3f4ff'
     ctx.fillRect(0, 0, 512, 960)
     ctx.fillStyle = '#2645cf'
@@ -257,7 +309,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     ctx.font = '500 47px system-ui, sans-serif'
     ctx.fillText(destination, 34, 553, 444)
     ctx.font = '23px system-ui, sans-serif'
-    ctx.fillText('Nonstop', 34, 599)
+    ctx.fillText(`${airport} · Nonstop`, 34, 599)
     ctx.fillStyle = '#dde1f1'
     ctx.fillRect(0, 658, 512, 160)
     ctx.fillStyle = '#293f99'
@@ -277,6 +329,7 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
   function addGate(
     number: string,
     destination: string,
+    airport: string,
     flight: string,
     boarding: string,
     x: number,
@@ -304,12 +357,20 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     face.position.z = 0.108
     mount.add(housing, bezel, face)
     group.add(mount)
-    const display = { context: gateContext, texture, number, destination, flight, boarding }
+    const display = {
+      context: gateContext,
+      texture,
+      number,
+      destination,
+      airport,
+      flight,
+      boarding,
+    }
     gateDisplays.push(display)
     drawGate(display, false)
   }
-  addGate('18', 'Tulsa, OK', '2146', '2:35 PM', 7.4, -7.62, -0.35)
-  addGate('20', 'Houston, TX', '1158', '2:20 PM', -5.48, -7.61, 0.25)
+  addGate('18', 'Atlanta, GA', 'ATL', '2146', '2:35 PM', 7.4, -7.62, -0.35)
+  addGate('20', 'Philadelphia, PA', 'PHL', '1158', '2:20 PM', -5.48, -7.61, 0.25)
   let gatePhase = 0
 
   for (const { shape, surface, matrices, castShadow } of batches.values()) {
@@ -322,8 +383,12 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
     group.add(mesh)
   }
 
+  const boardingGate = createBoardingGate()
+  group.add(boardingGate.group)
+
   const aircraft = createAircraft(onChange)
-  aircraft.group.position.set(-14, -0.13, -24.4)
+  aircraft.group.position.set(-0.5, -0.13, -24.4)
+  aircraft.group.rotation.y = Math.PI
   group.add(aircraft.group)
 
   return {
@@ -339,11 +404,12 @@ export function createTerminalEnvironment(onChange: () => void = () => {}): {
         gateDisplays.forEach((display, index) => drawGate(display, (nextPhase + index) % 3 === 1))
       }
       // A long, even taxi: the wrap occurs completely outside both window walls.
-      aircraft.group.position.x = 34 - ((timeSeconds * 0.24 + 48) % 80)
+      aircraft.group.position.x = -64 + ((timeSeconds * 0.24 + 63.5) % 128)
       aircraft.update(timeSeconds)
     },
     dispose() {
       aircraft.dispose()
+      boardingGate.dispose()
       group.traverse((object) => {
         if (object instanceof THREE.InstancedMesh) object.dispose()
       })
