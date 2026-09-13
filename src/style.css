@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './scene.css';
 
 @font-face {
   font-family: Inter;
@@ -71,177 +72,6 @@ svg {
 }
 .keyboard-skip:focus {
   transform: none;
-}
-.scene-track {
-  display: none;
-}
-.enhanced .scene-track {
-  display: block;
-  position: relative;
-  height: 195svh;
-}
-.scene-viewport {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: hidden;
-  isolation: isolate;
-  background: #dbdedb;
-}
-.scene-camera {
-  position: absolute;
-  inset: 0;
-}
-.scene-camera > canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.scene-loading {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font: italic 22px var(--font-serif);
-}
-.scene-surfaces {
-  display: none;
-}
-.laptop-screen {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  cursor: pointer;
-  border-radius: 3px;
-}
-/* The visible preview is a texture on the 3D display; this remains a native link. */
-.laptop-screen > * {
-  display: none;
-}
-.laptop-screen:focus-visible {
-  outline: 3px solid #f6ca56;
-  outline-offset: 5px;
-  background: #f6ca5614;
-}
-/* Keep the monogram readable against the dark exterior after sunset. */
-.scene-camera[data-night='true'] ~ .scene-header .scene-monogram {
-  color: #f6f5f1;
-  text-shadow: 0 1px 8px #172333;
-}
-.scene-chrome {
-  position: absolute;
-  left: 32px;
-  right: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  opacity: var(--chrome-opacity);
-  pointer-events: none;
-}
-.scene-chrome a {
-  pointer-events: auto;
-}
-.scene-header {
-  top: 23px;
-}
-.scene-monogram {
-  font: 36px/1 var(--font-serif);
-  letter-spacing: -2px;
-}
-.skip-scene {
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 0;
-}
-.skip-scene svg {
-  width: 15px;
-  height: 15px;
-}
-.scene-footer {
-  bottom: 30px;
-}
-.explore-cue {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-  font: 15px var(--font-serif);
-}
-.explore-cue svg {
-  width: 18px;
-  height: 18px;
-}
-.experience-controls {
-  display: none;
-  position: fixed;
-  z-index: 8;
-  bottom: 16px;
-  left: 32px;
-  right: 32px;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: none;
-}
-.enhanced .experience-controls {
-  display: flex;
-}
-.experience-controls > * {
-  pointer-events: auto;
-}
-.motion-toggle {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border: 1px solid #77776c50;
-  background: #f6f5f1e8;
-  border-radius: 3px;
-  font-size: 10px;
-  transform: translateY(-32px);
-}
-.motion-toggle svg {
-  width: 14px;
-  height: 14px;
-}
-.play-icon {
-  display: none;
-}
-.motion-paused .play-icon {
-  display: block;
-}
-.motion-paused .pause-icon {
-  display: none;
-}
-.back-to-terminal {
-  visibility: hidden;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #f6f5f1ef;
-  border: 1px solid #b5b7af;
-  padding: 9px 13px;
-  border-radius: 3px;
-  font-size: 11px;
-}
-.back-to-terminal svg {
-  width: 14px;
-  height: 14px;
-  transform: rotate(90deg);
-}
-.in-portfolio .back-to-terminal {
-  visibility: visible;
-}
-.in-portfolio .motion-toggle {
-  display: none;
 }
 .portfolio {
   background: var(--color-paper);
@@ -476,10 +306,6 @@ svg {
   flex-wrap: wrap;
   gap: 14px;
 }
-.model-credit a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
 .scene-unavailable .scene-track {
   display: none;
 }
@@ -492,42 +318,6 @@ svg {
   }
 }
 @media (max-width: 700px) {
-  .scene-chrome {
-    left: 20px;
-    right: 20px;
-  }
-  .scene-header {
-    top: 22px;
-  }
-  .scene-monogram {
-    font-size: 32px;
-  }
-  .skip-scene {
-    font-size: 11px;
-  }
-  .scene-footer {
-    bottom: 33px;
-    justify-content: center;
-  }
-  .explore-cue {
-    font-size: 14px;
-  }
-  .explore-cue span {
-    font-size: 0;
-  }
-  .explore-cue span::after {
-    content: 'Tap the laptop or scroll to explore';
-    font-size: 14px;
-  }
-  .experience-controls {
-    left: 16px;
-    right: 16px;
-    bottom: 14px;
-  }
-  .motion-toggle {
-    transform: translateY(-78px);
-    font-size: 9px;
-  }
   .portfolio {
     padding: 0 23px;
   }
@@ -612,25 +402,6 @@ svg {
   .portfolio-colophon {
     font-size: 10px;
     gap: 10px;
-  }
-}
-@media (max-height: 500px) and (min-aspect-ratio: 1/1) {
-  .scene-footer {
-    bottom: 10px;
-  }
-  .explore-cue,
-  .explore-cue span::after {
-    font-size: 12px;
-  }
-  .explore-cue {
-    gap: 4px;
-  }
-  .explore-cue svg {
-    width: 14px;
-    height: 14px;
-  }
-  .motion-toggle {
-    transform: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {

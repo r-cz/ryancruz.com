@@ -1,5 +1,5 @@
 import { renderPage } from './page'
-import type { LiveScene } from './scene3d'
+import type { LiveScene } from './scene2d'
 
 export const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value))
 export const transitionProgress = (scroll: number, distance: number) =>
@@ -159,7 +159,7 @@ export function initSite() {
   }
   function resize() {
     if (!viewport || !track || failed || disposed) return
-    // Canvas, camera and projected controls all use this same layout box.
+    // Artwork and live HTML controls share this same layout box.
     // Pinch zoom changes the visual viewport, not these CSS dimensions.
     const width = viewport.clientWidth
     const height = viewport.clientHeight
@@ -321,20 +321,14 @@ export function initSite() {
   resize()
   updateMotionControls()
   if (window.location.hash) followHash()
-  void import('./scene3d')
-    .then(({ createLiveScene }) => {
+  void import('./scene2d')
+    .then(async ({ createLiveScene }) => {
       if (disposed || failed) return
       liveScene = createLiveScene(camera, laptop, schedule)
+      await liveScene.ready
+      if (disposed || failed) return
       camera.querySelector('.scene-loading')?.remove()
       document.documentElement.classList.add('scene-ready')
-      camera.querySelector('canvas')?.addEventListener(
-        'webglcontextlost',
-        (event) => {
-          event.preventDefault()
-          revealContent()
-        },
-        { once: true },
-      )
       resize()
       if (window.location.hash) followHash()
       schedule()
