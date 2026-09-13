@@ -1,0 +1,124 @@
+{
+  "generator": "Built-in image_gen",
+  "date": "2026-09-13",
+  "revision": "Foreground belongings, MAX 8 and ground vehicles",
+  "concepts": {
+    "desktop": "exec-142adc00-e4fc-404f-aa97-735abe3bf568.png",
+    "travel": "exec-81944a93-2b71-4df9-92ed-cd6b13012674.png"
+  },
+  "selectedOutputs": {
+    "aircraft": "exec-84c4dd52-ea07-45b7-a47a-321bb625494d.png",
+    "terminal": "exec-d03a372d-a7b8-417b-ab2c-9adc6cd66dd7.png",
+    "foreground-seats": "exec-9b83d9b6-7ea2-43bf-8861-2c734fc3686d.png",
+    "backpack": "exec-85f27f13-a1d1-4b3e-87ad-3181f69d5c10.png",
+    "closed-macbook": "exec-f5c13941-4fed-4378-9a37-9340a399f8f5.png",
+    "apron": "exec-2252c00c-a683-4106-a469-540712604bf4.png",
+    "provisioning": "exec-186b58ab-b762-43fa-ac4a-05d0cac53bf6.png",
+    "baggage-train": "exec-a322da54-f69f-4a8e-8163-d7f72391f006.png",
+    "pushback": "exec-4c1a3f8f-b97f-49ba-ad5a-7c8c9e8d728e.png"
+  },
+  "note": "Reference paths identify inputs as they existed during generation. Aircraft-alpha and provisioning-alpha supplied the final cutouts; terminal-corridor supplied the final architecture. Baggage-alpha was discarded; baggage-train uses the earlier genuine-alpha output. Unchanged sky, clouds, skyline and side seating retain their original prompts.",
+  "requests": [
+    {
+      "name": "revised-scene-concept",
+      "refs": [
+        "/Users/ryancruz/.codex/visualizations/2026/09/13/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/love-field-implementation/desktop-day.png",
+        "/tmp/love-field-v2/bag-reference.jpg",
+        "/tmp/love-field-v2/max8-reference.jpg"
+      ],
+      "prompt": "Use case: ui-mockup. A complete revised desktop screenshot, 1536x1024, of the illustrated Love Field portfolio scene. Image 1 is the existing design to revise, images 2 and 3 are product/aircraft references. Preserve painted gouache textures, dark drawn outlines, timber ceiling, concrete columns, silver window frames, distant Dallas skyline and charcoal silver seating. Remove all gate signs, table, open laptop, pause button, and scroll zoom UI. New foreground focal point: a large row of two airport seats facing us, with a black newer Patagonia Mini MLC 30L backpack casually leaning on the left seat, and a CLOSED silver MacBook Pro casually angled on the right seat cushion. They have a very restrained warm edge highlight. Native HTML small labels under objects: \"Travel journal ↗\" and \"Portfolio ↗\". Top left \"RC.\" and top right \"Skip to portfolio ↗\" have a slight translucent blurred backing. Clear windows. At far left, the boarding doorway visibly connects to a roofed elevated glass corridor that immediately turns LEFT, with a visible continuous floor, glass sides, mullions, and a ceiling, exits off the left edge. No door into open air. No gate numbers or signage. Across the middle distance a right-facing Southwest Boeing 737 MAX 8, accurate dual-feather AT winglets, large LEAP nacelles, windows continuing through white Southwest wordmark; blue livery red yellow tail. A small white-cab blue-box provisioning truck, baggage cart train and low blue pushback tug on separate lanes below plane. Broad quiet apron and same Dallas skyline order. Bottom small text \"A moment between departures.\" Do not invent other UI, no active laptop screen, no gameplay. Well composed drawing, not photorealism."
+    },
+    {
+      "name": "travel-page-concept",
+      "refs": [],
+      "prompt": "Use case: ui-mockup. A full desktop 1440x1100 webpage screenshot for Ryan Cruz's personal travel journal placeholder page, companion to an illustrated airport portfolio. Clean quiet editorial page, paper background #f6f5f1, dark ink #262822, Georgia serif headings and Inter interface typography. Header at top in a centered 1120px wide container: left \"RC.\" in Georgia 34px, right text links \"Portfolio ↗\" and \"Back to the terminal\". Thin gray horizontal divider. Generous whitespace. Huge but disciplined Georgia title left \"Travel journal.\" at 90px. Beneath: \"Notes from the places in between.\" in Inter 18px. Below at 40px gap a single wide atmospheric painted gouache airport window view with Dallas skyline across an open apron, about 250px tall, dark drawn outlines and soft blue sky, NO people or aircraft, a timber beam over top, gray silver frames. Below image left small text \"Stories to come\" 22px Georgia, and three simple editorial rows separated by thin rules, NO cards: number \"01\", heading \"A place worth getting lost in\", right \"Coming soon\"; number \"02\", heading \"A few notes from the journey\", right \"Coming soon\"; number \"03\", heading \"What made it into the bag\", right \"Coming soon\". These are explicitly placeholders, not published accounts. Under rows muted sentence \"A few empty pages, ready for the next trip.\" Bottom small \"Ryan Cruz\" and \"Back to the terminal ↗\". No date claims, city claims, fake articles, clickable empty cards, eyebrow labels, icons beyond small arrows. Visually complete page, understated publication feel. All text will be native HTML in implementation."
+    },
+    {
+      "name": "aircraft",
+      "refs": [
+        "/tmp/love-field-v2/max8-reference.jpg",
+        "/Users/ryancruz/r-cz/ryancruz.com/public/scene/aircraft.webp"
+      ],
+      "prompt": "Use case: illustration-story. Production 2D game sprite of ONE Southwest Boeing 737 MAX 8 on landing gear, strict right-facing side profile, tail left, nose right. Image1 is the aircraft identity/accuracy reference (it faces opposite direction); image2 is style reference only and is INACCURATE. Completely redraw accurate MAX8 proportions based on photo, 39.5m long silhouette, about 3.6:1 length to tail height. Painted gouache with clean dark drawn contour, restrained textured blue shading, like a beautifully drawn 2D game. High resolution 2048x768. Near wing sweeps left backward from midbody, large upward and small downward dual-feather Boeing Advanced Technology winglet clearly visible (NOT NG split-scimitar). LEAP-1B engine with silver intake rim and serrated chevron rear edge. Southwest Heart livery: blue fuselage, red yellow blue tail, white trim. White text \"Southwest\" on forward fuselage must be vertically centered ON the continuous dark passenger window row, so roughly fourteen evenly spaced dark cabin windows visibly CUT THROUGH the white letters, as in photo. Windows DO NOT STOP at the wordmark. Forward service door between title and cockpit, two adjacent overwing exits, rear door. Small \"Southwest.com\" on engine. Small legible white \"8768 ETOPS\" on blue nose gear door directly above front wheels, not elsewhere. Tiny \"N8768Q\" rear fuselage. Main landing wheels and nosewheel contact same baseline. Right-facing profile with correct readable unreversed text. Full aircraft visible, no ground, no shadows outside silhouette, no airport, NO CHECKERBOARD OR MATTE. Genuinely transparent alpha background. No missing winglets, no swept wing resembling feathers, no invented doors. Detailed but retains drawn style."
+    },
+    {
+      "name": "terminal",
+      "refs": [
+        "/Users/ryancruz/r-cz/ryancruz.com/public/scene/terminal.webp",
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-142adc00-e4fc-404f-aa97-735abe3bf568.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Production layered environment artwork 1536x1024 for a 2D illustrated airport scene. Image1 is edit target, image2 is composition reference for NEW left glass boarding corridor. Retain the exact orthographic timber ceiling in top160px, two concrete columns at x30-135 and x1410-1515, thin steel window frames and blue gray striped carpet from y630 down to bottom. Remove both gate signage displays completely, paint clean continuous concrete columns. Remove metal boarding podium. Replace the little left door with a coherent GLASS ENCLOSED boarding corridor: entrance in left part x180-310,y280-620, a continuous elevated solid floor attached to terminal floor, roof and glass side walls visible; immediately turns LEFT and continues fully off the left edge. Door threshold connects visibly to the corridor floor. Never an opening into air. Preserve large wide open view across center/right. Critically: EVERYTHING visible through any window or door, including corridor glass, MUST be one perfectly flat saturated MAGENTA #ff00ff color for chroma key. Hard crisp structural borders against magenta. No reflections, no checkerboard, no simulated transparency, no gray/white matte, no sky or scenery behind panes. Magenta is a technical mask area, not interior paint. No aircraft, vehicles, seat rows, luggage, laptop, table or UI text. Only architecture, left glass corridor frame/floor, carpet and solid magenta window openings. Same refined gouache painted textures and dark drawn outlines as target. Preserve target dimensions and geometry as much as possible."
+    },
+    {
+      "name": "foreground-seats",
+      "refs": [
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-142adc00-e4fc-404f-aa97-735abe3bf568.png",
+        "/Users/ryancruz/r-cz/ryancruz.com/public/scene/seats-front.webp"
+      ],
+      "prompt": "Use case: illustration-story. Isolated production asset for the foreground of the illustrated airport scene in image1. Render ONLY its front central bank of TWO adjacent airport seats, exactly matching charcoal upholstered backrests and deep seat cushions with silver metal armrests, beam and legs. NO backpack, NO laptop, NO labels, no environment. Image2 is supporting chair material/style reference. Near-frontal seated eye viewpoint with a modest view down onto seat cushions so objects can rest on them. Whole chair bank visible including feet. Aspect approx 2.0:1, wide 1536x768 frame, fill nearly full frame. Two seats equal width; central seam at50%. Backrests fill upper55%, cushions horizontal surfaces at60–80%, feet lower20%. Subtle gouache cloth grain with deep charcoal blue gray shading, silver drawn edges; sophisticated 2D hand drawn game style, not 3D or photorealistic. Genuinely transparent background alpha; no checkerboard or gray matte; no floor or ground shadow outside chairs. Do not add third chair."
+    },
+    {
+      "name": "backpack",
+      "refs": [
+        "/tmp/love-field-v2/bag-reference.jpg",
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-142adc00-e4fc-404f-aa97-735abe3bf568.png"
+      ],
+      "prompt": "Use case: illustration-story. Isolated transparent production sprite of a newer black Patagonia Black Hole Mini MLC 30L model49266 backpack for illustrated airport scene. Image1 product identity reference; image2 style/pose reference. Render ONLY bag, no chair/background/UI. 768x1024 portrait. Soft rectangular clamshell pack, approx20x12x7 inches, matte black ripstop and recycled TPU laminate, rounded rectangular front panel outlined by double zipper, paired metal zipper pulls near upper left, black webbing side compression loops, top grab handle, shoulder straps casually tucked partly behind and one strap draping left. Small subtle dark gray vertical \"Patagonia\" wordmark on front, true to reference. Casually slouched and leaning about7 degrees to right as if on seat, front and left side visible. Believably full but soft fabric wrinkles, carefully drawn dark outline, gray highlights and painted gouache texture to match scene. Do NOT add colorful mountain patch, bottle, tags, giant logo or glow. Genuine transparent alpha background with no checkerboard, no white or gray matte, no ground, no cast shadow outside bag. Entire bag and straps contained with small transparent padding."
+    },
+    {
+      "name": "closed-macbook",
+      "refs": [
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-142adc00-e4fc-404f-aa97-735abe3bf568.png"
+      ],
+      "prompt": "Use case: illustration-story. Production 2D hand-drawn game sprite: ONE CLOSED silver MacBook Pro casually set diagonally on an airport seat cushion. Match closed MacBook in image1, isolate it with genuine transparent alpha. No seat, environment, labels, UI, extra objects. View slightly from above, lid forms foreshortened quadrilateral about3.4 times as wide as visible height. Lid rotated about7 degrees counterclockwise in screen plane, right edge recedes. Modern softly rounded MacBook Pro thick aluminum slab shape, narrow dark lid seam, two tiny ports on left edge if visible, subtle centered black Apple silhouette on top. Entire laptop CLOSED, no keyboard or screen. Fine charcoal outlines and painted silver-gray gouache texture, refined illustration rather than photorealism. 1200x480 wide frame with minimal padding, object occupies width90%, preserve plausible rigid proportions. No glowing edge, no reflection of screens, no checkerboard, no opaque matte, no background shadow."
+    },
+    {
+      "name": "apron",
+      "refs": ["/Users/ryancruz/r-cz/ryancruz.com/public/scene/apron.webp"],
+      "prompt": "Use case: precise-object-edit. Edit this illustrated airport apron production background. Keep the EXACT full wide composition, concrete perspective seams, thin yellow taxi and service road markings, distant low cream hangars and horizon strip. Remove ALL vehicles, all baggage carts, trucks, tractors, stray luggage and equipment from entire image including tiny vehicles at horizon. Fill their areas cleanly with empty apron or continuation of hangar walls. Aircraft and independently moving vehicle sprites are composited later. No aircraft, no vehicles, no people. Same restrained gouache painted style. Flat opaque 1536x559 wide image, no border and no text, no added objects."
+    },
+    {
+      "name": "provisioning",
+      "refs": ["/tmp/love-field-v2/provo-reference.jpg"],
+      "prompt": "Use case: illustration-story. Isolated production sprite: a real Southwest Airlines provisioning high-lift box truck based closely on image1. Side profile, driving LEFT with front cab on left. White Ford F-650 conventional cab, black tires, silver chassis, closed rectangular royal-blue catering box, lift lowered to travel position, metal platform tucked safely over cab, correctly proportioned about two cab-heights high and long rear box. Blue side with exact white words \"The snacks are on me.\" split over two lines and small \"Southwest\" lower right plus red yellow blue Heart motif bottom left as photographed. Driver tiny seated silhouette with safety vest through window. All tires on same horizontal ground baseline. Hand painted gouache with thin dark drawn outlines and clean detailed shapes matching a polished 2D airport game. Actual proportions, not toy truck, not generic delivery van. Whole vehicle isolated on genuinely transparent alpha, no checkerboard, no airport, no plane, no background, no ground shadow. 1200x650 wide asset; keep all edges contained."
+    },
+    {
+      "name": "baggage-train",
+      "refs": ["/tmp/love-field-v2/tug-reference.jpg", "/tmp/love-field-v2/pushback-reference.jpg"],
+      "prompt": "Use case: illustration-story. One isolated sprite showing a Southwest baggage tug pulling TWO connected baggage carts, traveling RIGHT. Based on real equipment in supplied photos. Blue squat open-cab TUG baggage tractor at far RIGHT with one small seated operator in orange high-vis vest facing right; low blue chassis, black tires, silver wheel hubs, small white \"Southwest\" on side. Behind it toward LEFT are two long low blue luggage carts, four small wheels each, metal towbar connections with sensible spacing, rectangular blue side walls and red roll-up fabric weather covers, partially open showing restrained suitcase shapes. The train must physically be connected. Broadside slightly elevated airport terminal viewpoint, not isometric. All wheel bottoms share one baseline. Full train edge to edge about5.5:1 length:height, in 2048x512 frame. Hand drawn gouache painted blue panels, charcoal outlines, proportionally accurate operational equipment, not chunky cartoon toy. Genuinely transparent alpha, no gray/white checkerboard, ground, aircraft, scenery or extra vehicles."
+    },
+    {
+      "name": "pushback",
+      "refs": ["/tmp/love-field-v2/pushback-reference.jpg"],
+      "prompt": "Use case: illustration-story. Isolated 2D drawn production sprite of a Southwest Airlines conventional BLUE aircraft pushback tractor based closely on photo1 (the large low vehicle in foreground). Strict side view driving LEFT with low driver station at left and flat long rear ballast hood at right. Broad heavy low rectangular chassis, two large visible black tires and gray hubs, stout bumper, tow-hitch, deep royal blue panels, thin white/red reflective strips, small white \"Southwest\" on flank. One tiny seated operator in orange safety vest, no roof and no cab tower. It is a heavy squat four-wheel pushback tractor, NOT a baggage tug, NOT a pickup truck. No aircraft attached, no towbar sticking beyond the image. Hand painted gouache with crisp charcoal drawn outlines; same illustrated 2D airport game style. 1100x420 image, actual low length to height ratio3.3:1, whole vehicle contained. Genuine transparent alpha background, no checkerboard or matte, no ground or external shadow."
+    },
+    {
+      "name": "aircraft-alpha",
+      "refs": [
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-a6a272c3-490b-47e1-b011-b6d683868233.png"
+      ],
+      "prompt": "Use case: background-extraction. Remove ONLY the entire gray/white checkerboard background from this exact aircraft illustration and make it genuinely transparent with an alpha channel. This is a cutout/extraction, not a redraw. Preserve all aircraft pixels: winglet, lettering and passenger windows cutting through it, landing wheels, struts, engine chevrons, ETOPS8768 text, accurate colors and proportions. All area outside the aircraft, including gaps between landing wheels, must be alpha zero. No checkerboard, matte, halo, glow, backdrop or shadow. Keep full aircraft tightly framed, PNG with real alpha transparency."
+    },
+    {
+      "name": "provisioning-alpha",
+      "refs": [
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-57e9a652-682c-4c49-8048-a4e55a5948f8.png"
+      ],
+      "prompt": "Use case: background-extraction. Remove ONLY the gray white checkerboard background from this exact truck illustration to genuine transparent alpha. Keep truck artwork, logo and 'The snacks are on me.' lettering, driver, wheels and platform exactly unchanged. Cut out all gaps around platform bars above cab, under chassis, between wheels. Absolutely no checkerboard, shadows, glow, matte, or backdrop. All empty background pixels fully transparent. Output clean tightly bounded production sprite."
+    },
+    {
+      "name": "baggage-alpha",
+      "refs": [
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-a322da54-f69f-4a8e-8163-d7f72391f006.png"
+      ],
+      "prompt": "Use case: background-extraction. Remove ONLY the exterior blue red yellow fuzzy glow/haze around this exact baggage cart train illustration. Make the background completely transparent alpha zero all the way to the hard object edges. Preserve tug, driver, wheels, two carts, suitcases, connected yellow towbars and all details exactly. No haze, glow, ground shadow, colored mist, matte or checkerboard. Clean isolated full train PNG sprite tightly framed with genuine alpha."
+    },
+    {
+      "name": "terminal-corridor",
+      "refs": [
+        "/Users/ryancruz/.codex/generated_images/01a09c35-e0ff-78c3-a716-f9e4e13ecb52/exec-d2a5f486-1c95-43ea-a797-a289a4e943de.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Keep this exact1536x1024 terminal illustration unchanged EXCEPT the small glass corridor behind the left doorway. Correction: immediately after passing the door at x180–310,y300–625, the corridor turns LEFT and runs toward and off the LEFT edge of the picture. Its glass walls, silver mullions, solid gray roof/ceiling and solid gray continuous elevated floor should all run LEFT from that doorway, no part of corridor to the right of x320. Remove the extraneous projecting corridor bay currently x320–425 and restore flat #ff00ff window opening there. Corridor roof must be solid gray with small warm rectangular ceiling lights; NOT magenta. Corridor floor must visibly connect the door threshold to the passage running off the left edge so it cannot look like a door opening into midair. All actual glass panes, both main window and corridor windows, remain flat #ff00ff chroma-key magenta, no checkerboard, reflections or background scenery. Preserve all other window mullions, ceiling timber, two plain concrete columns without signs, and full striped carpet exactly. No people, UI or objects."
+    }
+  ]
+}

@@ -1,40 +1,33 @@
 import { renderPortfolio } from './portfolio'
+import { assetURL, sprite } from './scene-art'
 
-const arrow =
+export const arrow =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>'
-const chevron =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
 
-/** Shared by the build and browser: the portfolio never depends on JavaScript. */
+/** Native links and prerendered content remain usable without the scene. */
 export function renderPage(): string {
   return `
     <a class="keyboard-skip" href="#portfolio">Skip to portfolio</a>
     <section class="scene-track" id="terminal" aria-label="A moment at Dallas Love Field">
       <div class="scene-viewport">
-        <div class="scene-camera" aria-label="An interactive view inside Dallas Love Field">
-          <div class="scene-loading">Taking a seat at Love Field…</div>
+        <div class="scene-camera" aria-hidden="true"><div class="scene-loading">Taking a seat at Love Field…</div></div>
+        <header class="scene-header"><a class="scene-monogram" href="#terminal" aria-label="Ryan Cruz, terminal home">RC.</a><a class="skip-scene" href="#portfolio">Skip to portfolio ${arrow}</a></header>
+        <div class="scene-foreground">
+          ${sprite('foreground-seats')}
+          <a class="scene-object backpack-link" href="/travel/" aria-label="Open Ryan’s travel journal">
+            <img src="${assetURL('backpack')}" alt="Black Patagonia Mini MLC backpack resting on a seat" draggable="false" />
+            <span class="object-label">Travel journal ${arrow}</span>
+          </a>
+          <a class="scene-object macbook-link" href="#portfolio" aria-label="Open Ryan Cruz’s portfolio">
+            <img src="${assetURL('closed-macbook')}" alt="Closed silver MacBook Pro resting on a seat" draggable="false" />
+            <span class="object-label">Portfolio ${arrow}</span>
+          </a>
         </div>
-        <div class="scene-surfaces">
-            <a class="laptop-screen" href="#portfolio" aria-label="Open Ryan Cruz’s portfolio">
-              <div class="screen-masthead" aria-hidden="true"><span>RC.</span><span>ABOUT &nbsp; EXPERIENCE &nbsp; PROJECTS</span></div>
-              <div class="screen-intro" aria-hidden="true">
-                <span class="screen-name">Ryan Cruz.</span>
-                <span class="screen-role">Senior Cybersecurity Engineer</span>
-                <span class="screen-description">I build identity and access solutions at Southwest Airlines.</span>
-                <span class="screen-cta">Get to know me ${arrow}</span>
-              </div>
-            </a>
-        </div>
-        <header class="scene-header scene-chrome"><a class="scene-monogram" href="#terminal" aria-label="Ryan Cruz, terminal home">RC.</a><a class="skip-scene" href="#portfolio">Skip to portfolio ${arrow}</a></header>
-        <div class="scene-footer scene-chrome">
-          <a class="explore-cue" href="#portfolio" aria-label="Explore the portfolio"><span>Click the laptop or scroll to explore</span>${chevron}</a>
-        </div>
+        <p class="scene-caption">A moment between departures.</p>
       </div>
     </section>
-    <main class="portfolio" id="portfolio" tabindex="-1">${renderPortfolio()}</main>
-    <div class="experience-controls">
-      <a class="back-to-terminal" href="#terminal">${chevron}<span>Back to the terminal</span></a>
-      <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause ambient motion"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path class="pause-icon" d="M7 5v10M13 5v10"/><path class="play-icon" d="m7 5 8 5-8 5Z"/></svg><span>Pause motion</span></button>
-    </div>
+    <main class="portfolio" id="portfolio" tabindex="-1">${renderPortfolio()}
+      <nav class="portfolio-return" aria-label="More from Ryan"><a href="#terminal">Back to the terminal ${arrow}</a><a href="/travel/">Travel journal ${arrow}</a></nav>
+    </main>
   `
 }

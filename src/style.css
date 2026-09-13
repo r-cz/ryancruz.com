@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './scene.css';
+@import './travel.css';
 
 @font-face {
   font-family: Inter;
@@ -20,8 +21,6 @@
   background: var(--color-paper);
   font-family: var(--font-sans);
   font-synthesis: none;
-  --chrome-opacity: 1;
-  --scene-height: 100svh;
 }
 * {
   box-sizing: border-box;
@@ -79,13 +78,6 @@ svg {
   z-index: 3;
   padding: 0 max(40px, calc((100vw - 1320px) / 2));
   outline: none;
-}
-.enhanced .portfolio {
-  margin-top: calc(-1 * var(--scene-height));
-  opacity: 0;
-}
-.enhanced:not(.in-portfolio) .portfolio {
-  pointer-events: none;
 }
 .portfolio-header {
   display: flex;

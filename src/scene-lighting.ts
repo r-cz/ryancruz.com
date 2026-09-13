@@ -30,7 +30,7 @@ export function mixColor(a: string, b: string, amount: number) {
   return `#${channels.join('')}`
 }
 
-/** Visitor wall time is independent of elapsed animation time and pause state. */
+/** Visitor wall time is independent of elapsed animation time and motion preferences. */
 export function getSceneLighting(date: Date = new Date()) {
   const hour = date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600
   const next = keyframes.findIndex((frame) => frame.hour > hour)
