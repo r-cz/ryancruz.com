@@ -1,356 +1,186 @@
 import { renderPage } from './page'
 import type { LiveScene } from './scene2d'
 
-export const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value))
-export const transitionProgress = (scroll: number, distance: number) =>
-  clamp(scroll / Math.max(distance, 1))
-
 export function initSite() {
   const app = document.querySelector<HTMLElement>('#app')
-  if (!app) return () => {}
+  if (!app || app.querySelector('.travel-page')) return () => {}
   if (!app.querySelector('#portfolio')) app.innerHTML = renderPage()
   const track = app.querySelector<HTMLElement>('.scene-track')
   const viewport = app.querySelector<HTMLElement>('.scene-viewport')
   const camera = app.querySelector<HTMLElement>('.scene-camera')
-  const portfolio = app.querySelector<HTMLElement>('#portfolio')
-  const laptop = app.querySelector<HTMLElement>('.laptop-screen')
-  const toggle = app.querySelector<HTMLButtonElement>('.motion-toggle')
-  if (!track || !viewport || !camera || !portfolio || !laptop || !toggle) return () => {}
+  if (!track || !viewport || !camera) return () => {}
+  const sceneElements = { track, viewport }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
-  let manuallyPaused = false
-  try {
-    manuallyPaused = window.localStorage.getItem('ryan-motion-paused') === 'true'
-  } catch {
-    /* Storage is optional. */
-  }
   let liveScene: LiveScene | undefined
   let frame = 0
-  let needsResize = false
-  let sceneWidth = 0
-  let sceneHeight = 0
-  let layoutHeight = 0
-  let resizeObserver: ResizeObserver | undefined
-  const visualViewport = window.visualViewport
-  let entering: number | undefined
-  let clockInterval: number | undefined
-  let travel = 1
-  let measured = false
+  let clock: number | undefined
   let disposed = false
-  let elapsed = 0
-  let previousTime = 0
   let failed = false
-  let lastSceneOpacity = -1
-  let lastPortfolioOpacity = -1
-  let lastChromeOpacity = -1
-  let lastContentVisible: boolean | undefined
-  let lastLaptopTabIndex: number | undefined
+  let needsResize = true
+  let width = 0
+  let height = 0
+  let sceneTop = 0
+  let elapsed = 0
+  let previousTime: number | undefined
   const pointer = { x: 0, y: 0 }
-  document.documentElement.classList.add('enhanced')
+  const root = document.documentElement
+  root.classList.add('enhanced')
 
-  function updateMotionControls() {
-    const paused = manuallyPaused || reduced.matches
-    document.documentElement.classList.toggle('motion-paused', paused)
-    toggle?.setAttribute('aria-pressed', String(paused))
-    toggle?.setAttribute(
-      'aria-label',
-      reduced.matches
-        ? 'Motion disabled by system preference'
-        : paused
-          ? 'Resume ambient motion'
-          : 'Pause ambient motion',
-    )
-    const label = toggle?.querySelector('span')
-    if (label)
-      label.textContent = reduced.matches
-        ? 'Motion reduced'
-        : paused
-          ? 'Resume motion'
-          : 'Pause motion'
-    if (toggle) toggle.disabled = reduced.matches
-    schedule()
+  const visible = () =>
+    !document.hidden &&
+    window.scrollY < sceneTop + height &&
+    window.scrollY + window.innerHeight > sceneTop
+  function stopClock() {
+    if (clock !== undefined) window.clearInterval(clock)
+    clock = undefined
   }
-  function render(time = 0) {
-    if (needsResize) {
-      needsResize = false
-      resize()
-    }
+  function stopAnimation() {
+    window.cancelAnimationFrame(frame)
     frame = 0
-    if (disposed || failed || !measured || !camera || !portfolio || !laptop) return
-    const progress = transitionProgress(window.scrollY, travel)
-    updateClock(progress)
-    const animated = !manuallyPaused && !reduced.matches && !document.hidden && progress < 1
-    if (animated && previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.06)
-    previousTime = time
-    try {
-      // Portfolio scrolling must not redraw the fully hidden airport.
-      if (progress < 1) {
-        liveScene?.render(
-          reduced.matches ? 0 : progress,
-          elapsed,
-          animated ? pointer : { x: 0, y: 0 },
-          new Date(),
-        )
-      }
-    } catch {
-      revealContent()
-      return
-    }
-    const sceneOpacity = 1 - clamp((progress - 0.91) / 0.09)
-    const portfolioOpacity = clamp((progress - 0.88) / 0.12)
-    const chromeOpacity = 1 - clamp(progress * 3)
-    const contentVisible = progress >= 0.995
-    const laptopTabIndex = progress < 0.1 ? 0 : -1
-    if (sceneOpacity !== lastSceneOpacity) {
-      camera.style.opacity = String(sceneOpacity)
-      lastSceneOpacity = sceneOpacity
-    }
-    if (portfolioOpacity !== lastPortfolioOpacity) {
-      portfolio.style.opacity = String(portfolioOpacity)
-      lastPortfolioOpacity = portfolioOpacity
-    }
-    if (chromeOpacity !== lastChromeOpacity) {
-      // Limit inherited style invalidation to the scene, outside the portfolio.
-      track?.style.setProperty('--chrome-opacity', String(chromeOpacity))
-      lastChromeOpacity = chromeOpacity
-    }
-    if (contentVisible !== lastContentVisible) {
-      document.documentElement.classList.toggle('in-portfolio', contentVisible)
-      if (track) track.inert = contentVisible
-      lastContentVisible = contentVisible
-    }
-    if (laptopTabIndex !== lastLaptopTabIndex) {
-      laptop.tabIndex = laptopTabIndex
-      lastLaptopTabIndex = laptopTabIndex
-    }
-    if (liveScene && animated) schedule()
+    previousTime = undefined
+    stopClock()
+  }
+  function fallback() {
+    failed = true
+    stopAnimation()
+    observer?.disconnect()
+    liveScene?.dispose()
+    liveScene = undefined
+    root.classList.remove('enhanced', 'scene-ready', 'scene-inactive')
+    root.classList.add('scene-unavailable')
+    // Preserve the destination if the scene vanishes while following a deep link.
+    followInitialHash()
   }
   function schedule() {
-    if (!frame && !document.hidden && !disposed && !failed)
+    if (!frame && !disposed && !failed && !document.hidden)
       frame = window.requestAnimationFrame(render)
   }
-  function queueResize() {
+  function resize() {
+    const nextWidth = sceneElements.viewport.clientWidth
+    const nextHeight = sceneElements.viewport.clientHeight
+    sceneTop = sceneElements.track.offsetTop
+    if (nextWidth <= 0 || nextHeight <= 0) return
+    if (nextWidth !== width || nextHeight !== height || needsResize) {
+      liveScene?.resize(nextWidth, nextHeight)
+      width = nextWidth
+      height = nextHeight
+    }
+    needsResize = false
+  }
+  function render(time: number) {
+    frame = 0
     if (disposed || failed) return
+    try {
+      if (needsResize) resize()
+      const active = visible()
+      root.classList.toggle('scene-inactive', !active)
+      if (!active) {
+        stopAnimation()
+        return
+      }
+      if (clock === undefined && liveScene) clock = window.setInterval(schedule, 60_000)
+      if (!reduced.matches && previousTime !== undefined)
+        elapsed += Math.min((time - previousTime) / 1000, 0.06)
+      previousTime = reduced.matches ? undefined : time
+      liveScene?.render(0, elapsed, reduced.matches ? { x: 0, y: 0 } : pointer, new Date())
+      if (liveScene && !reduced.matches) schedule()
+    } catch {
+      fallback()
+    }
+  }
+  function queueResize() {
     needsResize = true
     schedule()
   }
-  function stopObservingSize() {
-    resizeObserver?.disconnect()
-    window.removeEventListener('resize', queueResize)
-    window.removeEventListener('pageshow', queueResize)
-    visualViewport?.removeEventListener('resize', queueResize)
-    needsResize = false
+  function onVisibility() {
+    root.classList.toggle('scene-inactive', document.hidden || !visible())
+    stopAnimation()
+    if (!document.hidden) queueResize()
   }
-  function stopClock() {
-    if (clockInterval !== undefined) window.clearInterval(clockInterval)
-    clockInterval = undefined
-  }
-  function updateClock(progress = transitionProgress(window.scrollY, travel)) {
-    if (!liveScene || disposed || failed || document.hidden || progress >= 1) {
-      stopClock()
-      return
-    }
-    if (clockInterval === undefined) {
-      // The visitor's clock keeps advancing even when ambient motion is paused.
-      clockInterval = window.setInterval(() => {
-        updateClock()
-        if (clockInterval !== undefined) schedule()
-      }, 60_000)
-    }
-  }
-  function resize() {
-    if (!viewport || !track || failed || disposed) return
-    // Artwork and live HTML controls share this same layout box.
-    // Pinch zoom changes the visual viewport, not these CSS dimensions.
-    const width = viewport.clientWidth
-    const height = viewport.clientHeight
-    if (width <= 0 || height <= 0) return
-    const oldTravel = travel
-    const oldScroll = window.scrollY
-    travel = Math.round(height * (width <= 700 || reduced.matches ? 0.55 : 0.95))
-    if (height !== layoutHeight || travel !== oldTravel) track.style.height = `${height + travel}px`
-    if (height !== layoutHeight) {
-      document.documentElement.style.setProperty('--scene-height', `${height}px`)
-      layoutHeight = height
-    }
-    if (measured && travel !== oldTravel) {
-      const top =
-        oldScroll >= oldTravel - 1
-          ? oldScroll + travel - oldTravel
-          : transitionProgress(oldScroll, oldTravel) * travel
-      window.scrollTo({ top, behavior: 'instant' })
-    }
-    measured = true
-    try {
-      // Initial layout is measured before the asynchronous scene exists.
-      if (liveScene && (width !== sceneWidth || height !== sceneHeight)) {
-        liveScene.resize(width, height)
-        sceneWidth = width
-        sceneHeight = height
-      }
-    } catch {
-      revealContent()
-      return
-    }
-  }
-  function revealContent() {
-    failed = true
-    stopObservingSize()
-    stopClock()
-    if (entering) {
-      window.clearTimeout(entering)
-      entering = undefined
-    }
-    window.cancelAnimationFrame(frame)
-    frame = 0
-    document.documentElement.classList.remove('enhanced', 'scene-ready')
-    document.documentElement.classList.add('scene-unavailable')
-    portfolio?.style.removeProperty('opacity')
-    track?.style.removeProperty('height')
-    liveScene?.dispose()
-    liveScene = undefined
-  }
-  function navigate(event: MouseEvent) {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)
-      return
-    const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]')
-    if (!link || failed) return
-    const id = link.getAttribute('href')?.slice(1)
-    const target = id ? document.getElementById(id) : null
-    if (!target) return
-    event.preventDefault()
-    if (entering) window.clearTimeout(entering)
-    const top =
-      id === 'terminal'
-        ? 0
-        : id === 'portfolio'
-          ? travel
-          : target.getBoundingClientRect().top + window.scrollY - 36
-    window.history.pushState(null, '', `#${id}`)
-    const skip = link.classList.contains('skip-scene') || link.classList.contains('keyboard-skip')
-    const smooth = !reduced.matches && !skip
-    window.scrollTo({ top, behavior: smooth ? 'smooth' : 'instant' })
-    entering = window.setTimeout(
-      () => {
-        entering = undefined
-        const focus = id === 'terminal' ? laptop : target
-        if (!focus) return
-        if (!focus.hasAttribute('tabindex')) focus.setAttribute('tabindex', '-1')
-        focus.focus({ preventScroll: true })
-        schedule()
-      },
-      smooth ? 850 : 0,
-    )
-  }
-  function followHash() {
-    if (entering) {
-      window.clearTimeout(entering)
-      entering = undefined
-    }
-    const id = window.location.hash.slice(1)
-    const target = document.getElementById(id || 'terminal')
-    if (!target || failed) return
-    window.scrollTo({
-      top:
-        !id || id === 'terminal'
-          ? 0
-          : id === 'portfolio'
-            ? travel
-            : target.getBoundingClientRect().top + window.scrollY - 36,
-      behavior: 'instant',
-    })
-    schedule()
-  }
-  function onFocus(event: FocusEvent) {
-    if (
-      portfolio?.contains(event.target as Node) &&
-      window.scrollY < travel &&
-      !entering &&
-      !failed
-    ) {
-      window.scrollTo({ top: travel, behavior: 'instant' })
-      schedule()
-    }
-  }
-  function onToggle() {
-    manuallyPaused = !manuallyPaused
-    try {
-      window.localStorage.setItem('ryan-motion-paused', String(manuallyPaused))
-    } catch {
-      /* Continue without persistence. */
-    }
-    updateMotionControls()
+  function onScroll() {
+    const active = visible()
+    root.classList.toggle('scene-inactive', !active)
+    if (active) schedule()
+    else stopAnimation()
   }
   function onPreference() {
-    queueResize()
-    updateMotionControls()
-  }
-  function onVisibility() {
-    previousTime = 0
-    if (document.hidden) {
-      stopClock()
-      window.cancelAnimationFrame(frame)
-      frame = 0
-    } else {
-      updateClock()
-      queueResize()
-    }
-  }
-  function onPointer(event: PointerEvent) {
-    if (event.pointerType !== 'mouse') return
-    const rect = viewport?.getBoundingClientRect()
-    if (!rect || rect.width <= 0 || rect.height <= 0) return
-    pointer.x = clamp(((event.clientX - rect.left) / rect.width) * 2 - 1, -1, 1)
-    pointer.y = clamp(1 - ((event.clientY - rect.top) / rect.height) * 2, -1, 1)
+    previousTime = undefined
     schedule()
   }
-  app.addEventListener('click', navigate)
-  app.addEventListener('focusin', onFocus)
-  toggle.addEventListener('click', onToggle)
-  viewport.addEventListener('pointermove', onPointer)
-  window.addEventListener('scroll', schedule, { passive: true })
-  window.addEventListener('resize', queueResize)
-  window.addEventListener('hashchange', followHash)
-  window.addEventListener('pageshow', queueResize)
-  visualViewport?.addEventListener('resize', queueResize)
-  if (typeof window.ResizeObserver === 'function') {
-    resizeObserver = new window.ResizeObserver(queueResize)
-    resizeObserver.observe(viewport)
+  function onPointer(event: PointerEvent) {
+    if (event.pointerType !== 'mouse' || reduced.matches || !visible()) return
+    const rect = sceneElements.viewport.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return
+    pointer.x = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width) * 2 - 1))
+    pointer.y = Math.max(-1, Math.min(1, 1 - ((event.clientY - rect.top) / rect.height) * 2))
   }
+  // Keep native scrolling, hashes, history restoration and modified link clicks.
+  // A focusable destination lets the browser move keyboard focus with its anchor jump.
+  function onNavigate(event: MouseEvent) {
+    const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]')
+    if (
+      !link ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return
+    const target = document.getElementById(link.hash.slice(1))
+    if (target && !target.hasAttribute('tabindex')) target.tabIndex = -1
+  }
+  function followInitialHash() {
+    const id = window.location.hash.slice(1)
+    const target = id ? document.getElementById(id) : null
+    if (target) {
+      if (!target.hasAttribute('tabindex')) target.tabIndex = -1
+      target.scrollIntoView({ behavior: 'instant', block: 'start' })
+      target.focus({ preventScroll: true })
+    }
+  }
+  const observer =
+    typeof window.ResizeObserver === 'function' ? new window.ResizeObserver(queueResize) : undefined
+  observer?.observe(viewport)
+  window.addEventListener('resize', queueResize)
+  window.addEventListener('pageshow', queueResize)
+  window.addEventListener('scroll', onScroll, { passive: true })
   document.addEventListener('visibilitychange', onVisibility)
   reduced.addEventListener('change', onPreference)
+  viewport.addEventListener('pointermove', onPointer)
+  app.addEventListener('click', onNavigate)
+  // Align direct section links once, when enhancement adds the normal-height scene.
   resize()
-  updateMotionControls()
-  if (window.location.hash) followHash()
+  followInitialHash()
+  schedule()
   void import('./scene2d')
     .then(async ({ createLiveScene }) => {
       if (disposed || failed) return
-      liveScene = createLiveScene(camera, laptop, schedule)
+      liveScene = createLiveScene(camera, schedule)
+      needsResize = true
+      resize()
       await liveScene.ready
       if (disposed || failed) return
       camera.querySelector('.scene-loading')?.remove()
-      document.documentElement.classList.add('scene-ready')
-      resize()
-      if (window.location.hash) followHash()
+      root.classList.add('scene-ready')
       schedule()
     })
     .catch(() => {
-      if (!disposed) revealContent()
+      if (!disposed) fallback()
     })
   return () => {
     disposed = true
-    stopObservingSize()
-    stopClock()
-    window.cancelAnimationFrame(frame)
-    if (entering) window.clearTimeout(entering)
+    stopAnimation()
+    observer?.disconnect()
     liveScene?.dispose()
-    app.removeEventListener('click', navigate)
-    app.removeEventListener('focusin', onFocus)
-    toggle.removeEventListener('click', onToggle)
-    viewport.removeEventListener('pointermove', onPointer)
-    window.removeEventListener('scroll', schedule)
-    window.removeEventListener('hashchange', followHash)
+    window.removeEventListener('resize', queueResize)
+    window.removeEventListener('pageshow', queueResize)
+    window.removeEventListener('scroll', onScroll)
     document.removeEventListener('visibilitychange', onVisibility)
     reduced.removeEventListener('change', onPreference)
+    viewport.removeEventListener('pointermove', onPointer)
+    app.removeEventListener('click', onNavigate)
+    root.classList.remove('enhanced', 'scene-ready', 'scene-inactive')
   }
 }
 

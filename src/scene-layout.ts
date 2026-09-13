@@ -1,42 +1,26 @@
 export interface SceneLayout {
   width: number
   height: number
-  laptop: { x: number; y: number; width: number; height: number }
-  screen: { x: number; y: number; width: number; height: number }
   aircraftWidth: number
   aircraftGround: number
+  vehicleScale: number
+  vehicleGround: number
 }
 
-/** A single box drives both the painted laptop and its live HTML display. */
+/** Only ambient routes need pixel measurements; belongings keep their CSS aspect ratios. */
 export function getSceneLayout(width: number, height: number): SceneLayout {
   const portrait = width <= 700 && height > width
-  const short = height <= 500 && width >= height
-  const laptopWidth = portrait ? width * 0.94 : Math.min(width * 0.41, height * 0.6)
-  const laptopHeight = portrait
-    ? Math.min(Math.max(height * 0.285, 180), laptopWidth * 0.76, height * 0.32)
-    : (laptopWidth * 2) / 3
-  const x = (width - laptopWidth) / 2
-  const y = portrait
-    ? Math.min(height * 0.58, height - laptopHeight - 106)
-    : short
-      ? height * 0.47
-      : height * 0.495
   return {
     width,
     height,
-    laptop: { x, y, width: laptopWidth, height: laptopHeight },
-    screen: {
-      x: x + laptopWidth * 0.147,
-      y: y + laptopHeight * 0.105,
-      width: laptopWidth * 0.709,
-      height: laptopHeight * 0.586,
-    },
-    aircraftWidth: width * (portrait ? 0.5 : 0.3),
-    aircraftGround: height * (portrait ? 0.448 : 0.466),
+    aircraftWidth: width * (portrait ? 0.72 : 0.3),
+    aircraftGround: height * (portrait ? 0.433 : 0.466),
+    vehicleScale: width * (portrait ? 0.00155 : 0.001),
+    vehicleGround: height * (portrait ? 0.463 : 0.519),
   }
 }
 
-/** Both ends of a loop are beyond the viewport, including the entire sprite. */
+/** Both ends are beyond the viewport, including the full sprite. */
 export function loopPosition(
   elapsed: number,
   duration: number,
@@ -48,13 +32,18 @@ export function loopPosition(
   return -spriteWidth - 24 + fraction * (width + spriteWidth + 48)
 }
 
-export function sceneTransform(layout: SceneLayout, progress: number) {
-  const p = Math.min(1, Math.max(0, progress))
-  const blend = p * p * (3 - 2 * p)
-  const { screen } = layout
-  const scale =
-    1 + (Math.max(layout.width / screen.width, layout.height / screen.height) - 1) * blend
-  const x = (layout.width / 2 - (screen.x + screen.width / 2)) * blend
-  const y = (layout.height / 2 - (screen.y + screen.height / 2)) * blend
-  return `translate(${x}px, ${y}px) scale(${scale})`
+export const groundRoutes = [
+  { name: 'provisioning', width: 94, duration: 108, phase: 0.72, direction: -1, lane: -0.018 },
+  { name: 'baggage-train', width: 172, duration: 76, phase: 0.2, direction: 1, lane: 0 },
+  { name: 'pushback', width: 69, duration: 132, phase: 0.14, direction: -1, lane: 0.018 },
+] as const
+
+export function groundPosition(
+  route: (typeof groundRoutes)[number],
+  elapsed: number,
+  layout: SceneLayout,
+) {
+  const size = route.width * layout.vehicleScale
+  const x = loopPosition(elapsed, route.duration, layout.width, size, route.phase)
+  return route.direction === 1 ? x : layout.width - size - x
 }

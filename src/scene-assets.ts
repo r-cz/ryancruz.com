@@ -1,4 +1,4 @@
-import { assetURL, sceneAssets } from './scene-art'
+import { assetURL, optionalAssets, sceneAssets } from './scene-art'
 
 /** Essential artwork gates enhancement; optional ambient sprites may arrive later. */
 export function loadSceneArtwork(onOptionalFailure: (name: string) => void) {
@@ -6,7 +6,7 @@ export function loadSceneArtwork(onOptionalFailure: (name: string) => void) {
   const cancelLoads: (() => void)[] = []
   const essential: Promise<void>[] = []
   for (const name of sceneAssets) {
-    const optional = name === 'aircraft' || name === 'clouds'
+    const optional = optionalAssets.has(name)
     const load = new Promise<void>((resolve, reject) => {
       const image = new window.Image()
       let settled = false

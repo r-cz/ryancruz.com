@@ -15,7 +15,8 @@ class TestImage {
     images.push(this)
   }
 }
-const optional = (image: TestImage) => /\/(aircraft|clouds)\.webp/.test(image.src)
+const optional = (image: TestImage) =>
+  /\/(aircraft|clouds|provisioning|baggage-train|pushback)\.webp/.test(image.src)
 
 beforeEach(() => {
   images.length = 0
@@ -40,9 +41,15 @@ test('starts once essential layers load even when ambient sprites are still pend
   const artwork = loadSceneArtwork(failed)
   images.filter((image) => !optional(image)).forEach((image) => image.onload?.())
   await artwork.ready
-  expect(timeouts.size).toBe(2)
+  expect(timeouts.size).toBe(5)
   images.filter(optional).forEach((image) => image.onerror?.())
-  expect(failed.mock.calls).toEqual([['aircraft'], ['clouds']])
+  expect(failed.mock.calls).toEqual([
+    ['aircraft'],
+    ['clouds'],
+    ['provisioning'],
+    ['baggage-train'],
+    ['pushback'],
+  ])
   expect(timeouts.size).toBe(0)
   artwork.dispose()
 })

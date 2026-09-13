@@ -2,6 +2,7 @@
 import { cpSync, existsSync, mkdirSync, rmSync, watch, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { renderPage } from './src/page'
+import { renderTravel } from './src/travel'
 
 const srcDir = 'src'
 const distDir = 'dist'
@@ -47,26 +48,50 @@ if (!result.success) {
   process.exit(1)
 }
 
-writeFileSync(
-  join(distDir, 'index.html'),
-  `<!DOCTYPE html>
+const documentHTML = (
+  content: string,
+  title: string,
+  description: string,
+  route: string,
+  script = false,
+) => `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f6f5f1" />
-  <meta name="description" content="Ryan Cruz is a Senior Cybersecurity Engineer specializing in identity and access management at Southwest Airlines in Dallas, Texas." />
-  <title>Ryan Cruz — Cybersecurity Engineer</title>
-  <link rel="canonical" href="https://ryancruz.com/" />
+  <meta name="description" content="${description}" />
+  <title>${title}</title>
+  <link rel="canonical" href="https://ryancruz.com${route}" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <div id="app">${renderPage()}</div>
-  <script type="module" src="/main.js"></script>
+  <div id="app">${content}</div>
+  ${script ? '<script type="module" src="/main.js"></script>' : ''}
 </body>
-</html>`,
+</html>`
+
+writeFileSync(
+  join(distDir, 'index.html'),
+  documentHTML(
+    renderPage(),
+    'Ryan Cruz — Cybersecurity Engineer',
+    'Ryan Cruz is a Senior Cybersecurity Engineer specializing in identity and access management at Southwest Airlines in Dallas, Texas.',
+    '/',
+    true,
+  ),
+)
+mkdirSync(join(distDir, 'travel'), { recursive: true })
+writeFileSync(
+  join(distDir, 'travel/index.html'),
+  documentHTML(
+    renderTravel(),
+    'Travel journal — Ryan Cruz',
+    'Notes from the places in between. A travel journal by Ryan Cruz, with stories to come.',
+    '/travel/',
+  ),
 )
 
 console.log('✓ Built JavaScript and prerendered HTML')
