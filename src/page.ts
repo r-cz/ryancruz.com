@@ -16,11 +16,11 @@ export function renderPage(): string {
         </div>
         <div class="scene-surfaces">
             <a class="laptop-screen" href="#portfolio" aria-label="Open Ryan Cruz’s portfolio">
-              <div class="screen-masthead" aria-hidden="true"><span>RYAN CRUZ</span><span>ABOUT &nbsp; EXPERIENCE &nbsp; PROJECTS</span></div>
+              <div class="screen-masthead" aria-hidden="true"><span>RC.</span><span>ABOUT &nbsp; EXPERIENCE &nbsp; PROJECTS</span></div>
               <div class="screen-intro" aria-hidden="true">
                 <span class="screen-name">Ryan Cruz.</span>
                 <span class="screen-role">Senior Cybersecurity Engineer</span>
-                <span class="screen-description">I build identity and access solutions at Southwest Airlines.<br>Based in Dallas. Usually thinking about what’s next.</span>
+                <span class="screen-description">I build identity and access solutions at Southwest Airlines.</span>
                 <span class="screen-cta">Get to know me ${arrow}</span>
               </div>
             </a>

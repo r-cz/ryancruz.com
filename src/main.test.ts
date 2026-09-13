@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, mock, setSystemTime, spyOn } from 'bun:test'
 import { renderPage } from './page'
-import type { LiveScene } from './scene3d'
+import type { LiveScene } from './scene2d'
 
 let failRenderer = false
 let failRender = false
 let failResize = false
+let assetLoad: Promise<void> | undefined
 const renderer = {
   render: mock<LiveScene['render']>(() => {
     if (failRender) throw new Error('Render failed')
@@ -15,11 +16,11 @@ const renderer = {
   dispose: mock<LiveScene['dispose']>(() => {}),
 }
 const createLiveScene = mock((container: HTMLElement) => {
-  if (failRenderer) throw new Error('WebGL is unavailable')
-  container.append(document.createElement('canvas'))
-  return renderer
+  if (failRenderer) throw new Error('scene is unavailable')
+  container.append(document.createElement('div'))
+  return { ...renderer, ready: assetLoad }
 })
-mock.module('./scene3d', () => ({ createLiveScene }))
+mock.module('./scene2d', () => ({ createLiveScene }))
 const { clamp, transitionProgress, initSite } = await import('./main')
 // Consume browser auto-initialization before installing any test fixture.
 document.dispatchEvent(new Event('DOMContentLoaded'))
@@ -132,6 +133,7 @@ beforeEach(() => {
     if (id) intervals.delete(id)
   })
   failRenderer = failRender = failResize = false
+  assetLoad = undefined
   frames.clear()
   timers.clear()
   intervals.clear()
@@ -417,8 +419,10 @@ describe('scene viewport measurements', () => {
       await start()
       const observer = sizeObservers[0]
       sizeObservers[0].notify()
-      if (outcome === 'fallback') element('canvas').dispatchEvent(new Event('webglcontextlost'))
-      else {
+      if (outcome === 'fallback') {
+        failRender = true
+        flushFrame()
+      } else {
         cleanup?.()
         cleanup = undefined
       }
@@ -453,7 +457,7 @@ describe('motion and graceful degradation', () => {
   })
 
   for (const paused of [false, true]) {
-    it(`skips hidden WebGL work and restores the ${paused ? 'paused' : 'animated'} terminal on return`, async () => {
+    it(`skips hidden scene work and restores the ${paused ? 'paused' : 'animated'} terminal on return`, async () => {
       if (paused) window.localStorage.setItem('ryan-motion-paused', 'true')
       await start()
       const rendered = renderer.render.mock.calls.length
@@ -610,17 +614,34 @@ describe('motion and graceful degradation', () => {
     expect(intervals.size).toBe(0)
   })
 
-  it('reveals the document and releases the scene after WebGL context loss', async () => {
+  it('reveals the portfolio when essential artwork cannot load', async () => {
+    let rejectArt!: (error: Error) => void
+    assetLoad = new Promise((_resolve, reject) => {
+      rejectArt = reject
+    })
     await start()
-    const event = new Event('webglcontextlost', { cancelable: true })
-    element('canvas').dispatchEvent(event)
-    flushFrame()
-    expect(event.defaultPrevented).toBe(true)
+    expect(document.documentElement.classList.contains('scene-ready')).toBe(false)
+    rejectArt(new Error('Artwork failed'))
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    expect(document.documentElement.classList.contains('scene-unavailable')).toBe(true)
     expect(renderer.dispose).toHaveBeenCalledTimes(1)
-    expect(document.documentElement.classList.contains('enhanced')).toBe(false)
     expect(element('#portfolio').style.opacity).toBe('')
     expect(frames.size).toBe(0)
-    expect(intervals.size).toBe(0)
+  })
+
+  it('does not revive a disposed scene when artwork finishes loading', async () => {
+    let resolveArt!: () => void
+    assetLoad = new Promise((resolve) => {
+      resolveArt = resolve
+    })
+    await start()
+    cleanup?.()
+    cleanup = undefined
+    resolveArt()
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    expect(document.documentElement.classList.contains('scene-ready')).toBe(false)
+    expect(renderer.dispose).toHaveBeenCalledTimes(1)
+    expect(frames.size).toBe(0)
   })
 
   for (const failure of ['render', 'resize'] as const) {
