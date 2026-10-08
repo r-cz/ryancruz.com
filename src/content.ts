@@ -6,9 +6,9 @@
  */
 export const profile = {
   name: 'Ryan Cruz',
-  role: 'Cybersecurity engineer focused on identity, based in Dallas.',
+  role: 'Identity engineer',
+  email: 'mail@ryancruz.com',
   links: [
-    { label: 'Email', href: 'mailto:mail@ryancruz.com' },
     { label: 'GitHub', href: 'https://github.com/r-cz' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/cruzryan' },
     { label: 'Résumé', href: '/Resume.pdf' },

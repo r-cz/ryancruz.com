@@ -5,6 +5,19 @@ const arrowIcon =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>'
 /** Two stacked arrows let hover swap one out to the top right and the next in from the bottom left. */
 export const arrow = `<span class="arrow" aria-hidden="true">${arrowIcon}${arrowIcon}</span>`
+const chevron =
+  '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>'
+
+/** A native disclosure, so the menu opens without JavaScript; main.ts adds copying and dismissal. */
+const emailMenu = (address: string) => `<li>
+          <details class="email">
+            <summary class="link">Email${chevron}</summary>
+            <div class="email-menu">
+              <button class="email-option" type="button" data-copy="${address}"><span data-copy-label aria-live="polite">Copy email address</span><span class="email-address">${address}</span></button>
+              <a class="email-option" href="mailto:${address}">Send an email</a>
+            </div>
+          </details>
+        </li>`
 
 function letters(text: string) {
   let i = 0
@@ -41,6 +54,7 @@ export function renderPage(design: Design): string {
       <p class="role rise" ${next()}>${profile.role}</p>
       <ul class="links rise" ${next()} aria-label="Contact and profiles">
         ${profile.links.map((link) => `<li><a class="link" href="${link.href}">${link.label}${arrow}</a></li>`).join('')}
+        ${emailMenu(profile.email)}
       </ul>
     </header>
 

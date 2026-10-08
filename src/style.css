@@ -102,17 +102,19 @@ main {
   display: inline-block;
   white-space: nowrap;
 }
+.word > span,
+.rise {
+  position: relative;
+  animation: focus var(--duration) var(--ease) both;
+  animation-delay: calc(var(--i) * var(--stagger) + 150ms);
+}
 .word > span {
   display: inline-block;
-  transform-origin: 0 100%;
-  animation: letter var(--duration) var(--ease) both;
-  animation-delay: calc(var(--i) * var(--stagger) + 150ms);
-}
-.rise {
-  animation: rise var(--duration) var(--ease) both;
-  animation-delay: calc(var(--i) * var(--stagger) + 150ms);
+  --from: 0.45em;
+  --soft: 0.12em;
 }
 .role {
+  --tint: var(--accent);
   font-family: var(--display-family);
   font-size: calc(1rem * var(--ratio) * var(--ratio));
   line-height: 1.3;
@@ -120,11 +122,72 @@ main {
   margin-bottom: 0.75rem;
 }
 .links {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.75rem;
   margin-top: 2rem;
   font-weight: 500;
+}
+
+/* Email: a small disclosure menu to copy the address or open a mail app */
+.email {
+  position: relative;
+}
+.email summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.email summary::-webkit-details-marker {
+  display: none;
+}
+.email[open] summary {
+  color: var(--accent);
+}
+.chevron {
+  width: 0.85em;
+  height: 0.85em;
+  transition: transform 0.45s var(--ease);
+}
+.email[open] .chevron {
+  transform: rotate(180deg);
+}
+.email-menu {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.6rem);
+  left: -0.75rem;
+  display: grid;
+  min-width: 15rem;
+  padding: 0.35rem;
+  border-radius: 1rem;
+  background: var(--bg);
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 16px 40px -16px color-mix(in oklch, var(--ink) 30%, transparent);
+  animation: menu 0.4s var(--ease) both;
+}
+.email-option {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+.email-option:hover,
+.email-option:focus-visible {
+  background: var(--surface);
+  color: var(--accent);
+}
+.email-address {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
 }
 
 /* Links: an underline sweeps in and the arrow swaps */
@@ -180,7 +243,6 @@ a:focus-visible .arrow svg + svg,
   display: grid;
   gap: 1.25rem 2rem;
   padding-block: 2.75rem;
-  view-timeline: --section block;
 }
 .section::before {
   content: '';
@@ -316,6 +378,13 @@ h3 {
   color: var(--accent);
 }
 
+/* On narrow screens the menu anchors to the start of the links row, so it never runs off the edge. */
+@media (max-width: 40rem) {
+  .email {
+    position: static;
+  }
+}
+
 @media (min-width: 52rem) {
   .section {
     grid-template-columns: 11rem minmax(0, 1fr);
@@ -325,45 +394,53 @@ h3 {
   }
 }
 
-@keyframes letter {
+/*
+ * Text comes into focus through a painted text-shadow and a relative offset.
+ * Filters and transforms would put it on a GPU layer that WebKit visibly
+ * re-renders, sharpening the serifs, the moment the animation ends.
+ */
+@keyframes focus {
   from {
-    opacity: 0;
-    transform: translateY(0.5em) rotate(8deg);
-    filter: blur(12px);
+    top: var(--from, 0.75rem);
+    color: transparent;
+    text-shadow: 0 0 var(--soft, 0.25em) transparent;
+  }
+  /* Only the blurred shadow shows at first; the glyph then sharpens through it. */
+  40% {
+    color: transparent;
+    text-shadow: 0 0 var(--soft, 0.25em) var(--tint, var(--ink));
+  }
+  to {
+    text-shadow: 0 0 0 transparent;
   }
 }
-@keyframes rise {
+@keyframes menu {
   from {
     opacity: 0;
-    transform: translateY(1rem);
-    filter: blur(6px);
-  }
-}
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(1.75rem);
-    filter: blur(6px);
-  }
-}
-@keyframes hairline {
-  from {
-    transform: scaleX(0);
+    top: calc(100% + 0.15rem);
   }
 }
 
-/* Content settles in as it scrolls into view, without JavaScript, where supported. */
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: reveal var(--ease) both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 85%;
-  }
-  .section::before {
-    animation: hairline var(--ease) both;
-    animation-timeline: --section;
-    animation-range: entry 0% entry 40%;
-  }
+/* Once JavaScript is running, content waits off-screen and reveals once as it arrives. */
+.js .reveal {
+  position: relative;
+  opacity: 0;
+  top: 1.25rem;
+  transition:
+    opacity var(--duration) var(--ease),
+    top var(--duration) var(--ease);
+  transition-delay: calc(var(--n, 0) * var(--stagger));
+}
+.js .reveal.in {
+  opacity: 1;
+  top: 0;
+}
+.js .section::before {
+  transform: scaleX(0);
+  transition: transform calc(var(--duration) * 1.5) var(--ease);
+}
+.js .section.in::before {
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -372,5 +449,12 @@ h3 {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+  .js .reveal {
+    opacity: 1;
+    top: 0;
+  }
+  .js .section::before {
+    transform: none;
   }
 }

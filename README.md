@@ -31,9 +31,9 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 - `src/content.ts`: links, projects, experience and education.
 - `src/page.ts`: semantic HTML, prerendered by `build.ts` with the seeded tokens inlined in `<head>`.
 - `src/style.css`: layout and animation, driven entirely by the seeded custom properties.
-- `src/main.ts`: optional extras. Project cards glow under the cursor, and the seed decodes itself when it scrolls into view.
+- `src/main.ts`: enhancements. Sections reveal once as they arrive, project cards glow under the cursor, the email menu copies the address and dismisses on Escape or an outside click, and the seed decodes itself when it scrolls into view.
 
-The page is complete without JavaScript. The name settles in letter by letter, and sections reveal with CSS scroll-driven animations where supported. Reduced motion turns off every animation.
+The page is complete without JavaScript: content stays visible and the email menu still opens. The name and intro come into focus through a painted `text-shadow` and a relative offset rather than `filter` and `transform`, which WebKit composites and visibly re-renders when the animation ends. Reveals are one-shot transitions triggered by an IntersectionObserver, so they always finish, unlike scroll-linked animation, which Safari can leave mid-blur. Reduced motion turns off every animation.
 
 ## Content
 

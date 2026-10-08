@@ -68,12 +68,13 @@ writeFileSync(
   <link rel="canonical" href="https://ryancruz.com/" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />${displayFont}
+  <script>document.documentElement.classList.add('js')</script>
   <style>${designCSS(design)}</style>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   ${renderPage(design)}
-  <script type="module" src="/main.js"></script>
+  <script type="module" src="/main.js" onerror="document.documentElement.classList.remove('js')"></script>
 </body>
 </html>`,
 )
