@@ -19,17 +19,6 @@ const emailMenu = (address: string) => `<li>
           </details>
         </li>`
 
-function letters(text: string) {
-  let i = 0
-  const words = text
-    .split(' ')
-    .map(
-      (word) =>
-        `<span class="word">${[...word].map((char) => `<span style="--i:${i++}">${char}</span>`).join('')}</span>`,
-    )
-  return `<span class="sr-only">${text}</span><span class="letters" aria-hidden="true">${words.join(' ')}</span>`
-}
-
 const section = (id: string, title: string, body: string) => `
     <section class="section" id="${id}" aria-labelledby="${id}-title">
       <h2 class="section-title reveal" id="${id}-title">${title}</h2>
@@ -43,16 +32,13 @@ const entry = (years: string, title: string, org: string) => `
           </li>`
 
 export function renderPage(design: Design): string {
-  // Indices continue after the name so the intro rises once the letters land.
-  let rise = profile.name.length
-  const next = () => `style="--i:${rise++}"`
   return `
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="page">
     <header class="intro">
-      <h1 class="name">${letters(profile.name)}</h1>
-      <p class="role rise" ${next()}>${profile.role}</p>
-      <ul class="links rise" ${next()} aria-label="Contact and profiles">
+      <h1 class="name">${profile.name}</h1>
+      <p class="role">${profile.role}</p>
+      <ul class="links" aria-label="Contact and profiles">
         ${profile.links.map((link) => `<li><a class="link" href="${link.href}">${link.label}${arrow}</a></li>`).join('')}
         ${emailMenu(profile.email)}
       </ul>

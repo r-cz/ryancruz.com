@@ -87,8 +87,9 @@ afterEach(() => {
 
 test('prerenders every detail and project as plain, readable HTML', () => {
   const text = document.body.textContent ?? ''
-  expect($('h1 .sr-only').textContent).toBe(profile.name)
-  expect($('h1 .letters').getAttribute('aria-hidden')).toBe('true')
+  // The intro is static: plain text with no per-letter animation markup.
+  expect($('h1').innerHTML).toBe(profile.name)
+  expect(document.querySelector('.intro [style]')).toBeNull()
   expect($('.role').textContent).toBe('Identity engineer')
   for (const item of [education.degree, education.school]) expect(text).toContain(item)
   for (const job of experience) expect(text).toContain(`${job.role} · ${job.org}`)

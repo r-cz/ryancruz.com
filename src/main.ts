@@ -3,7 +3,7 @@ const HEX = '0123456789abcdef'
 /**
  * Enhancements over the prerendered page. Sections reveal once as they enter
  * the viewport; a one-shot transition always finishes, unlike scroll-linked
- * animation, which can stall mid-blur. Project cards glow under a mouse, the
+ * animation, which Safari can leave half-finished. Project cards glow under a mouse, the
  * seed decodes itself, and the email menu copies and dismisses.
  */
 export function initSite(): () => void {
