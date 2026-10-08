@@ -1,33 +1,72 @@
-import { renderPortfolio } from './portfolio'
-import { assetURL, sprite } from './scene-art'
+import { education, experience, profile, projects } from './content'
 
-export const arrow =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>'
+const arrowIcon =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>'
+/** Two stacked arrows let hover swap one out to the top right and the next in from the bottom left. */
+export const arrow = `<span class="arrow" aria-hidden="true">${arrowIcon}${arrowIcon}</span>`
+const chevron =
+  '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>'
 
-/** Native links and prerendered content remain usable without the scene. */
+/** A native disclosure, so the menu opens without JavaScript; main.ts adds copying and dismissal. */
+const emailMenu = (address: string) => `<li>
+          <details class="email">
+            <summary class="link">Email${chevron}</summary>
+            <div class="email-menu">
+              <button class="email-option" type="button" data-copy="${address}"><span data-copy-label aria-live="polite">Copy email address</span><span class="email-address">${address}</span></button>
+              <a class="email-option" href="mailto:${address}">Send an email</a>
+            </div>
+          </details>
+        </li>`
+
+const section = (id: string, title: string, body: string) => `
+    <section class="section" id="${id}" aria-labelledby="${id}-title">
+      <h2 class="section-title reveal" id="${id}-title">${title}</h2>
+      <div class="section-body">${body}</div>
+    </section>`
+
+const entry = (years: string, title: string, org: string) => `
+          <li class="entry reveal">
+            <p class="meta years">${years}</p>
+            <h3>${title} <span class="org">· ${org}</span></h3>
+          </li>`
+
 export function renderPage(): string {
   return `
-    <a class="keyboard-skip" href="#portfolio">Skip to portfolio</a>
-    <section class="scene-track" id="terminal" aria-label="A moment at Dallas Love Field">
-      <div class="scene-viewport">
-        <div class="scene-camera" aria-hidden="true"><div class="scene-loading">Taking a seat at Love Field…</div></div>
-        <header class="scene-header"><a class="scene-monogram" href="#terminal" aria-label="Ryan Cruz, terminal home">RC.</a><a class="skip-scene" href="#portfolio">Skip to portfolio ${arrow}</a></header>
-        <div class="scene-foreground">
-          ${sprite('foreground-seats')}
-          <a class="scene-object backpack-link" href="/travel/" aria-label="Open Ryan’s travel journal">
-            <img src="${assetURL('backpack')}" alt="Black Patagonia Mini MLC backpack resting on a seat" draggable="false" />
-            <span class="object-label">Travel journal ${arrow}</span>
-          </a>
-          <a class="scene-object macbook-link" href="#portfolio" aria-label="Open Ryan Cruz’s portfolio">
-            <img src="${assetURL('closed-macbook')}" alt="Closed silver MacBook Pro resting on a seat" draggable="false" />
-            <span class="object-label">Portfolio ${arrow}</span>
-          </a>
-        </div>
-        <p class="scene-caption">A moment between departures.</p>
-      </div>
-    </section>
-    <main class="portfolio" id="portfolio" tabindex="-1">${renderPortfolio()}
-      <nav class="portfolio-return" aria-label="More from Ryan"><a href="#terminal">Back to the terminal ${arrow}</a><a href="/travel/">Travel journal ${arrow}</a></nav>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="page">
+    <header class="intro">
+      <h1 class="name">${profile.name}</h1>
+      <p class="role">${profile.role}</p>
+      <ul class="links" aria-label="Contact and profiles">
+        ${profile.links.map((link) => `<li><a class="link" href="${link.href}">${link.label}${arrow}</a></li>`).join('')}
+        ${emailMenu(profile.email)}
+      </ul>
+    </header>
+
+    <main id="main" tabindex="-1">
+      ${section(
+        'projects',
+        'Projects',
+        `<ul class="projects">${projects
+          .map(
+            (project) => `
+          <li class="project reveal">
+            <h3><a class="project-link" href="${project.href}">${project.name}${arrow}</a></h3>
+            <p class="note">${project.description}</p>
+          </li>`,
+          )
+          .join('')}</ul>`,
+      )}
+      ${section(
+        'experience',
+        'Experience',
+        `<ol class="timeline">${experience.map((job) => entry(job.years, job.role, job.org)).join('')}</ol>`,
+      )}
+      ${section(
+        'education',
+        'Education',
+        `<ul class="timeline">${entry(education.years, education.degree, education.school)}</ul>`,
+      )}
     </main>
-  `
+  </div>`
 }

@@ -1,7 +1,6 @@
 @import 'tailwindcss';
-@import './scene.css';
-@import './travel.css';
 
+/* Seeded tokens (--bg, --accent, --ease, …) are prerendered into <head> by build.ts from src/design.ts. */
 @font-face {
   font-family: Inter;
   src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2');
@@ -9,398 +8,401 @@
   font-style: normal;
   font-display: swap;
 }
-@theme {
-  --color-paper: #f6f5f1;
-  --color-ink: #262822;
-  --color-navy: #132b42;
-  --font-sans: 'Inter', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent2);
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 :root {
-  color: var(--color-ink);
-  background: var(--color-paper);
-  font-family: var(--font-sans);
+  color-scheme: light dark;
+  color: var(--ink);
+  background: var(--bg);
+  font: 400 1rem/1.65 var(--font-sans);
   font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
+::selection {
+  background: color-mix(in oklch, var(--accent) 24%, transparent);
 }
 a {
   color: inherit;
   text-decoration: none;
-}
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
-button:disabled {
-  cursor: default;
-}
-a,
-button {
   -webkit-tap-highlight-color: transparent;
 }
-a:focus-visible,
-button:focus-visible {
-  outline: 2px solid #265b8a;
-  outline-offset: 7px;
-  border-radius: 2px;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
-::selection {
-  background: #d9e0e5;
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
 }
-svg {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  vertical-align: middle;
-  flex-shrink: 0;
+ul,
+ol {
+  list-style: none;
 }
-.keyboard-skip {
+
+.skip-link {
   position: fixed;
-  z-index: 20;
-  top: 16px;
-  left: 16px;
-  padding: 12px 20px;
-  background: var(--color-paper);
-  transform: translateY(-180%);
+  z-index: 10;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  transform: translateY(-200%);
+  transition: transform 0.4s var(--ease);
 }
-.keyboard-skip:focus {
+.skip-link:focus {
   transform: none;
 }
-.portfolio {
-  background: var(--color-paper);
-  position: relative;
-  z-index: 3;
-  padding: 0 max(40px, calc((100vw - 1320px) / 2));
+.page {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 3rem) 2.5rem;
+}
+main {
   outline: none;
 }
-.portfolio-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 28px 0 24px;
-  border-bottom: 1px solid #bfc1b7;
-}
-.portfolio-wordmark {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-.portfolio-nav {
-  display: flex;
-  gap: 35px;
-  font-size: 13px;
-}
-.portfolio-nav a {
-  padding: 8px 0;
-}
-.portfolio-nav a:hover,
-.portfolio-contact a:hover {
-  color: #5a7390;
-}
-.portfolio-intro {
-  text-align: center;
-  padding: 48px 0 60px;
-}
-.portfolio-intro h1 {
-  font: clamp(70px, 10.3vw, 150px)/1.03 var(--font-serif);
-  letter-spacing: -0.065em;
-  margin: 0 0 19px;
-}
-.portfolio-role {
-  font: clamp(22px, 2.5vw, 36px)/1.25 var(--font-serif);
-  margin: 0 0 25px;
-  letter-spacing: -0.5px;
-}
-.portfolio-intro-description {
-  font-size: 17px;
-  line-height: 1.75;
-  margin: 0;
-}
-.portfolio-intro-links {
-  display: flex;
-  justify-content: center;
-  gap: 46px;
-  margin-top: 28px;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-navy);
-}
-.link-arrow {
-  width: 17px;
-  height: 17px;
-  margin-left: 4px;
-}
-.portfolio-location {
-  font-size: 12px;
-  margin: 29px 0 0;
-  color: #63675e;
-}
-.portfolio-section {
+
+/* Intro */
+.intro {
   display: grid;
-  grid-template-columns: 24% 1fr;
-  gap: 30px;
-  padding: 38px 0 42px;
-  border-top: 1px solid #bfc1b7;
-  scroll-margin-top: 35px;
+  padding-block: clamp(3.5rem, 16vh, 9rem) clamp(3rem, 10vh, 6rem);
 }
-#about {
-  border-top: 0;
-  padding-top: 0;
+.name {
+  font-family: var(--display-family);
+  font-weight: var(--display-weight);
+  font-size: clamp(3.4rem, 11vw, 7.25rem);
+  line-height: 0.95;
+  letter-spacing: var(--display-tracking);
+  margin-bottom: 1.5rem;
 }
-.portfolio-kicker {
-  font-size: 14px;
-  margin: 0 0 12px;
-  color: var(--color-navy);
-  font-weight: 500;
+.role {
+  font-family: var(--display-family);
+  font-size: calc(1rem * var(--ratio) * var(--ratio));
+  line-height: 1.3;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
 }
-.section-heading h2 {
-  font: 36px/1.13 var(--font-serif);
-  letter-spacing: -1px;
-  margin: 0;
-}
-.section-copy p,
-.experience-detail > p:not(.experience-role):not(.experience-date),
-.project-row > p:not(.project-type),
-.education-detail > p {
-  font-size: 15px;
-  line-height: 1.75;
-  margin: 0 0 15px;
-}
-.section-copy p:last-child {
-  margin-bottom: 0;
-}
-.experience-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.experience-row {
+.links {
   position: relative;
-  padding: 27px 0;
-  border-bottom: 1px solid #cfd0c8;
-}
-.experience-row:first-child {
-  padding-top: 0;
-}
-.experience-row:last-child {
-  border: 0;
-  padding-bottom: 0;
-}
-.experience-company h3,
-.project-row h3,
-.education-detail h3 {
-  font: 29px/1.2 var(--font-serif);
-  letter-spacing: -0.5px;
-  color: var(--color-navy);
-  margin: 0 0 8px;
-}
-.experience-company > span {
-  display: none;
-}
-.experience-role {
-  font-size: 14px;
-  margin: 0 0 13px;
-}
-.experience-date {
-  font-size: 12px;
-  color: #62675e;
-  margin: 0 0 16px;
-}
-.experience-detail .experience-date {
-  position: absolute;
-  top: 34px;
-  right: 0;
-}
-.experience-row:first-child .experience-date {
-  top: 7px;
-}
-.experience-detail > p:last-child {
-  margin-bottom: 0 !important;
-}
-.project-row {
-  padding: 29px 0;
-  border-bottom: 1px solid #cfd0c8;
-}
-.project-row:first-child {
-  padding-top: 0;
-}
-.project-row:last-child {
-  padding-bottom: 0;
-  border: 0;
-}
-.project-type {
-  margin: 0 0 11px;
-  font-size: 11px;
-  color: #687064;
-}
-.project-link {
-  display: inline-block;
-  color: var(--color-navy);
-  font-size: 13px;
-  text-decoration: underline;
-  text-underline-offset: 5px;
-}
-.education-detail .education-degree {
-  margin-bottom: 6px;
-}
-.education-detail .experience-date {
-  font-size: 12px;
-}
-.portfolio-footer {
-  border-top: 1px solid #bfc1b7;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  padding: 42px 0 72px;
-  gap: 30px;
-}
-.portfolio-footer-copy > p {
-  font-size: 12px;
-  margin: 0 0 11px;
-  color: #656d60;
-}
-.contact-link {
-  font: 40px var(--font-serif);
-  letter-spacing: -1px;
-}
-.contact-link .link-arrow {
-  height: 25px;
-  width: 25px;
-}
-.portfolio-contact {
   display: flex;
-  gap: 27px;
-  justify-content: flex-end;
-  font-size: 13px;
-  color: var(--color-navy);
-}
-.portfolio-contact small {
-  display: block;
-  margin-top: 8px;
-  font-size: 9px;
-  color: #6a7167;
-}
-.portfolio-colophon {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: space-between;
-  padding-top: 24px;
-  font: 12px var(--font-serif);
-  color: #656d60;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 0.75rem 1.75rem;
+  margin-top: 2rem;
+  font-weight: 500;
 }
-.scene-unavailable .scene-track {
+
+/* Email: a small disclosure menu to copy the address or open a mail app */
+.email {
+  position: relative;
+}
+.email summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.email summary::-webkit-details-marker {
   display: none;
 }
-@media (max-width: 1000px) {
-  .experience-detail .experience-date {
+.email[open] summary {
+  color: var(--accent);
+}
+.chevron {
+  width: 0.85em;
+  height: 0.85em;
+  transition: transform 0.45s var(--ease);
+}
+.email[open] .chevron {
+  transform: rotate(180deg);
+}
+.email-menu {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.6rem);
+  left: -0.75rem;
+  display: grid;
+  min-width: 15rem;
+  padding: 0.35rem;
+  border-radius: 1rem;
+  background: var(--bg);
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 16px 40px -16px color-mix(in oklch, var(--ink) 30%, transparent);
+}
+/* Scoped to [open] so the fade restarts on each opening; WebKit runs animations inside closed <details>. */
+.email[open] .email-menu {
+  animation: menu 0.4s var(--ease) both;
+}
+.email-option {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+.email-option:hover,
+.email-option:focus-visible {
+  background: var(--surface);
+  color: var(--accent);
+}
+.email-address {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Links: an underline sweeps in and the arrow swaps */
+.link,
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  transition: color 0.35s var(--ease);
+}
+.link {
+  padding-bottom: 2px;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition:
+    color 0.35s var(--ease),
+    background-size 0.6s var(--ease);
+}
+.link:hover,
+.link:focus-visible {
+  color: var(--accent);
+  background-size: 100% 1px;
+}
+.arrow {
+  display: inline-grid;
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+  overflow: hidden;
+}
+.arrow svg {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.55s var(--ease);
+}
+.arrow svg + svg {
+  transform: translate(-115%, 115%);
+}
+a:hover .arrow svg:first-child,
+a:focus-visible .arrow svg:first-child,
+.project:hover .arrow svg:first-child {
+  transform: translate(115%, -115%);
+}
+a:hover .arrow svg + svg,
+a:focus-visible .arrow svg + svg,
+.project:hover .arrow svg + svg {
+  transform: none;
+}
+
+/* Sections */
+.section {
+  position: relative;
+  display: grid;
+  gap: 1.25rem 2rem;
+  padding-block: 2.75rem;
+}
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--line);
+  transform-origin: 0 0;
+}
+.section-title {
+  font-family: var(--display-family);
+  font-weight: var(--display-weight);
+  font-size: calc(1rem * var(--ratio) * var(--ratio));
+  line-height: 1.2;
+  letter-spacing: calc(var(--display-tracking) / 3);
+}
+.section-body {
+  display: grid;
+  gap: 1rem;
+}
+.meta {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Projects: the card lifts toward the cursor with a soft seeded glow */
+.projects {
+  display: grid;
+  margin-top: -1rem;
+}
+.project {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 0.15rem;
+  justify-items: start;
+  padding: 1rem 1.25rem;
+  margin-left: -1.25rem;
+  border-radius: 1.25rem;
+}
+.project::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      26rem circle at var(--x, 50%) var(--y, 50%),
+      color-mix(in oklch, var(--accent) 12%, transparent),
+      color-mix(in oklch, var(--accent2) 6%, transparent) 40%,
+      transparent 70%
+    ),
+    var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.6s var(--ease);
+}
+.project:hover::before,
+.project:focus-within::before {
+  opacity: 1;
+  transform: none;
+}
+.project h3 {
+  font-family: var(--display-family);
+  font-weight: var(--display-weight);
+  font-size: calc(1rem * var(--ratio) * var(--ratio) * var(--ratio));
+  line-height: 1.15;
+  letter-spacing: calc(var(--display-tracking) / 2);
+}
+.project:hover .project-link {
+  color: var(--accent);
+}
+.project-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Experience and education */
+.timeline {
+  display: grid;
+  gap: 1rem;
+}
+.entry {
+  display: grid;
+  gap: 0.35rem 1.5rem;
+}
+.years {
+  padding-top: 0.2rem;
+}
+.org {
+  font-weight: 400;
+  color: var(--muted);
+}
+.note {
+  max-width: 38rem;
+  text-wrap: pretty;
+  margin-top: 0.25rem;
+  font-size: 0.94rem;
+  color: var(--muted);
+}
+
+/* On narrow screens the menu anchors to the start of the links row, so it never runs off the edge. */
+@media (max-width: 40rem) {
+  .email {
     position: static;
   }
-  .portfolio-contact {
-    flex-wrap: wrap;
+}
+
+@media (min-width: 52rem) {
+  .section {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+  .entry {
+    grid-template-columns: 8rem minmax(0, 1fr);
   }
 }
-@media (max-width: 700px) {
-  .portfolio {
-    padding: 0 23px;
-  }
-  .portfolio-header {
-    flex-direction: column;
-    gap: 15px;
-    padding: 25px 0 18px;
-  }
-  .portfolio-nav {
-    gap: 23px;
-    font-size: 11px;
-  }
-  .portfolio-intro {
-    padding: 47px 0 45px;
-  }
-  .portfolio-intro h1 {
-    font-size: clamp(61px, 16vw, 99px);
-    margin-bottom: 16px;
-  }
-  .portfolio-role {
-    font-size: 20px;
-    line-height: 1.4;
-    margin-bottom: 19px;
-  }
-  .portfolio-intro-description {
-    font-size: 14px;
-    line-height: 1.8;
-  }
-  .portfolio-intro-description br {
-    display: none;
-  }
-  .portfolio-intro-links {
-    font-size: 14px;
-    gap: 30px;
-    margin-top: 23px;
-  }
-  .portfolio-location {
-    font-size: 10px;
-    margin-top: 25px;
-  }
-  .portfolio-section {
-    grid-template-columns: 1fr;
-    gap: 25px;
-    padding: 33px 0;
-  }
-  .section-heading {
-    display: flex;
-    align-items: baseline;
-    gap: 15px;
-  }
-  .portfolio-kicker {
-    font-size: 12px;
-    margin: 0;
-  }
-  .section-heading h2 {
-    font-size: 30px;
-  }
-  .section-copy p,
-  .experience-detail > p:not(.experience-role):not(.experience-date),
-  .project-row > p:not(.project-type),
-  .education-detail > p {
-    font-size: 14px;
-  }
-  .experience-company h3,
-  .project-row h3,
-  .education-detail h3 {
-    font-size: 26px;
-  }
-  .experience-detail .experience-date {
-    position: static;
-    font-size: 11px;
-  }
-  .portfolio-footer {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding: 34px 0 80px;
-  }
-  .portfolio-contact {
-    justify-content: flex-start;
-    gap: 25px;
-  }
-  .portfolio-colophon {
-    font-size: 10px;
-    gap: 10px;
+
+@keyframes menu {
+  from {
+    opacity: 0;
+    top: calc(100% + 0.15rem);
   }
 }
+
+/* Once JavaScript is running, content waits off-screen and reveals once as it arrives. */
+.js .reveal {
+  position: relative;
+  opacity: 0;
+  top: 1.25rem;
+  transition:
+    opacity var(--duration) var(--ease),
+    top var(--duration) var(--ease);
+  transition-delay: calc(var(--n, 0) * var(--stagger));
+}
+.js .reveal.in {
+  opacity: 1;
+  top: 0;
+}
+.js .section::before {
+  transform: scaleX(0);
+  transition: transform calc(var(--duration) * 1.5) var(--ease);
+}
+.js .section.in::before {
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation: none !important;
-    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+  .js .reveal {
+    opacity: 1;
+    top: 0;
+  }
+  .js .section::before {
+    transform: none;
   }
 }
