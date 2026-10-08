@@ -11,7 +11,10 @@ let next = 0
 let now = 0
 
 window.matchMedia = (() => ({ matches: reduced })) as unknown as typeof window.matchMedia
+// Defer the module's own start-up so each test controls initSite itself.
+Object.defineProperty(document, 'readyState', { configurable: true, value: 'loading' })
 const { initSite } = await import('./main')
+Object.defineProperty(document, 'readyState', { configurable: true, value: 'complete' })
 
 class TestObserver {
   constructor(callback: typeof intersect) {
@@ -60,18 +63,18 @@ test('prerenders every detail and project as plain, readable HTML', () => {
   const text = document.body.textContent ?? ''
   expect(document.querySelector('h1 .sr-only')?.textContent).toBe(profile.name)
   expect(document.querySelector('h1 .letters')?.getAttribute('aria-hidden')).toBe('true')
-  for (const item of [profile.role, ...profile.about, education.degree])
+  for (const item of [profile.role, education.degree, education.school])
     expect(text).toContain(item)
-  for (const job of experience) expect(text).toContain(job.org)
+  for (const job of experience) expect(text).toContain(`${job.role} · ${job.org}`)
   for (const link of profile.links)
     expect(document.querySelector(`.links a[href="${link.href}"]`)?.textContent).toBe(link.label)
   for (const project of projects) {
-    expect(document.querySelector(`.project-link[href="${project.href}"]`)?.textContent).toBe(
-      project.name,
-    )
+    const link = document.querySelector(`.project-link[href="${project.href}"]`)
+    expect(link?.textContent).toBe(project.name)
+    expect(link?.closest('.project')?.textContent).toContain(project.description)
   }
-  expect(document.querySelector('a[href="https://iam-tools.racruz7.workers.dev"]')).not.toBeNull()
-  expect(document.querySelectorAll('.figure path')).toHaveLength(2)
+  expect(document.querySelector('.project-link[href="https://martenldap.com"]')).not.toBeNull()
+  expect(document.querySelector('svg path[d^="M-"], .figure')).toBeNull()
   expect(seed()?.textContent).toBe(design.seed)
 })
 
@@ -88,31 +91,27 @@ test('the seed decodes left to right once it scrolls into view', () => {
   expect(frames.size).toBe(0)
 })
 
-test('a mouse leans the figure and lights the card under it; touch does neither', () => {
+test('a mouse lights the card under it; touch does not', () => {
   cleanup = initSite()
-  const figure = document.querySelector<HTMLElement>('.figure')
   const card = document.querySelector<HTMLElement>('.project')
-  if (!figure || !card) throw new Error('Expected the figure and a project card')
+  if (!card) throw new Error('Expected a project card')
   pointer(card, 100, 50, 'touch')
-  expect(frames.size).toBe(0)
   expect(card.style.getPropertyValue('--x')).toBe('')
-  pointer(card, 1000, 0)
-  expect(card.style.getPropertyValue('--x')).toBe('1000px')
-  for (let i = 0; i < 400 && frames.size; i++) frame(i * 16)
-  expect(figure.style.getPropertyValue('--tilt-x')).toBe('9.00deg')
-  expect(figure.style.getPropertyValue('--tilt-y')).toBe('9.00deg')
+  pointer(card, 120, 40)
+  expect(card.style.getPropertyValue('--x')).toBe('120px')
+  expect(card.style.getPropertyValue('--y')).toBe('40px')
 })
 
-test('reduced motion leaves the seed and figure still', () => {
+test('reduced motion leaves the seed and cards still', () => {
   reduced = true
   cleanup = initSite()
   intersect?.([{ isIntersecting: true }])
-  pointer(document.body, 900, 100)
+  const card = document.querySelector<HTMLElement>('.project')
+  if (!card) throw new Error('Expected a project card')
+  pointer(card, 120, 40)
   expect(frames.size).toBe(0)
   expect(seed()?.textContent).toBe(design.seed)
-  expect(document.querySelector<HTMLElement>('.figure')?.style.getPropertyValue('--tilt-x')).toBe(
-    '',
-  )
+  expect(card.style.getPropertyValue('--x')).toBe('')
 })
 
 test('cleanup stops listening and restores the seed mid-decode', () => {
@@ -122,6 +121,9 @@ test('cleanup stops listening and restores the seed mid-decode', () => {
   cleanup()
   cleanup = undefined
   expect(seed()?.textContent).toBe(design.seed)
-  pointer(document.querySelector('.project') ?? document.body, 500, 400)
+  seed()?.closest('code')?.dispatchEvent(new window.Event('pointerenter'))
   expect(frames.size).toBe(0)
+  const card = document.querySelector<HTMLElement>('.project')
+  if (card) pointer(card, 120, 40)
+  expect(card?.style.getPropertyValue('--x')).toBe('')
 })

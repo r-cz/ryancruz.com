@@ -17,23 +17,17 @@ function letters(text: string) {
   return `<span class="sr-only">${text}</span><span class="letters" aria-hidden="true">${words.join(' ')}</span>`
 }
 
-function figure(design: Design) {
-  return `<div class="figure" aria-hidden="true">
-    <svg viewBox="-104 -104 208 208" focusable="false">
-      <defs><linearGradient id="figure-ink" x1="-100" y1="-100" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent2)"/></linearGradient></defs>
-      <g class="figure-spin">
-        <path class="figure-trace" d="${design.figure}" pathLength="1"/>
-        <path class="figure-glint" d="${design.figure}" pathLength="1"/>
-      </g>
-    </svg>
-  </div>`
-}
-
 const section = (id: string, title: string, body: string) => `
     <section class="section" id="${id}" aria-labelledby="${id}-title">
       <h2 class="section-title reveal" id="${id}-title">${title}</h2>
       <div class="section-body">${body}</div>
     </section>`
+
+const entry = (years: string, title: string, org: string) => `
+          <li class="entry reveal">
+            <p class="meta years">${years}</p>
+            <h3>${title} <span class="org">· ${org}</span></h3>
+          </li>`
 
 export function renderPage(design: Design): string {
   // Indices continue after the name so the intro rises once the letters land.
@@ -43,19 +37,14 @@ export function renderPage(design: Design): string {
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="page">
     <header class="intro">
-      ${figure(design)}
-      <div class="intro-copy">
-        <h1 class="name">${letters(profile.name)}</h1>
-        <p class="role rise" ${next()}>${profile.role}</p>
-        <p class="lede rise" ${next()}>${profile.lede}</p>
-        <ul class="links rise" ${next()} aria-label="Contact and profiles">
-          ${profile.links.map((link) => `<li><a class="link" href="${link.href}">${link.label}${arrow}</a></li>`).join('')}
-        </ul>
-      </div>
+      <h1 class="name">${letters(profile.name)}</h1>
+      <p class="role rise" ${next()}>${profile.role}</p>
+      <ul class="links rise" ${next()} aria-label="Contact and profiles">
+        ${profile.links.map((link) => `<li><a class="link" href="${link.href}">${link.label}${arrow}</a></li>`).join('')}
+      </ul>
     </header>
 
     <main id="main" tabindex="-1">
-      ${section('about', 'About', profile.about.map((p) => `<p class="prose reveal">${p}</p>`).join(''))}
       ${section(
         'projects',
         'Projects',
@@ -63,10 +52,8 @@ export function renderPage(design: Design): string {
           .map(
             (project) => `
           <li class="project reveal">
-            <p class="meta">${project.kind}</p>
             <h3><a class="project-link" href="${project.href}">${project.name}${arrow}</a></h3>
-            <p class="prose">${project.description}</p>
-            ${project.live ? `<a class="link small" href="${project.live}">Open the app${arrow}</a>` : ''}
+            <p class="note">${project.description}</p>
           </li>`,
           )
           .join('')}</ul>`,
@@ -74,29 +61,17 @@ export function renderPage(design: Design): string {
       ${section(
         'experience',
         'Experience',
-        `<ol class="timeline">${experience
-          .map(
-            (job) => `
-          <li class="entry reveal">
-            <p class="meta years">${job.years}</p>
-            <div><h3>${job.role} <span class="org">· ${job.org}</span></h3><p class="note">${job.note}</p></div>
-          </li>`,
-          )
-          .join('')}</ol>`,
+        `<ol class="timeline">${experience.map((job) => entry(job.years, job.role, job.org)).join('')}</ol>`,
       )}
       ${section(
         'education',
         'Education',
-        `<div class="entry reveal">
-          <p class="meta years">${education.years}</p>
-          <div><h3>${education.degree} <span class="org">· ${education.school}</span></h3><p class="note">${education.note}</p></div>
-        </div>`,
+        `<ul class="timeline">${entry(education.years, education.degree, education.school)}</ul>`,
       )}
     </main>
 
     <footer class="footer reveal">
-      <p>${profile.name} · Dallas, Texas</p>
-      <p class="colophon">Palette, type, curve and motion generated from seed <code><span class="sr-only">0x${design.seed}</span><span aria-hidden="true">0x<span data-seed="${design.seed}">${design.seed}</span></span></code></p>
+      <p class="colophon">Designed from seed <code><span class="sr-only">0x${design.seed}</span><span aria-hidden="true">0x<span data-seed="${design.seed}">${design.seed}</span></span></code></p>
     </footer>
   </div>`
 }

@@ -29,7 +29,9 @@ describe('seeded design', () => {
   test('the same seed always grows the same design, and other seeds differ', () => {
     expect(deriveDesign(SEED)).toEqual(deriveDesign(SEED))
     expect(deriveDesign().seed).toBe((SEED >>> 0).toString(16).padStart(8, '0'))
-    const variants = new Set(seeds.slice(0, 20).map((seed) => deriveDesign(seed).figure))
+    const variants = new Set(
+      seeds.slice(0, 20).map((seed) => JSON.stringify(deriveDesign(seed).light)),
+    )
     expect(variants.size).toBe(20)
   })
 
@@ -42,24 +44,6 @@ describe('seeded design', () => {
         for (const fg of [p.muted, p.accent])
           for (const bg of [p.bg, p.surface]) expect(contrast(fg, bg)).toBeGreaterThan(4.5)
       }
-    }
-  })
-
-  test('every seed draws a bounded, compact figure', () => {
-    for (const seed of seeds) {
-      const { figure } = deriveDesign(seed)
-      expect(figure).toMatch(/^M-?[\d.]+ -?[\d.]+(s(-?[\d.]+[ -]?){3}-?[\d.]+)+$/)
-      expect(figure.length).toBeLessThan(20_000)
-      const [start, ...segments] = figure.slice(1).split('s')
-      let [x, y] = start.split(' ').map(Number)
-      for (const segment of segments) {
-        const values = segment.match(/-?[\d.]+/g)?.map(Number) ?? []
-        expect(values).toHaveLength(4)
-        x += values[2]
-        y += values[3]
-        expect(Math.max(Math.abs(x), Math.abs(y))).toBeLessThan(100.5)
-      }
-      expect(segments.length).toBeGreaterThan(200)
     }
   })
 
