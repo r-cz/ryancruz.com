@@ -73,7 +73,7 @@ writeFileSync(
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  ${renderPage(design)}
+  ${renderPage()}
   <script type="module" src="/main.js" onerror="document.documentElement.classList.remove('js')"></script>
 </body>
 </html>`,

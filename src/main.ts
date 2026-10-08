@@ -1,19 +1,15 @@
-const HEX = '0123456789abcdef'
-
 /**
  * Enhancements over the prerendered page. Sections reveal once as they enter
  * the viewport; a one-shot transition always finishes, unlike scroll-linked
- * animation, which Safari can leave half-finished. Project cards glow under a mouse, the
- * seed decodes itself, and the email menu copies and dismisses.
+ * animation, which Safari can leave half-finished. Project cards glow under a
+ * mouse, and the email menu copies and dismisses.
  */
 export function initSite(): () => void {
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
-  const seed = document.querySelector<HTMLElement>('[data-seed]')
   const email = document.querySelector<HTMLDetailsElement>('details.email')
   const copyLabel = email?.querySelector('[data-copy-label]')
   const copyText = copyLabel?.textContent ?? ''
   const revealable = [...document.querySelectorAll<HTMLElement>('.section, .reveal')]
-  let seedFrame = 0
   let copyTimer = 0
 
   // Elements arriving together stagger in document order.
@@ -33,23 +29,6 @@ export function initSite(): () => void {
     const rect = card.getBoundingClientRect()
     card.style.setProperty('--x', `${event.clientX - rect.left}px`)
     card.style.setProperty('--y', `${event.clientY - rect.top}px`)
-  }
-
-  // Characters lock in left to right while the rest cycle through hex digits.
-  function decode() {
-    if (!seed || motion.matches) return
-    const value = seed.dataset.seed ?? ''
-    const start = performance.now()
-    window.cancelAnimationFrame(seedFrame)
-    const tick = (now: number) => {
-      const progress = Math.min((now - start) / 1100, 1)
-      const settled = Math.floor(progress * value.length)
-      seed.textContent = [...value]
-        .map((char, i) => (i < settled ? char : HEX[Math.floor(Math.random() * 16)]))
-        .join('')
-      seedFrame = progress < 1 ? window.requestAnimationFrame(tick) : 0
-    }
-    seedFrame = window.requestAnimationFrame(tick)
   }
 
   function closeEmail(returnFocus = false) {
@@ -88,29 +67,23 @@ export function initSite(): () => void {
             .filter((entry) => entry.isIntersecting)
             .map((entry) => entry.target as HTMLElement)
           arrived.forEach((element) => observer?.unobserve(element))
-          if (seed && arrived.includes(seed)) decode()
-          reveal(arrived.filter((element) => element !== seed))
+          reveal(arrived)
         })
       : undefined
-  if (observer) [...revealable, ...(seed ? [seed] : [])].forEach((el) => observer.observe(el))
+  if (observer) revealable.forEach((element) => observer.observe(element))
   else reveal(revealable)
 
   document.addEventListener('pointermove', onPointer, { passive: true })
   document.addEventListener('click', onDocumentClick)
   document.addEventListener('keydown', onKey)
   email?.addEventListener('click', onEmailClick)
-  const colophon = seed?.closest('code')
-  colophon?.addEventListener('pointerenter', decode)
   return () => {
     observer?.disconnect()
     document.removeEventListener('pointermove', onPointer)
     document.removeEventListener('click', onDocumentClick)
     document.removeEventListener('keydown', onKey)
     email?.removeEventListener('click', onEmailClick)
-    colophon?.removeEventListener('pointerenter', decode)
-    window.cancelAnimationFrame(seedFrame)
     window.clearTimeout(copyTimer)
-    if (seed) seed.textContent = seed.dataset.seed ?? ''
     if (copyLabel) copyLabel.textContent = copyText
   }
 }

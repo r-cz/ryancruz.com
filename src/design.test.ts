@@ -28,7 +28,6 @@ const contrast = (x: string, y: string) => {
 describe('seeded design', () => {
   test('the same seed always grows the same design, and other seeds differ', () => {
     expect(deriveDesign(SEED)).toEqual(deriveDesign(SEED))
-    expect(deriveDesign().seed).toBe((SEED >>> 0).toString(16).padStart(8, '0'))
     const variants = new Set(
       seeds.slice(0, 20).map((seed) => JSON.stringify(deriveDesign(seed).light)),
     )

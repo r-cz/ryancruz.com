@@ -17,7 +17,6 @@ interface Palette {
 }
 
 export interface Design {
-  seed: string
   hue: number
   display: Display
   ratio: number
@@ -55,7 +54,6 @@ export function deriveDesign(seed = SEED): Design {
   const duration = Math.round(700 + rand() * 400)
   const stagger = Math.round(45 + rand() * 45)
   return {
-    seed: (seed >>> 0).toString(16).padStart(8, '0'),
     hue: round(hue, 1),
     display,
     ratio: round(ratio),

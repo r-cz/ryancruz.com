@@ -2,7 +2,7 @@
 
 Ryan Cruz’s personal site: a single, minimal page with his projects, experience and education.
 
-Every visual decision comes from one seed, `0xcc0fe108`, rolled with `crypto.getRandomValues`. `src/design.ts` feeds it to a small PRNG that picks the hue and palette for light and dark mode, the display typeface, the type-scale ratio, and the easing curve and animation timing. To redesign the site, replace `SEED` and rebuild.
+Every visual decision comes from one seed, `0xcc0fe108`, rolled with `crypto.getRandomValues`. `src/design.ts` feeds it to a small PRNG that picks the hue and palette for light and dark mode, the display typeface, the type-scale ratio, and the easing curve and animation timing. The seed isn't shown on the page. To redesign the site, replace `SEED` and rebuild.
 
 ## Development
 
@@ -31,7 +31,7 @@ Changes use a feature branch and PR. Merging into `main` runs the existing GitHu
 - `src/content.ts`: links, projects, experience and education.
 - `src/page.ts`: semantic HTML, prerendered by `build.ts` with the seeded tokens inlined in `<head>`.
 - `src/style.css`: layout and animation, driven entirely by the seeded custom properties.
-- `src/main.ts`: enhancements. Sections reveal once as they arrive, project cards glow under the cursor, the email menu copies the address and dismisses on Escape or an outside click, and the seed decodes itself when it scrolls into view.
+- `src/main.ts`: enhancements. Sections reveal once as they arrive, project cards glow under the cursor, and the email menu copies the address and dismisses on Escape or an outside click.
 
 The page is complete without JavaScript: content stays visible and the email menu still opens. The intro is static. Below it, sections fade and rise in once as they arrive. These are one-shot transitions triggered by an IntersectionObserver, so they always finish, unlike scroll-linked animation, which Safari can leave half-finished. Nothing uses blur. Reduced motion turns off every animation.
 

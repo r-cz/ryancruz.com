@@ -1,5 +1,4 @@
 import { education, experience, profile, projects } from './content'
-import type { Design } from './design'
 
 const arrowIcon =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>'
@@ -31,7 +30,7 @@ const entry = (years: string, title: string, org: string) => `
             <h3>${title} <span class="org">· ${org}</span></h3>
           </li>`
 
-export function renderPage(design: Design): string {
+export function renderPage(): string {
   return `
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="page">
@@ -69,9 +68,5 @@ export function renderPage(design: Design): string {
         `<ul class="timeline">${entry(education.years, education.degree, education.school)}</ul>`,
       )}
     </main>
-
-    <footer class="footer reveal">
-      <p class="colophon">Designed from seed <code><span class="sr-only">0x${design.seed}</span><span aria-hidden="true">0x<span data-seed="${design.seed}">${design.seed}</span></span></code></p>
-    </footer>
   </div>`
 }

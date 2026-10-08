@@ -1,16 +1,11 @@
 import { afterEach, beforeEach, expect, mock, spyOn, test } from 'bun:test'
 import { education, experience, profile, projects } from './content'
-import { deriveDesign } from './design'
 import { renderPage } from './page'
 
-const design = deriveDesign()
 let reduced = false
 const observers: TestObserver[] = []
 const observer = () => observers.at(-1)
-const frames = new Map<number, FrameRequestCallback>()
 const timers: (() => void)[] = []
-let next = 0
-let now = 0
 
 window.matchMedia = (() => ({ matches: reduced })) as unknown as typeof window.matchMedia
 // Defer the module's own start-up so each test controls initSite itself.
@@ -38,12 +33,6 @@ class TestObserver {
     this.callback(elements.map((target) => ({ isIntersecting: true, target })))
   }
 }
-function frame(time: number) {
-  now = time
-  const pending = [...frames.values()]
-  frames.clear()
-  pending.forEach((callback) => callback(time))
-}
 function pointer(target: Element, x: number, y: number, pointerType = 'mouse') {
   const event = new window.MouseEvent('pointermove', { bubbles: true, clientX: x, clientY: y })
   target.dispatchEvent(Object.assign(event, { pointerType }))
@@ -53,30 +42,21 @@ const $ = <T extends Element = HTMLElement>(selector: string) => {
   if (!element) throw new Error(`Expected ${selector}`)
   return element
 }
-const seed = () => $('[data-seed]')
 const click = (target: Element) =>
   target.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }))
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
 
 let cleanup: (() => void) | undefined
 beforeEach(() => {
-  document.body.innerHTML = renderPage(design)
+  document.body.innerHTML = renderPage()
   reduced = false
   observers.length = 0
-  frames.clear()
   timers.length = 0
-  now = 0
   Object.defineProperty(window, 'IntersectionObserver', { configurable: true, value: TestObserver })
-  spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
-    frames.set(++next, callback)
-    return next
-  })
-  spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => void frames.delete(id))
   spyOn(window, 'setTimeout').mockImplementation(((callback: () => void) => {
     timers.push(callback)
     return timers.length
   }) as unknown as typeof window.setTimeout)
-  spyOn(performance, 'now').mockImplementation(() => now)
 })
 afterEach(() => {
   cleanup?.()
@@ -98,7 +78,8 @@ test('prerenders every detail and project as plain, readable HTML', () => {
     expect(link.textContent).toBe(project.name)
     expect(link.closest('.project')?.textContent).toContain(project.description)
   }
-  expect(seed().textContent).toBe(design.seed)
+  expect(document.querySelector('footer')).toBeNull()
+  expect(text).not.toMatch(/seed/i)
 })
 
 test('email comes last as a menu to copy the address or open a mail app', () => {
@@ -167,18 +148,6 @@ test('sections reveal once on arrival and stay revealed', () => {
   expect(observer()?.observed.has(section)).toBe(false)
 })
 
-test('the seed decodes left to right once it scrolls into view', () => {
-  cleanup = initSite()
-  observer()?.arrive(seed())
-  frame(550)
-  const halfway = seed().textContent ?? ''
-  expect(halfway).toHaveLength(8)
-  expect(halfway.slice(0, 4)).toBe(design.seed.slice(0, 4))
-  frame(1100)
-  expect(seed().textContent).toBe(design.seed)
-  expect(frames.size).toBe(0)
-})
-
 test('a mouse lights the card under it; touch does not', () => {
   cleanup = initSite()
   const card = $('.project')
@@ -189,7 +158,7 @@ test('a mouse lights the card under it; touch does not', () => {
   expect(card.style.getPropertyValue('--y')).toBe('40px')
 })
 
-test('reduced motion shows everything at once and keeps the seed and cards still', () => {
+test('reduced motion shows everything at once and keeps cards still', () => {
   reduced = true
   cleanup = initSite()
   expect(observer()).toBeUndefined()
@@ -197,8 +166,6 @@ test('reduced motion shows everything at once and keeps the seed and cards still
     [...document.querySelectorAll('.reveal, .section')].every((el) => el.classList.contains('in')),
   ).toBe(true)
   pointer($('.project'), 120, 40)
-  expect(frames.size).toBe(0)
-  expect(seed().textContent).toBe(design.seed)
   expect($('.project').style.getPropertyValue('--x')).toBe('')
 })
 
@@ -210,15 +177,11 @@ test('without IntersectionObserver, content is revealed rather than left hidden'
   ).toBe(true)
 })
 
-test('cleanup stops listening and restores the seed mid-decode', () => {
+test('cleanup stops listening', () => {
   cleanup = initSite()
-  observer()?.arrive(seed())
-  frame(300)
   cleanup()
   cleanup = undefined
-  expect(seed().textContent).toBe(design.seed)
-  seed().closest('code')?.dispatchEvent(new window.Event('pointerenter'))
-  expect(frames.size).toBe(0)
+  expect(observer()?.observed.size).toBe(0)
   pointer($('.project'), 120, 40)
   expect($('.project').style.getPropertyValue('--x')).toBe('')
   const email = $<HTMLDetailsElement>('details.email')
