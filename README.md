@@ -37,4 +37,4 @@ The page is complete without JavaScript: content stays visible and the email men
 
 ## Content
 
-Career and education are sourced from `public/Resume.pdf`, dated February 24, 2025. Project descriptions are based on [martenldap.com](https://martenldap.com) and the public READMEs for [IAM Tools](https://github.com/r-cz/iam-tools) and [.dsconfig Helper](https://github.com/r-cz/dsconfig-helper). Visitors do not trigger GitHub API requests.
+Career and education are sourced from `public/Resume.pdf`, dated October 19, 2026. Project descriptions are based on [martenldap.com](https://martenldap.com) and the public READMEs for [IAM Tools](https://github.com/r-cz/iam-tools) and [.dsconfig Helper](https://github.com/r-cz/dsconfig-helper). Visitors do not trigger GitHub API requests.
