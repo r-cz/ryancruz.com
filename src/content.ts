@@ -1,5 +1,5 @@
 /**
- * Career and education source: public/Resume.pdf (February 24, 2025).
+ * Career and education source: public/Resume.pdf (October 19, 2026).
  * Projects: https://martenldap.com and the public READMEs for
  * https://github.com/r-cz/iam-tools and https://github.com/r-cz/dsconfig-helper.
  * Content is prerendered; visitors make no GitHub requests.
