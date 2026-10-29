@@ -2,6 +2,7 @@
 import { cpSync, existsSync, mkdirSync, rmSync, watch, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { deriveDesign, designCSS } from './src/design'
+import { education, experience, profile } from './src/content'
 import { renderPage } from './src/page'
 
 const srcDir = 'src'
@@ -54,20 +55,75 @@ const displayFont =
     ? '\n  <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />'
     : ''
 
+const siteUrl = 'https://ryancruz.com'
+const title = `${profile.name} — Identity & Cybersecurity Engineer`
+const description = `${profile.name} is a Senior Cybersecurity Engineer specializing in identity and access management at ${experience[0].org} in Dallas, Texas.`
+const socialImage = `${siteUrl}/images/Profile.png`
+
+// Person structured data helps search engines connect the name to its profiles.
+const structuredData = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  url: `${siteUrl}/`,
+  image: socialImage,
+  email: `mailto:${profile.email}`,
+  jobTitle: experience[0].role,
+  worksFor: { '@type': 'Organization', name: experience[0].org },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: education.school },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Dallas',
+    addressRegion: 'TX',
+    addressCountry: 'US',
+  },
+  knowsAbout: [
+    'Identity and access management',
+    'Cybersecurity',
+    'LDAP',
+    'OAuth',
+    'OpenID Connect',
+    'SAML',
+  ],
+  sameAs: profile.links.filter((link) => link.href.startsWith('https://')).map((link) => link.href),
+}).replace(/</g, '\\u003c')
+
+const head = (pageTitle: string, extra: string) => `<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="${design.light.bg}" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="${design.dark.bg}" media="(prefers-color-scheme: dark)" />
+  <title>${pageTitle}</title>${extra}
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />${displayFont}`
+
 writeFileSync(
   join(distDir, 'index.html'),
   `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="${design.light.bg}" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="${design.dark.bg}" media="(prefers-color-scheme: dark)" />
-  <meta name="description" content="Ryan Cruz is a Senior Cybersecurity Engineer specializing in identity and access management at Southwest Airlines in Dallas, Texas." />
-  <title>Ryan Cruz — Cybersecurity Engineer</title>
-  <link rel="canonical" href="https://ryancruz.com/" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />${displayFont}
+  ${head(
+    title,
+    `
+  <meta name="description" content="${description}" />
+  <meta name="author" content="${profile.name}" />
+  <link rel="canonical" href="${siteUrl}/" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content="${siteUrl}/" />
+  <meta property="og:site_name" content="${profile.name}" />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${description}" />
+  <meta property="og:image" content="${socialImage}" />
+  <meta property="og:image:width" content="499" />
+  <meta property="og:image:height" content="499" />
+  <meta property="og:image:alt" content="Portrait of ${profile.name}" />
+  <meta property="profile:first_name" content="${profile.name.split(' ')[0]}" />
+  <meta property="profile:last_name" content="${profile.name.split(' ').slice(1).join(' ')}" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="${title}" />
+  <meta name="twitter:description" content="${description}" />
+  <meta name="twitter:image" content="${socialImage}" />
+  <script type="application/ld+json">${structuredData}</script>`,
+  )}
   <script>document.documentElement.classList.add('js')</script>
   <style>${designCSS(design)}</style>
   <link rel="stylesheet" href="/style.css" />
@@ -79,7 +135,40 @@ writeFileSync(
 </html>`,
 )
 
-console.log('✓ Built JavaScript and prerendered HTML')
+// Served with a 404 status by the assets binding, so unknown URLs are not indexed as the homepage.
+writeFileSync(
+  join(distDir, '404.html'),
+  `<!DOCTYPE html>
+<html lang="en">
+<head>
+  ${head(`Page not found — ${profile.name}`, '\n  <meta name="robots" content="noindex" />')}
+  <style>${designCSS(design)}</style>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="intro">
+      <h1 class="name">Page not found</h1>
+      <p class="role"><a class="link" href="/">Back to ${profile.name}</a></p>
+    </header>
+  </div>
+</body>
+</html>`,
+)
+
+writeFileSync(
+  join(distDir, 'sitemap.xml'),
+  `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${siteUrl}/</loc>
+    <lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>
+  </url>
+</urlset>
+`,
+)
+
+console.log('✓ Built JavaScript, prerendered HTML, 404 page, and sitemap')
 
 if (watchMode) {
   const cssWatcher = Bun.spawn(
